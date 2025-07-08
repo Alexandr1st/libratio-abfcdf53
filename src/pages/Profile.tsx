@@ -1,66 +1,144 @@
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Building2, Calendar, Edit, MapPin, Star, TrendingUp } from "lucide-react";
-import { Link } from "react-router-dom";
+import { BookOpen, Building2, Calendar, Edit, MapPin, Star, TrendingUp, User, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface Profile {
+  id: string;
+  full_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  company: string | null;
+  position: string | null;
+  location: string | null;
+  created_at: string | null;
+}
 
 const Profile = () => {
-  const user = {
-    name: "Анна Петрова",
-    company: "TechCorp",
-    position: "Senior Frontend Developer",
-    location: "Москва, Россия",
-    joinDate: "Январь 2023",
-    avatar: "👩‍💻",
+  const { user, signOut, loading: authLoading } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        navigate("/auth");
+        return;
+      }
+      fetchProfile();
+    }
+  }, [user, authLoading, navigate]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        toast({
+          title: "Ошибка",
+          description: "Не удалось загрузить профиль",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setProfile(data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <BookOpen className="h-12 w-12 text-blue-600 mx-auto animate-pulse mb-4" />
+          <p className="text-lg text-gray-600">Загрузка профиля...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return null;
+  }
+
+  const joinDate = profile.created_at 
+    ? new Date(profile.created_at).toLocaleDateString('ru-RU', { 
+        year: 'numeric', 
+        month: 'long' 
+      })
+    : 'Неизвестно';
+
+  // Mock data for now - will be replaced with real data later
+  const mockData = {
     booksRead: 24,
     reviews: 18,
     followers: 156,
-    following: 89
-  };
-
-  const currentlyReading = [
-    {
-      id: 1,
-      title: "Microservices Patterns",
-      author: "Chris Richardson",
-      progress: 65,
-      image: "📖"
-    },
-    {
-      id: 2,
-      title: "Team Topologies",
-      author: "Matthew Skelton",
-      progress: 32,
-      image: "👥"
+    following: 89,
+    currentlyReading: [
+      {
+        id: 1,
+        title: "Microservices Patterns",
+        author: "Chris Richardson",
+        progress: 65,
+        image: "📖"
+      },
+      {
+        id: 2,
+        title: "Team Topologies",
+        author: "Matthew Skelton",
+        progress: 32,
+        image: "👥"
+      }
+    ],
+    recentReviews: [
+      {
+        id: 1,
+        book: "Чистый код",
+        author: "Роберт Мартин",
+        rating: 5,
+        review: "Отличная книга для любого разработчика. Много практических советов по написанию качественного кода.",
+        date: "5 дней назад",
+        image: "📚"
+      },
+      {
+        id: 2,
+        book: "Психология влияния",
+        author: "Роберт Чалдини",
+        rating: 4,
+        review: "Интересные принципы влияния, которые можно применить не только в продажах, но и в повседневной жизни.",
+        date: "2 недели назад",
+        image: "🧠"
+      }
+    ],
+    readingGoals: {
+      yearly: 30,
+      current: 24,
+      percentage: 80
     }
-  ];
-
-  const recentReviews = [
-    {
-      id: 1,
-      book: "Чистый код",
-      author: "Роберт Мартин",
-      rating: 5,
-      review: "Отличная книга для любого разработчика. Много практических советов по написанию качественного кода.",
-      date: "5 дней назад",
-      image: "📚"
-    },
-    {
-      id: 2,
-      book: "Психология влияния",
-      author: "Роберт Чалдини",
-      rating: 4,
-      review: "Интересные принципы влияния, которые можно применить не только в продажах, но и в повседневной жизни.",
-      date: "2 недели назад",
-      image: "🧠"
-    }
-  ];
-
-  const readingGoals = {
-    yearly: 30,
-    current: 24,
-    percentage: 80
   };
 
   return (
@@ -80,9 +158,14 @@ const Profile = () => {
               <Link to="/companies">
                 <Button variant="ghost">Компании</Button>
               </Link>
-              <Link to="/profile">
-                <Button variant="outline" className="text-blue-600">Профиль</Button>
-              </Link>
+              <Button variant="outline" className="text-blue-600">
+                <User className="mr-2 h-4 w-4" />
+                Профиль
+              </Button>
+              <Button variant="outline" onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Выйти
+              </Button>
             </div>
           </div>
         </div>
@@ -94,41 +177,59 @@ const Profile = () => {
           <div className="lg:col-span-1">
             <Card className="border-0 shadow-lg">
               <CardHeader className="text-center">
-                <div className="text-6xl mb-4">{user.avatar}</div>
-                <CardTitle className="text-2xl">{user.name}</CardTitle>
+                <div className="text-6xl mb-4">
+                  {profile.avatar_url ? (
+                    <img 
+                      src={profile.avatar_url} 
+                      alt="Avatar" 
+                      className="w-24 h-24 rounded-full mx-auto"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                      <User className="h-12 w-12 text-blue-600" />
+                    </div>
+                  )}
+                </div>
+                <CardTitle className="text-2xl">
+                  {profile.full_name || user.email}
+                </CardTitle>
                 <CardDescription className="text-base">
-                  {user.position}
+                  {profile.position || "Reader"}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Building2 className="h-4 w-4" />
-                  <span>{user.company}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <MapPin className="h-4 w-4" />
-                  <span>{user.location}</span>
-                </div>
+                {profile.company && (
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <Building2 className="h-4 w-4" />
+                    <span>{profile.company}</span>
+                  </div>
+                )}
+                {profile.location && (
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>{profile.location}</span>
+                  </div>
+                )}
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
                   <Calendar className="h-4 w-4" />
-                  <span>На платформе с {user.joinDate}</span>
+                  <span>На платформе с {joinDate}</span>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{user.booksRead}</div>
+                    <div className="text-2xl font-bold text-blue-600">{mockData.booksRead}</div>
                     <div className="text-sm text-gray-500">Прочитано</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{user.reviews}</div>
+                    <div className="text-2xl font-bold text-green-600">{mockData.reviews}</div>
                     <div className="text-sm text-gray-500">Отзывов</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">{user.followers}</div>
+                    <div className="text-2xl font-bold text-purple-600">{mockData.followers}</div>
                     <div className="text-sm text-gray-500">Подписчиков</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">{user.following}</div>
+                    <div className="text-2xl font-bold text-orange-600">{mockData.following}</div>
                     <div className="text-sm text-gray-500">Подписки</div>
                   </div>
                 </div>
@@ -152,16 +253,16 @@ const Profile = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Прогресс</span>
-                    <span className="text-sm font-medium">{readingGoals.current}/{readingGoals.yearly} книг</span>
+                    <span className="text-sm font-medium">{mockData.readingGoals.current}/{mockData.readingGoals.yearly} книг</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
                       className="bg-green-600 h-2 rounded-full transition-all duration-300" 
-                      style={{ width: `${readingGoals.percentage}%` }}
+                      style={{ width: `${mockData.readingGoals.percentage}%` }}
                     />
                   </div>
                   <p className="text-sm text-gray-500">
-                    Осталось прочитать {readingGoals.yearly - readingGoals.current} книг до конца года
+                    Осталось прочитать {mockData.readingGoals.yearly - mockData.readingGoals.current} книг до конца года
                   </p>
                 </div>
               </CardContent>
@@ -184,7 +285,7 @@ const Profile = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {currentlyReading.map((book) => (
+                  {mockData.currentlyReading.map((book) => (
                     <div key={book.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start space-x-3">
                         <div className="text-2xl">{book.image}</div>
@@ -217,7 +318,7 @@ const Profile = () => {
                 <CardTitle>Последние отзывы</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {recentReviews.map((review) => (
+                {mockData.recentReviews.map((review) => (
                   <div key={review.id} className="border-b pb-6 last:border-b-0 last:pb-0">
                     <div className="flex items-start space-x-4">
                       <div className="text-3xl">{review.image}</div>

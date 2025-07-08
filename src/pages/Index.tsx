@@ -1,10 +1,28 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Users, Building2, PenTool, Search, Star } from "lucide-react";
+import { BookOpen, Users, Building2, PenTool, Search, Star, LogOut, User } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { user, signOut, loading } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <BookOpen className="h-12 w-12 text-blue-600 mx-auto animate-pulse mb-4" />
+          <p className="text-lg text-gray-600">Загрузка...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Navigation */}
@@ -22,9 +40,24 @@ const Index = () => {
               <Link to="/companies">
                 <Button variant="ghost">Компании</Button>
               </Link>
-              <Link to="/profile">
-                <Button variant="outline">Профиль</Button>
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/profile">
+                    <Button variant="ghost">
+                      <User className="mr-2 h-4 w-4" />
+                      Профиль
+                    </Button>
+                  </Link>
+                  <Button variant="outline" onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Выйти
+                  </Button>
+                </>
+              ) : (
+                <Link to="/auth">
+                  <Button variant="outline">Войти</Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -34,11 +67,14 @@ const Index = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Ваш персональный
+            {user ? `Добро пожаловать, ${user.user_metadata?.full_name || user.email}!` : "Ваш персональный"}
             <span className="text-blue-600 block">читательский дневник</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Ведите дневник чтения, делитесь впечатлениями с коллегами и откройте для себя новые книги через профессиональные сообщества
+            {user 
+              ? "Продолжайте вести дневник чтения, делитесь впечатлениями с коллегами и открывайте новые книги"
+              : "Ведите дневник чтения, делитесь впечатлениями с коллегами и откройте для себя новые книги через профессиональные сообщества"
+            }
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/books">
@@ -47,12 +83,21 @@ const Index = () => {
                 Исследовать книги
               </Button>
             </Link>
-            <Link to="/profile">
-              <Button size="lg" variant="outline">
-                <PenTool className="mr-2 h-5 w-5" />
-                Создать дневник
-              </Button>
-            </Link>
+            {user ? (
+              <Link to="/diary">
+                <Button size="lg" variant="outline">
+                  <PenTool className="mr-2 h-5 w-5" />
+                  Мой дневник
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button size="lg" variant="outline">
+                  <PenTool className="mr-2 h-5 w-5" />
+                  Создать дневник
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -73,9 +118,9 @@ const Index = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Link to="/diary">
+                <Link to={user ? "/diary" : "/auth"}>
                   <Button variant="link" className="p-0">
-                    Начать вести дневник →
+                    {user ? "Открыть дневник" : "Начать вести дневник"} →
                   </Button>
                 </Link>
               </CardContent>
