@@ -59,6 +59,59 @@ export type Database = {
         }
         Relationships: []
       }
+      diary_entries: {
+        Row: {
+          book_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          pages_read: number | null
+          quotes: string[] | null
+          rating: number | null
+          started_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          pages_read?: number | null
+          quotes?: string[] | null
+          rating?: number | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          pages_read?: number | null
+          quotes?: string[] | null
+          rating?: number | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_entries_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

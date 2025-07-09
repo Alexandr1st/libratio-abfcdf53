@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Search, Star, Heart, Plus, Loader2 } from "lucide-react";
+import { BookOpen, Search, Star, Heart, Plus, Loader2, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useBooks, useSearchBooks } from "@/hooks/useBooks";
+import { useAddBookToDiary, useDiaryEntries } from "@/hooks/useDiaryEntries";
 import type { Tables } from '@/integrations/supabase/types';
 
 type Book = Tables<'books'>;
@@ -17,6 +18,8 @@ const Books = () => {
 
   const { data: allBooks, isLoading: isLoadingAll, error: errorAll } = useBooks();
   const { data: searchResults, isLoading: isSearching } = useSearchBooks(searchTerm, selectedGenre);
+  const { data: diaryEntries } = useDiaryEntries();
+  const addBookToDiary = useAddBookToDiary();
 
   // Определяем какие книги показывать
   const booksToShow = useMemo(() => {
@@ -32,6 +35,15 @@ const Books = () => {
     const uniqueGenres = Array.from(new Set(allBooks.map(book => book.genre)));
     return ["Все", ...uniqueGenres.sort()];
   }, [allBooks]);
+
+  // Проверяем, добавлена ли книга в дневник
+  const isBookInDiary = (bookId: string) => {
+    return diaryEntries?.some(entry => entry.book_id === bookId);
+  };
+
+  const handleAddToDiary = (bookId: string) => {
+    addBookToDiary.mutate({ bookId });
+  };
 
   const isLoading = isLoadingAll || isSearching;
 
@@ -52,6 +64,9 @@ const Books = () => {
             <div className="flex items-center space-x-4">
               <Link to="/books">
                 <Button variant="ghost" className="text-blue-600">Каталог книг</Button>
+              </Link>
+              <Link to="/diary">
+                <Button variant="ghost">Мой дневник</Button>
               </Link>
               <Link to="/companies">
                 <Button variant="ghost">Компании</Button>
@@ -119,59 +134,75 @@ const Books = () => {
         {/* Books Grid */}
         {!isLoading && !errorAll && booksToShow.length > 0 && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {booksToShow.map((book) => (
-              <Card key={book.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="text-4xl mb-4">{book.image || '📚'}</div>
-                    <Button size="sm" variant="ghost" className="text-red-500 hover:text-red-600">
-                      <Heart className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <CardTitle className="text-xl line-clamp-2">{book.title}</CardTitle>
-                  <CardDescription className="text-base">
-                    <span className="font-medium">{book.author}</span>
-                    {book.year && (
-                      <>
-                        <span className="text-gray-400 mx-2">•</span>
-                        {book.year}
-                      </>
-                    )}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {book.description && (
-                      <p className="text-sm text-gray-600 line-clamp-3">{book.description}</p>
-                    )}
-                    
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      {book.pages && <span>{book.pages} стр.</span>}
-                      {book.rating && (
-                        <div className="flex items-center space-x-1">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="font-medium">{book.rating}</span>
-                        </div>
-                      )}
+            {booksToShow.map((book) => {
+              const inDiary = isBookInDiary(book.id);
+              
+              return (
+                <Card key={book.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="text-4xl mb-4">{book.image || '📚'}</div>
+                      <Button size="sm" variant="ghost" className="text-red-500 hover:text-red-600">
+                        <Heart className="h-4 w-4" />
+                      </Button>
                     </div>
-
-                    <div className="flex items-center justify-between">
-                      <Badge variant="secondary">{book.genre}</Badge>
-                      {book.read_by_colleagues && book.read_by_colleagues > 0 && (
-                        <span className="text-xs text-blue-600">
-                          {book.read_by_colleagues} коллег читают
-                        </span>
+                    <CardTitle className="text-xl line-clamp-2">{book.title}</CardTitle>
+                    <CardDescription className="text-base">
+                      <span className="font-medium">{book.author}</span>
+                      {book.year && (
+                        <>
+                          <span className="text-gray-400 mx-2">•</span>
+                          {book.year}
+                        </>
                       )}
-                    </div>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {book.description && (
+                        <p className="text-sm text-gray-600 line-clamp-3">{book.description}</p>
+                      )}
+                      
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        {book.pages && <span>{book.pages} стр.</span>}
+                        {book.rating && (
+                          <div className="flex items-center space-x-1">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <span className="font-medium">{book.rating}</span>
+                          </div>
+                        )}
+                      </div>
 
-                    <Button className="w-full" size="sm">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Добавить в дневник
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                      <div className="flex items-center justify-between">
+                        <Badge variant="secondary">{book.genre}</Badge>
+                        {book.read_by_colleagues && book.read_by_colleagues > 0 && (
+                          <span className="text-xs text-blue-600">
+                            {book.read_by_colleagues} коллег читают
+                          </span>
+                        )}
+                      </div>
+
+                      <Button 
+                        className="w-full" 
+                        size="sm"
+                        onClick={() => handleAddToDiary(book.id)}
+                        disabled={inDiary || addBookToDiary.isPending}
+                        variant={inDiary ? "outline" : "default"}
+                      >
+                        {addBookToDiary.isPending ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : inDiary ? (
+                          <Check className="mr-2 h-4 w-4" />
+                        ) : (
+                          <Plus className="mr-2 h-4 w-4" />
+                        )}
+                        {inDiary ? 'В дневнике' : 'Добавить в дневник'}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
 
