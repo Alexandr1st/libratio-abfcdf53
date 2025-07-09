@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Users, Building2, PenTool, Search, Star, LogOut, User } from "lucide-react";
@@ -31,7 +30,7 @@ const Index = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
               <BookOpen className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">ReadConnect</span>
+              <span className="text-xl font-bold text-gray-900">Libratio</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/books">
@@ -192,10 +191,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center space-x-2 mb-8">
             <BookOpen className="h-8 w-8 text-blue-400" />
-            <span className="text-2xl font-bold">ReadConnect</span>
+            <span className="text-2xl font-bold">Libratio</span>
           </div>
           <div className="text-center text-gray-400">
-            <p>&copy; 2024 ReadConnect. Объединяем читателей через профессиональные сообщества.</p>
+            <p>&copy; 2024 Libratio. Объединяем читателей через профессиональные сообщества.</p>
           </div>
         </div>
       </footer>
