@@ -83,14 +83,14 @@ const Diary = () => {
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center space-x-2">
               <BookOpen className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">ReadConnect</span>
+              <span className="text-xl font-bold text-gray-900">Libratio</span>
             </Link>
             <div className="flex items-center space-x-4">
               <Link to="/books">
                 <Button variant="ghost">Каталог книг</Button>
               </Link>
               <Link to="/diary">
-                <Button variant="ghost" className="text-blue-600">Мой дневник</Button>
+                <Button variant="ghost" className="text-blue-600 bg-blue-50">Мой дневник</Button>
               </Link>
               <Link to="/companies">
                 <Button variant="ghost">Компании</Button>
