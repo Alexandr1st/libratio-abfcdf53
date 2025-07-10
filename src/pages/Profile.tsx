@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -198,6 +197,11 @@ const Profile = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {profile.bio && (
+                  <div className="text-sm text-gray-600">
+                    <p>{profile.bio}</p>
+                  </div>
+                )}
                 {profile.company && (
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Building2 className="h-4 w-4" />
@@ -234,10 +238,12 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <Button className="w-full mt-4">
-                  <Edit className="mr-2 h-4 w-4" />
-                  Редактировать профиль
-                </Button>
+                <Link to="/profile/edit">
+                  <Button className="w-full mt-4">
+                    <Edit className="mr-2 h-4 w-4" />
+                    Редактировать профиль
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
