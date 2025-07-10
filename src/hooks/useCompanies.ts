@@ -1,0 +1,120 @@
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import type { Tables, TablesInsert } from '@/integrations/supabase/types';
+import { useToast } from '@/hooks/use-toast';
+
+type Company = Tables<'companies'>;
+type CompanyInsert = TablesInsert<'companies'>;
+
+export const useCompanies = () => {
+  return useQuery({
+    queryKey: ['companies'],
+    queryFn: async (): Promise<Company[]> => {
+      const { data, error } = await supabase
+        .from('companies')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching companies:', error);
+        throw error;
+      }
+
+      return data || [];
+    },
+  });
+};
+
+export const useCreateCompany = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (companyData: CompanyInsert) => {
+      const { data, error } = await supabase
+        .from('companies')
+        .insert(companyData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating company:', error);
+        throw error;
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      toast({
+        title: "Успешно!",
+        description: "Компания создана",
+      });
+    },
+    onError: (error) => {
+      console.error('Error creating company:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось создать компанию",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useJoinCompany = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ companyId, position }: { companyId: string; position?: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      const { data, error } = await supabase
+        .from('company_employees')
+        .insert({
+          company_id: companyId,
+          user_id: user.id,
+          position: position || null,
+          is_admin: false,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error joining company:', error);
+        throw error;
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      toast({
+        title: "Успешно!",
+        description: "Вы присоединились к компании",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error joining company:', error);
+      if (error.code === '23505') {
+        toast({
+          title: "Уже участник",
+          description: "Вы уже участник этой компании",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Ошибка",
+          description: "Не удалось присоединиться к компании",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+};

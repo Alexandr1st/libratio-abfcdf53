@@ -59,6 +59,116 @@ export type Database = {
         }
         Relationships: []
       }
+      companies: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          industry: string | null
+          location: string | null
+          logo_url: string | null
+          name: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          industry?: string | null
+          location?: string | null
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          industry?: string | null
+          location?: string | null
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      company_books: {
+        Row: {
+          added_at: string
+          added_by: string | null
+          book_id: string
+          company_id: string
+          id: string
+        }
+        Insert: {
+          added_at?: string
+          added_by?: string | null
+          book_id: string
+          company_id: string
+          id?: string
+        }
+        Update: {
+          added_at?: string
+          added_by?: string | null
+          book_id?: string
+          company_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_books_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_books_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_employees: {
+        Row: {
+          company_id: string
+          id: string
+          is_admin: boolean | null
+          joined_at: string
+          position: string | null
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          id?: string
+          is_admin?: boolean | null
+          joined_at?: string
+          position?: string | null
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          id?: string
+          is_admin?: boolean | null
+          joined_at?: string
+          position?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_employees_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diary_entries: {
         Row: {
           book_id: string
@@ -117,6 +227,7 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           company: string | null
+          company_id: string | null
           created_at: string | null
           full_name: string | null
           id: string
@@ -129,6 +240,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           company?: string | null
+          company_id?: string | null
           created_at?: string | null
           full_name?: string | null
           id: string
@@ -141,6 +253,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           company?: string | null
+          company_id?: string | null
           created_at?: string | null
           full_name?: string | null
           id?: string
@@ -149,7 +262,15 @@ export type Database = {
           updated_at?: string | null
           username?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
