@@ -7,10 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { BookOpen, Calendar, Edit3, Plus, Quote, Star, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDiaryEntries, useUpdateDiaryEntry } from "@/hooks/useDiaryEntries";
+import StatusDropdown from "@/components/StatusDropdown";
 
 const Diary = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
-  const [isAddingEntry, setIsAddingEntry] = useState(false);
   const [editingEntry, setEditingEntry] = useState<string | null>(null);
   const [editNotes, setEditNotes] = useState("");
   const [editRating, setEditRating] = useState<number | null>(null);
@@ -21,34 +21,14 @@ const Diary = () => {
   const statusLabels = {
     all: "Все записи",
     reading: "Читаю",
-    completed: "Завершено",
-    paused: "Приостановлено",
-    want_to_read: "Хочу прочитать"
+    completed: "Прочел",
+    paused: "Пауза",
+    want_to_read: "Хочу читать"
   };
 
   const filteredEntries = selectedStatus === "all" 
     ? diaryEntries || []
     : (diaryEntries || []).filter(entry => entry.status === selectedStatus);
-
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      reading: "default",
-      completed: "secondary",
-      paused: "outline",
-      want_to_read: "outline"
-    };
-    const labels = {
-      reading: "Читаю",
-      completed: "Завершено",
-      paused: "Пауза",
-      want_to_read: "Хочу прочитать"
-    };
-    return (
-      <Badge variant={variants[status as keyof typeof variants] as any}>
-        {labels[status as keyof typeof labels]}
-      </Badge>
-    );
-  };
 
   const handleEditEntry = (entry: any) => {
     setEditingEntry(entry.id);
@@ -169,7 +149,10 @@ const Diary = () => {
                           {entry.pages_read && entry.pages_read > 0 && (
                             <span>стр. {entry.pages_read}</span>
                           )}
-                          {getStatusBadge(entry.status)}
+                          <StatusDropdown 
+                            currentStatus={entry.status} 
+                            entryId={entry.id}
+                          />
                         </div>
                       </div>
                     </div>
