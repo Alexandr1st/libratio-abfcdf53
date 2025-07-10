@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useCompanies, useJoinCompany } from "@/hooks/useCompanies";
 import { useCompanyStats } from "@/hooks/useCompanyEmployees";
+import { CreateCompanyDialog } from "@/components/CreateCompanyDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -108,8 +109,13 @@ const Companies = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Каталог компаний</h1>
-          <p className="text-lg text-gray-600">Узнайте, что читают в разных компаниях и найдите единомышленников</p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">Каталог компаний</h1>
+              <p className="text-lg text-gray-600">Узнайте, что читают в разных компаниях и найдите единомышленников</p>
+            </div>
+            <CreateCompanyDialog />
+          </div>
         </div>
 
         {/* Search and Filters */}
