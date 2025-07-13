@@ -1,203 +1,143 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Users, Building2, PenTool, Search, Star, LogOut, User } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { BookOpen, Users, TrendingUp, Star, ArrowRight } from "lucide-react";
+import DiaryNavigation from "@/components/diary/DiaryNavigation";
 
 const Index = () => {
-  const { user, signOut, loading } = useAuth();
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <BookOpen className="h-12 w-12 text-blue-600 mx-auto animate-pulse mb-4" />
-          <p className="text-lg text-gray-600">Загрузка...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-blue-200/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <BookOpen className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">Libratio</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link to="/books">
-                <Button variant="ghost">Каталог книг</Button>
-              </Link>
-              <Link to="/companies">
-                <Button variant="ghost">Компании</Button>
-              </Link>
-              {user ? (
-                <>
-                  <Link to="/profile">
-                    <Button variant="ghost">
-                      <User className="mr-2 h-4 w-4" />
-                      Профиль
-                    </Button>
-                  </Link>
-                  <Button variant="outline" onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Выйти
-                  </Button>
-                </>
-              ) : (
-                <Link to="/auth">
-                  <Button variant="outline">Войти</Button>
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
-
+      <DiaryNavigation />
+      
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            {user ? `Добро пожаловать, ${user.user_metadata?.full_name || user.email}!` : "Ваш персональный"}
-            <span className="text-blue-600 block">читательский дневник</span>
+      <div className="relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          {/* Headline */}
+          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl lg:text-6xl text-center">
+            <span className="block">Добро пожаловать в <span className="text-blue-600">Libratio</span></span>
+            <span className="block mt-2">Ваш личный кабинет читателя</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            {user 
-              ? "Продолжайте вести дневник чтения, делитесь впечатлениями с коллегами и открывайте новые книги"
-              : "Ведите дневник чтения, делитесь впечатлениями с коллегами и откройте для себя новые книги через профессиональные сообщества"
-            }
+          {/* Description */}
+          <p className="mt-6 text-xl text-gray-600 text-center max-w-3xl mx-auto">
+            Отслеживайте свои прочитанные книги, делитесь впечатлениями и находите новых друзей по интересам.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* CTA Buttons */}
+          <div className="mt-10 flex justify-center space-x-4">
             <Link to="/books">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                <Search className="mr-2 h-5 w-5" />
-                Исследовать книги
+              <Button size="lg">
+                Каталог книг
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            {user ? (
-              <Link to="/diary">
-                <Button size="lg" variant="outline">
-                  <PenTool className="mr-2 h-5 w-5" />
-                  Мой дневник
-                </Button>
-              </Link>
-            ) : (
-              <Link to="/auth">
-                <Button size="lg" variant="outline">
-                  <PenTool className="mr-2 h-5 w-5" />
-                  Создать дневник
-                </Button>
-              </Link>
-            )}
+            <Link to="/diary">
+              <Button variant="outline" size="lg">
+                Мой дневник
+              </Button>
+            </Link>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Features Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white/70">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Возможности платформы
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <div className="py-16 bg-white/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-extrabold text-gray-900 text-center">Возможности</h2>
+          <p className="mt-4 text-lg text-gray-600 text-center">
+            Все, что нужно для удобного чтения и обмена опытом.
+          </p>
+          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Feature 1 */}
+            <Card>
               <CardHeader>
-                <BookOpen className="h-12 w-12 text-blue-600 mb-4" />
-                <CardTitle>Читательский дневник</CardTitle>
-                <CardDescription>
-                  Ведите записи о прочитанных книгах, сохраняйте цитаты и делитесь впечатлениями
-                </CardDescription>
+                <CardTitle className="flex items-center space-x-2">
+                  <BookOpen className="h-5 w-5 text-blue-600" />
+                  <span>Удобный каталог книг</span>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <Link to={user ? "/diary" : "/auth"}>
-                  <Button variant="link" className="p-0">
-                    {user ? "Открыть дневник" : "Начать вести дневник"} →
-                  </Button>
-                </Link>
+                <CardDescription>
+                  Ищите книги по названию, автору или жанру. Добавляйте в свой список "Хочу прочитать" или отмечайте как "Прочитано".
+                </CardDescription>
               </CardContent>
             </Card>
-
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            {/* Feature 2 */}
+            <Card>
               <CardHeader>
-                <Building2 className="h-12 w-12 text-green-600 mb-4" />
-                <CardTitle>Рабочие сообщества</CardTitle>
-                <CardDescription>
-                  Узнайте, что читают ваши коллеги, и откройте для себя профессиональную литературу
-                </CardDescription>
+                <CardTitle className="flex items-center space-x-2">
+                  <Users className="h-5 w-5 text-green-600" />
+                  <span>Сообщество читателей</span>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <Link to="/companies">
-                  <Button variant="link" className="p-0">
-                    Посмотреть компании →
-                  </Button>
-                </Link>
+                <CardDescription>
+                  Общайтесь с другими читателями, делитесь своими впечатлениями о книгах и находите новые рекомендации.
+                </CardDescription>
               </CardContent>
             </Card>
-
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            {/* Feature 3 */}
+            <Card>
               <CardHeader>
-                <Users className="h-12 w-12 text-purple-600 mb-4" />
-                <CardTitle>Каталог книг</CardTitle>
-                <CardDescription>
-                  Обширная библиотека с рекомендациями, рейтингами и отзывами читателей
-                </CardDescription>
+                <CardTitle className="flex items-center space-x-2">
+                  <TrendingUp className="h-5 w-5 text-purple-600" />
+                  <span>Отслеживание прогресса</span>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <Link to="/books">
-                  <Button variant="link" className="p-0">
-                    Исследовать каталог →
-                  </Button>
-                </Link>
+                <CardDescription>
+                  Ставьте цели по чтению на год и отслеживайте свой прогресс. Получайте уведомления о новых книгах от ваших любимых авторов.
+                </CardDescription>
               </CardContent>
             </Card>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Stats Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">2,500+</div>
-              <div className="text-gray-600">Книг в каталоге</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-green-600 mb-2">150+</div>
-              <div className="text-gray-600">Компаний</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-purple-600 mb-2">1,200+</div>
-              <div className="text-gray-600">Пользователей</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-orange-600 mb-2">8,900+</div>
-              <div className="text-gray-600">Записей в дневниках</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <div className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center space-x-2 mb-8">
-            <BookOpen className="h-8 w-8 text-blue-400" />
-            <span className="text-2xl font-bold">Libratio</span>
-          </div>
-          <div className="text-center text-gray-400">
-            <p>&copy; 2024 Libratio. Объединяем читателей через профессиональные сообщества.</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 text-center">Наша статистика</h2>
+          <p className="mt-4 text-lg text-gray-600 text-center">
+            Цифры говорят сами за себя.
+          </p>
+          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Stat 1 */}
+            <div className="text-center">
+              <div className="text-5xl font-bold text-blue-600">12,000+</div>
+              <div className="mt-2 text-gray-500">Зарегистрированных пользователей</div>
+            </div>
+            {/* Stat 2 */}
+            <div className="text-center">
+              <div className="text-5xl font-bold text-green-600">45,000+</div>
+              <div className="mt-2 text-gray-500">Книг в каталоге</div>
+            </div>
+            {/* Stat 3 */}
+            <div className="text-center">
+              <div className="text-5xl font-bold text-purple-600">9,000+</div>
+              <div className="mt-2 text-gray-500">Активных обсуждений</div>
+            </div>
+            {/* Stat 4 */}
+            <div className="text-center">
+              <div className="text-5xl font-bold text-orange-600">4.8</div>
+              <div className="mt-2 text-gray-500">Средняя оценка книг <Star className="inline-block h-5 w-5 text-yellow-400 ml-1" /></div>
+            </div>
           </div>
         </div>
-      </footer>
+      </div>
+
+      {/* CTA Section */}
+      <div className="py-16 bg-blue-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-extrabold text-white">Присоединяйтесь к нам сегодня!</h2>
+          <p className="mt-4 text-xl text-blue-100">
+            Начните свой путь в мир книг прямо сейчас.
+          </p>
+          <Link to="/auth">
+            <Button variant="secondary" size="lg" className="mt-8">
+              Зарегистрироваться
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

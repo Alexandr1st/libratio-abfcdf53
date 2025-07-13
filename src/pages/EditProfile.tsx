@@ -1,15 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { BookOpen, ArrowLeft, Save } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Save, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import DiaryNavigation from "@/components/diary/DiaryNavigation";
 
 interface ProfileData {
   full_name: string | null;
@@ -117,35 +117,21 @@ const EditProfile = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
-          <BookOpen className="h-12 w-12 text-blue-600 mx-auto animate-pulse mb-4" />
-          <p className="text-lg text-gray-600">Загрузка...</p>
+          <User className="h-12 w-12 text-blue-600 mx-auto animate-pulse mb-4" />
+          <p className="text-lg text-gray-600">Загрузка профиля...</p>
         </div>
       </div>
     );
   }
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-blue-200/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-2">
-              <BookOpen className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">ReadConnect</span>
-            </Link>
-            <div className="flex items-center space-x-4">
-              <Link to="/profile">
-                <Button variant="ghost">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Назад к профилю
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
+      <DiaryNavigation />
+      
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card className="border-0 shadow-lg">
           <CardHeader>

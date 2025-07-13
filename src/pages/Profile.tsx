@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import DiaryNavigation from "@/components/diary/DiaryNavigation";
 
 interface Profile {
   id: string;
@@ -142,33 +143,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-blue-200/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-2">
-              <BookOpen className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">ReadConnect</span>
-            </Link>
-            <div className="flex items-center space-x-4">
-              <Link to="/books">
-                <Button variant="ghost">Каталог книг</Button>
-              </Link>
-              <Link to="/companies">
-                <Button variant="ghost">Компании</Button>
-              </Link>
-              <Button variant="outline" className="text-blue-600">
-                <User className="mr-2 h-4 w-4" />
-                Профиль
-              </Button>
-              <Button variant="outline" onClick={handleSignOut}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Выйти
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <DiaryNavigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
