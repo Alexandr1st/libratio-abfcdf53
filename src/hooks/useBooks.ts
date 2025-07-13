@@ -9,6 +9,8 @@ export const useBooks = () => {
   return useQuery({
     queryKey: ['books'],
     queryFn: async (): Promise<Book[]> => {
+      console.log('Fetching books from Supabase...');
+      
       const { data, error } = await supabase
         .from('books')
         .select('*')
@@ -19,6 +21,7 @@ export const useBooks = () => {
         throw error;
       }
 
+      console.log('Books fetched successfully:', data);
       return data || [];
     },
   });
@@ -28,6 +31,8 @@ export const useSearchBooks = (searchTerm: string, selectedGenre: string) => {
   return useQuery({
     queryKey: ['books', 'search', searchTerm, selectedGenre],
     queryFn: async (): Promise<Book[]> => {
+      console.log('Searching books:', { searchTerm, selectedGenre });
+      
       let query = supabase.from('books').select('*');
 
       // Фильтрация по поиску
@@ -49,6 +54,7 @@ export const useSearchBooks = (searchTerm: string, selectedGenre: string) => {
         throw error;
       }
 
+      console.log('Books search results:', data);
       return data || [];
     },
     enabled: searchTerm.length > 0 || selectedGenre !== 'Все', // Only run if there's a search term or genre filter

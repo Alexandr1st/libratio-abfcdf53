@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Plus, Loader2 } from "lucide-react";
 import { useAddBookToDiary } from "@/hooks/useDiaryEntries";
+import { toast } from "@/hooks/use-toast";
 
 interface AddToDiaryDropdownProps {
   bookId: string;
@@ -26,12 +27,26 @@ const AddToDiaryDropdown = ({ bookId, isInDiary }: AddToDiaryDropdownProps) => {
     { value: "completed", label: "Прочел" },
   ];
 
-  const handleAddToDiary = (status: string) => {
-    addBookToDiary.mutate({
-      bookId,
-      status
-    });
-    setIsOpen(false);
+  const handleAddToDiary = async (status: string) => {
+    try {
+      console.log('Adding book to diary:', { bookId, status });
+      await addBookToDiary.mutateAsync({
+        bookId,
+        status
+      });
+      setIsOpen(false);
+      toast({
+        title: "Успешно",
+        description: "Книга добавлена в дневник",
+      });
+    } catch (error) {
+      console.error('Error adding book to diary:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось добавить книгу в дневник",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isInDiary) {
