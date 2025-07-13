@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      book_notes: {
+        Row: {
+          book_id: string
+          created_at: string
+          diary_entry_id: string
+          id: string
+          note_content: string
+          page_number: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          diary_entry_id: string
+          id?: string
+          note_content: string
+          page_number?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          diary_entry_id?: string
+          id?: string
+          note_content?: string
+          page_number?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_notes_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_notes_diary_entry_id_fkey"
+            columns: ["diary_entry_id"]
+            isOneToOne: false
+            referencedRelation: "diary_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       books: {
         Row: {
           author: string

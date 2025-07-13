@@ -4,16 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { BookOpen, Calendar, Edit3, Plus, Quote, Star, Loader2 } from "lucide-react";
+import { BookOpen, Calendar, Edit3, Plus, Quote, Star, Loader2, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDiaryEntries, useUpdateDiaryEntry } from "@/hooks/useDiaryEntries";
 import StatusDropdown from "@/components/StatusDropdown";
+import AddBookNoteModal from "@/components/AddBookNoteModal";
+import BookNotesList from "@/components/BookNotesList";
 
 const Diary = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [editingEntry, setEditingEntry] = useState<string | null>(null);
   const [editNotes, setEditNotes] = useState("");
   const [editRating, setEditRating] = useState<number | null>(null);
+  const [noteModalOpen, setNoteModalOpen] = useState(false);
+  const [selectedBookForNote, setSelectedBookForNote] = useState<{
+    id: string;
+    title: string;
+    diaryEntryId: string;
+  } | null>(null);
 
   const { data: diaryEntries, isLoading, error } = useDiaryEntries();
   const updateDiaryEntry = useUpdateDiaryEntry();
@@ -49,6 +57,20 @@ const Diary = () => {
       setEditNotes("");
       setEditRating(null);
     }
+  };
+
+  const handleAddNoteClick = (entry: any) => {
+    setSelectedBookForNote({
+      id: entry.book_id,
+      title: entry.books?.title || '',
+      diaryEntryId: entry.id,
+    });
+    setNoteModalOpen(true);
+  };
+
+  const handleCloseNoteModal = () => {
+    setNoteModalOpen(false);
+    setSelectedBookForNote(null);
   };
 
   if (error) {
@@ -171,6 +193,16 @@ const Diary = () => {
                           ))}
                         </div>
                       )}
+                      {entry.status === 'reading' && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleAddNoteClick(entry)}
+                        >
+                          <FileText className="h-4 w-4 mr-1" />
+                          Добавить заметку
+                        </Button>
+                      )}
                       <Button 
                         size="sm" 
                         variant="ghost"
@@ -253,6 +285,9 @@ const Diary = () => {
                             </div>
                           </div>
                         )}
+
+                        {/* Book Notes List */}
+                        <BookNotesList diaryEntryId={entry.id} />
                       </>
                     )}
                   </div>
@@ -282,6 +317,17 @@ const Diary = () => {
           </div>
         )}
       </div>
+
+      {/* Add Book Note Modal */}
+      {selectedBookForNote && (
+        <AddBookNoteModal
+          isOpen={noteModalOpen}
+          onClose={handleCloseNoteModal}
+          bookTitle={selectedBookForNote.title}
+          bookId={selectedBookForNote.id}
+          diaryEntryId={selectedBookForNote.diaryEntryId}
+        />
+      )}
     </div>
   );
 };
