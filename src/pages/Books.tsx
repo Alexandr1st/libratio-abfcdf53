@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +10,7 @@ import DiaryNavigation from "@/components/diary/DiaryNavigation";
 const Books = () => {
   const [mockBooks, setMockBooks] = useState([
     {
-      id: 1,
+      id: "1",
       title: "Война и мир",
       author: "Лев Толстой",
       rating: 4,
@@ -18,9 +19,10 @@ const Books = () => {
       timeStarted: "2023-01-15",
       timeFinished: null,
       image: "https://upload.wikimedia.org/wikipedia/ru/thumb/9/91/%D0%9E%D0%B1%D0%BB%D0%BE%D0%B6%D0%BA%D0%B0_%D0%BA%D0%BD%D0%B8%D0%B3%D0%B8_%D0%92%D0%BE%D0%B9%D0%BD%D0%B0_%D0%B8_%D0%BC%D0%B8%D1%80_1%D0%B8%D0%B9_%D1%82%D0%BE%D0%BC.jpg/330px-%D0%9E%D0%B1%D0%BB%D0%BE%D0%B6%D0%BA%D0%B0_%D0%BA%D0%BD%D0%B8%D0%B3%D0%B8_%D0%92%D0%BE%D0%B9%D0%BD%D0%B0_%D0%B8_%D0%BC%D0%B8%D1%80_1%D0%B8%D0%B9_%D1%82%D0%BE%D0%BC.jpg",
+      isInDiary: false,
     },
     {
-      id: 2,
+      id: "2",
       title: "Преступление и наказание",
       author: "Федор Достоевский",
       rating: 5,
@@ -29,9 +31,10 @@ const Books = () => {
       timeStarted: "2022-11-01",
       timeFinished: "2022-12-20",
       image: "https://upload.wikimedia.org/wikipedia/ru/thumb/4/4a/%D0%9F%D1%80%D0%B5%D1%81%D1%82%D1%83%D0%BF%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B8_%D0%BD%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%D0%B8%D0%B5.jpg/375px-%D0%9F%D1%80%D0%B5%D1%81%D1%82%D1%83%D0%BF%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B8_%D0%BD%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%D0%B8%D0%B5.jpg",
+      isInDiary: true,
     },
     {
-      id: 3,
+      id: "3",
       title: "Мастер и Маргарита",
       author: "Михаил Булгаков",
       rating: 4,
@@ -40,6 +43,7 @@ const Books = () => {
       timeStarted: null,
       timeFinished: null,
       image: "https://upload.wikimedia.org/wikipedia/ru/thumb/3/3c/%D0%9C%D0%B0%D1%81%D1%82%D0%B5%D1%80_%D0%B8_%D0%9C%D0%B0%D1%80%D0%B3%D0%B0%D1%80%D0%B8%D1%82%D0%B0_%28%D0%B8%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5_1967%29.jpg/276px-%D0%9C%D0%B0%D1%81%D1%82%D0%B5%D1%80_%D0%B8_%D0%9C%D0%B0%D1%80%D0%B3%D0%B0%D1%80%D0%B8%D1%82%D0%B0_%28%D0%B8%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5_1967%29.jpg",
+      isInDiary: false,
     },
   ]);
 
@@ -84,7 +88,7 @@ const Books = () => {
                 </div>
               </CardContent>
               <div className="p-4 border-t">
-                <AddToDiaryDropdown book={book} />
+                <AddToDiaryDropdown bookId={book.id} isInDiary={book.isInDiary} />
               </div>
             </Card>
           ))}

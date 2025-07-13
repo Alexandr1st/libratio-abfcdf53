@@ -8,7 +8,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -21,7 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface CompanyFormData {
   name: string;
@@ -31,8 +30,12 @@ interface CompanyFormData {
   website?: string;
 }
 
-export const CreateCompanyDialog = () => {
-  const [open, setOpen] = useState(false);
+interface CreateCompanyDialogProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps) => {
   const createCompany = useCreateCompany();
 
   const form = useForm<CompanyFormData>({
@@ -57,12 +60,6 @@ export const CreateCompanyDialog = () => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Зарегистрировать компанию
-        </Button>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Регистрация новой компании</DialogTitle>
@@ -174,3 +171,5 @@ export const CreateCompanyDialog = () => {
     </Dialog>
   );
 };
+
+export default CreateCompanyDialog;

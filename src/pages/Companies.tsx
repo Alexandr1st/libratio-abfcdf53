@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Building2, Users, MapPin, Globe, Plus } from "lucide-react";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useToast } from "@/hooks/use-toast";
-import CreateCompanyDialog from "@/components/CreateCompanyDialog";
+import { CreateCompanyDialog } from "@/components/CreateCompanyDialog";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 
 const Companies = () => {
   const [open, setOpen] = useState(false);
-  const { companies, isLoading, isError } = useCompanies();
+  const { data: companies, isLoading, isError } = useCompanies();
   const { toast } = useToast();
 
   const handleCreateCompany = () => {
@@ -53,18 +54,20 @@ const Companies = () => {
               <CardContent className="space-y-3">
                 <div className="flex items-center space-x-2 text-gray-600">
                   <Users className="h-4 w-4" />
-                  <span>{company.employee_count} сотрудников</span>
+                  <span>Сотрудники</span>
                 </div>
                 <div className="flex items-center space-x-2 text-gray-600">
                   <MapPin className="h-4 w-4" />
                   <span>{company.location}</span>
                 </div>
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <Globe className="h-4 w-4" />
-                  <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                    Веб-сайт
-                  </a>
-                </div>
+                {company.website && (
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <Globe className="h-4 w-4" />
+                    <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                      Веб-сайт
+                    </a>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
