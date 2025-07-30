@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -46,29 +47,29 @@ const Companies = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {companies?.map((company) => (
-            <Card key={company.id} className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">{company.name}</CardTitle>
-                <CardDescription>{company.industry}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <Users className="h-4 w-4" />
-                  <span>Сотрудники</span>
-                </div>
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <MapPin className="h-4 w-4" />
-                  <span>{company.location}</span>
-                </div>
-                {company.website && (
+            <Card key={company.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+              <Link to={`/companies/${company.id}`} className="block">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold">{company.name}</CardTitle>
+                  <CardDescription>{company.industry}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
                   <div className="flex items-center space-x-2 text-gray-600">
-                    <Globe className="h-4 w-4" />
-                    <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                      Веб-сайт
-                    </a>
+                    <Users className="h-4 w-4" />
+                    <span>Сотрудники</span>
                   </div>
-                )}
-              </CardContent>
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>{company.location}</span>
+                  </div>
+                  {company.website && (
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Globe className="h-4 w-4" />
+                      <span className="text-blue-500">Веб-сайт</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Link>
             </Card>
           ))}
         </div>
