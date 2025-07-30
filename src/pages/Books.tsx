@@ -5,9 +5,11 @@ import { Star, Users, Clock, Loader2 } from "lucide-react";
 import AddToDiaryDropdown from "@/components/AddToDiaryDropdown";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { useBooks } from "@/hooks/useBooks";
+import { useDiaryEntries } from "@/hooks/useDiaryEntries";
 
 const Books = () => {
   const { data: books, isLoading, error } = useBooks();
+  const { data: diaryEntries } = useDiaryEntries();
 
   console.log('Books data:', books);
   console.log('Books loading:', isLoading);
@@ -91,7 +93,10 @@ const Books = () => {
                   )}
                 </CardContent>
                 <div className="p-4 border-t">
-                  <AddToDiaryDropdown bookId={book.id} isInDiary={false} />
+                  <AddToDiaryDropdown 
+                    bookId={book.id} 
+                    isInDiary={diaryEntries?.some(entry => entry.book_id === book.id) || false} 
+                  />
                 </div>
               </Card>
             ))}
