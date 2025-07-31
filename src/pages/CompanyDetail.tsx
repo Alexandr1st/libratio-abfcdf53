@@ -33,6 +33,40 @@ const CompanyDetail = () => {
     },
     enabled: !!id,
   });
+
+  // Получаем книги компании
+  const { data: companyBooks } = useQuery({
+    queryKey: ['company-books', id],
+    queryFn: async () => {
+      if (!id) return [];
+      
+      const { data, error } = await supabase
+        .from('company_books')
+        .select(`
+          id,
+          added_at,
+          books (
+            id,
+            title,
+            author,
+            genre,
+            image,
+            rating,
+            pages
+          )
+        `)
+        .eq('company_id', id)
+        .order('added_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching company books:', error);
+        throw error;
+      }
+
+      return data || [];
+    },
+    enabled: !!id,
+  });
   
   const company = companies?.find(c => c.id === id);
 
@@ -169,7 +203,31 @@ const CompanyDetail = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-500">Скоро здесь будут отображаться книги компании</p>
+                {companyBooks && companyBooks.length > 0 ? (
+                  <div className="space-y-3">
+                    {companyBooks.map((companyBook) => (
+                      <div key={companyBook.id} className="flex items-start space-x-3 p-3 rounded-lg border">
+                        <div className="text-2xl">{companyBook.books?.image || '📚'}</div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-sm">{companyBook.books?.title}</h4>
+                          <p className="text-xs text-gray-500">{companyBook.books?.author}</p>
+                          <div className="flex items-center justify-between mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {companyBook.books?.genre}
+                            </Badge>
+                            {companyBook.books?.rating && (
+                              <span className="text-xs text-yellow-600">
+                                ⭐ {companyBook.books.rating}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">Нет книг в библиотеке компании</p>
+                )}
               </CardContent>
             </Card>
           </div>
