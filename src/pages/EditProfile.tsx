@@ -182,14 +182,13 @@ const EditProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="company">Место работы</Label>
                 <Select
-                  value={profileData.company_id || ""}
+                  value={profileData.company_id || undefined}
                   onValueChange={(value) => setProfileData(prev => ({ ...prev, company_id: value || null }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Выберите компанию" />
+                    <SelectValue placeholder="Выберите компанию или оставьте пустым" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Не указана</SelectItem>
                     {companies.map((company) => (
                       <SelectItem key={company.id} value={company.id}>
                         {company.name}
