@@ -94,10 +94,10 @@ const DiaryEntry = ({ entry, onAddNote }: DiaryEntryProps) => {
             )}
             <Button 
               size="sm" 
-              variant="ghost"
+              variant="outline"
               onClick={() => handleEditEntry(entry)}
             >
-              <Edit3 className="h-4 w-4" />
+              {entry.rating ? "Изменить отзыв" : "Оставить отзыв"}
             </Button>
           </div>
         </div>
