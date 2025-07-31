@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Building2, Users, MapPin, Globe, Calendar, Book } from "lucide-react";
 import { useCompanies } from "@/hooks/useCompanies";
-import { useCompanyEmployees } from "@/hooks/useCompanyEmployees";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,17 +12,17 @@ const CompanyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { data: companies, isLoading } = useCompanies();
   
-  // Получаем сотрудников компании
+  // Получаем сотрудников компании из таблицы profiles
   const { data: employees } = useQuery({
-    queryKey: ['company-employees', id],
+    queryKey: ['company-profiles', id],
     queryFn: async () => {
       if (!id) return [];
       
       const { data, error } = await supabase
-        .from('company_employees')
-        .select('*')
+        .from('profiles')
+        .select('id, full_name, username, position, created_at')
         .eq('company_id', id)
-        .order('joined_at', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching company employees:', error);
@@ -144,19 +143,16 @@ const CompanyDetail = () => {
               <CardContent>
                 {employees && employees.length > 0 ? (
                   <div className="space-y-3">
-                    {employees.map((employee) => (
-                      <div key={employee.id} className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">Сотрудник</p>
-                          {employee.position && (
-                            <p className="text-sm text-gray-500">{employee.position}</p>
-                          )}
-                        </div>
-                        {employee.is_admin && (
-                          <Badge variant="secondary">Админ</Badge>
-                        )}
-                      </div>
-                    ))}
+                     {employees.map((employee) => (
+                       <div key={employee.id} className="flex items-center justify-between">
+                         <div>
+                           <p className="font-medium">{employee.full_name || employee.username || 'Пользователь'}</p>
+                           {employee.position && (
+                             <p className="text-sm text-gray-500">{employee.position}</p>
+                           )}
+                         </div>
+                       </div>
+                     ))}
                   </div>
                 ) : (
                   <p className="text-gray-500">Нет сотрудников</p>
