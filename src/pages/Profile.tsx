@@ -213,12 +213,23 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <Link to="/profile/edit">
-                  <Button className="w-full mt-4">
-                    <Edit className="mr-2 h-4 w-4" />
-                    Редактировать профиль
+                <div className="space-y-2">
+                  <Link to="/profile/edit">
+                    <Button className="w-full">
+                      <Edit className="mr-2 h-4 w-4" />
+                      Редактировать профиль
+                    </Button>
+                  </Link>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full" 
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Выйти
                   </Button>
-                </Link>
+                </div>
               </CardContent>
             </Card>
 
