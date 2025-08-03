@@ -96,8 +96,6 @@ const Profile = () => {
   const mockData = {
     booksRead: 24,
     reviews: 18,
-    followers: 156,
-    following: 89,
     currentlyReading: [
       {
         id: 1,
@@ -202,14 +200,6 @@ const Profile = () => {
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">{mockData.reviews}</div>
                     <div className="text-sm text-gray-500">Отзывов</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">{mockData.followers}</div>
-                    <div className="text-sm text-gray-500">Подписчиков</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">{mockData.following}</div>
-                    <div className="text-sm text-gray-500">Подписки</div>
                   </div>
                 </div>
 
