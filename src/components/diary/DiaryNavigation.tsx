@@ -2,9 +2,11 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const DiaryNavigation = () => {
   const location = useLocation();
+  const { user } = useAuth();
   
   const getButtonStyle = (path: string) => {
     return location.pathname === path 
@@ -21,18 +23,31 @@ const DiaryNavigation = () => {
             <span className="text-xl font-bold text-gray-900">Libratio</span>
           </Link>
           <div className="flex items-center space-x-4">
-            <Link to="/books">
-              <Button variant="ghost" className={getButtonStyle("/books")}>Каталог книг</Button>
-            </Link>
-            <Link to="/diary">
-              <Button variant="ghost" className={getButtonStyle("/diary")}>Мой дневник</Button>
-            </Link>
-            <Link to="/companies">
-              <Button variant="ghost" className={getButtonStyle("/companies")}>Компании</Button>
-            </Link>
-            <Link to="/profile">
-              <Button variant="outline" className={getButtonStyle("/profile")}>Профиль</Button>
-            </Link>
+            {user ? (
+              <>
+                <Link to="/books">
+                  <Button variant="ghost" className={getButtonStyle("/books")}>Каталог книг</Button>
+                </Link>
+                <Link to="/diary">
+                  <Button variant="ghost" className={getButtonStyle("/diary")}>Мой дневник</Button>
+                </Link>
+                <Link to="/companies">
+                  <Button variant="ghost" className={getButtonStyle("/companies")}>Компании</Button>
+                </Link>
+                <Link to="/profile">
+                  <Button variant="outline" className={getButtonStyle("/profile")}>Профиль</Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost">Войти</Button>
+                </Link>
+                <Link to="/auth">
+                  <Button variant="outline">Зарегистрироваться</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
