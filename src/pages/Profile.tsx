@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
+import { useProfileStats } from "@/hooks/useProfileStats";
 
 interface Profile {
   id: string;
@@ -27,6 +28,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { data: profileStats, isLoading: statsLoading } = useProfileStats();
 
   useEffect(() => {
     if (!authLoading) {
@@ -194,11 +196,15 @@ const Profile = () => {
                 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{mockData.booksRead}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {statsLoading ? "..." : profileStats?.booksRead || 0}
+                    </div>
                     <div className="text-sm text-gray-500">Прочитано</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{mockData.reviews}</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {statsLoading ? "..." : profileStats?.reviews || 0}
+                    </div>
                     <div className="text-sm text-gray-500">Отзывов</div>
                   </div>
                 </div>
