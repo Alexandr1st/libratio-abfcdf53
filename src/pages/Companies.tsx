@@ -1,23 +1,14 @@
 
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Building2, Users, MapPin, Globe, Plus } from "lucide-react";
+import { Users, MapPin, Globe } from "lucide-react";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useToast } from "@/hooks/use-toast";
-import { CreateCompanyDialog } from "@/components/CreateCompanyDialog";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 
 const Companies = () => {
-  const [open, setOpen] = useState(false);
   const { data: companies, isLoading, isError } = useCompanies();
   const { toast } = useToast();
-
-  const handleCreateCompany = () => {
-    setOpen(true);
-  };
 
   if (isLoading) {
     return <div>Loading companies...</div>;
@@ -37,12 +28,8 @@ const Companies = () => {
       <DiaryNavigation />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Компании</h1>
-          <Button onClick={handleCreateCompany}>
-            <Plus className="mr-2 h-4 w-4" />
-            Добавить компанию
-          </Button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -74,8 +61,6 @@ const Companies = () => {
           ))}
         </div>
       </div>
-
-      <CreateCompanyDialog open={open} setOpen={setOpen} />
     </div>
   );
 };
