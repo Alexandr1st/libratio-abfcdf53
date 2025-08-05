@@ -62,7 +62,21 @@ const Profile = () => {
         return;
       }
 
-      setProfile(data);
+      // Проверяем, является ли пользователь сотрудником компании
+      const { data: employeeData } = await supabase
+        .from('company_employees')
+        .select('company_id, is_admin')
+        .eq('user_id', user.id)
+        .single();
+
+      // Если пользователь является сотрудником компании, устанавливаем company_id
+      const profileWithCompany = {
+        ...data,
+        company_id: employeeData?.company_id || null
+      };
+
+      setProfile(profileWithCompany);
+      console.log('Profile data:', profileWithCompany); // Для отладки
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
