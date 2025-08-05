@@ -43,7 +43,7 @@ const DiaryNavigation = () => {
                 <Link to="/auth">
                   <Button variant="ghost">Войти</Button>
                 </Link>
-                <Link to="/auth">
+                <Link to="/auth?mode=signup">
                   <Button variant="outline">Зарегистрироваться</Button>
                 </Link>
               </>
