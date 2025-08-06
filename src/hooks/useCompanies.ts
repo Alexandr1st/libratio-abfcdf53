@@ -32,24 +32,58 @@ export const useCreateCompany = () => {
 
   return useMutation({
     mutationFn: async (companyData: CompanyInsert) => {
-      const { data, error } = await supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('Пользователь не авторизован');
+      }
+
+      // Create company
+      const { data: company, error: companyError } = await supabase
         .from('companies')
         .insert(companyData)
         .select()
         .single();
 
-      if (error) {
-        console.error('Error creating company:', error);
-        throw error;
+      if (companyError) {
+        throw companyError;
       }
 
-      return data;
+      // Add user as company admin
+      const { error: employeeError } = await supabase
+        .from('company_employees')
+        .insert({
+          company_id: company.id,
+          user_id: user.id,
+          is_admin: true,
+          position: "Администратор",
+        });
+
+      if (employeeError) {
+        throw employeeError;
+      }
+
+      // Update user profile with company info
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          company_id: company.id,
+          company: companyData.name,
+          position: "Администратор",
+        })
+        .eq('id', user.id);
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      return company;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
       toast({
         title: "Успешно!",
-        description: "Компания создана",
+        description: "Компания создана и вы добавлены как администратор",
       });
     },
     onError: (error) => {
