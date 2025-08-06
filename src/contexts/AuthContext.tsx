@@ -36,6 +36,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Check if user needs company creation
+        if (session?.user) {
+          setTimeout(() => {
+            checkAndCreateCompany(session.user);
+          }, 0);
+        }
       }
     );
 
@@ -44,10 +51,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Check if user needs company creation
+      if (session?.user) {
+        setTimeout(() => {
+          checkAndCreateCompany(session.user);
+        }, 0);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const checkAndCreateCompany = async (user: User) => {
+    const accountType = user.user_metadata?.account_type;
+    
+    if (accountType === 'company') {
+      // Check if user already has a company
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('company_id')
+        .eq('id', user.id)
+        .single();
+      
+      if (!profile?.company_id) {
+        // User is company type but has no company - they might have registered but company creation failed
+        // For now, we'll just log this. You might want to show a modal to collect company details
+        console.log('Company user without company detected:', user.id);
+      }
+    }
+  };
 
   const signOut = async () => {
     await supabase.auth.signOut();
