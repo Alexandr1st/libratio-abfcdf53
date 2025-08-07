@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { useProfileStats } from "@/hooks/useProfileStats";
-import { useCompanyStats } from "@/hooks/useCompanyStats";
 
 interface Profile {
   id: string;
@@ -31,7 +30,6 @@ const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { data: profileStats, isLoading: statsLoading } = useProfileStats();
-  const { data: companyStats, isLoading: companyStatsLoading } = useCompanyStats(profile?.company_id || null);
 
   useEffect(() => {
     if (!authLoading) {
@@ -62,21 +60,20 @@ const Profile = () => {
         return;
       }
 
-      // Проверяем, является ли пользователь сотрудником компании
-      const { data: employeeData } = await supabase
-        .from('company_employees')
-        .select('company_id, is_admin')
-        .eq('user_id', user.id)
+      // Check if user is a company contact person and redirect
+      const { data: companyData } = await supabase
+        .from('companies')
+        .select('id')
+        .eq('contact_person_id', user.id)
         .single();
 
-      // Если пользователь является сотрудником компании, устанавливаем company_id
-      const profileWithCompany = {
-        ...data,
-        company_id: employeeData?.company_id || null
-      };
+      if (companyData) {
+        // User is a company contact person, redirect to company profile
+        navigate('/company-profile');
+        return;
+      }
 
-      setProfile(profileWithCompany);
-      console.log('Profile data:', profileWithCompany); // Для отладки
+      setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
@@ -214,19 +211,13 @@ const Profile = () => {
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-600">
-                      {profile?.company_id ? 
-                        (companyStatsLoading ? "..." : companyStats?.booksRead || 0) :
-                        (statsLoading ? "..." : profileStats?.booksRead || 0)
-                      }
+                      {statsLoading ? "..." : profileStats?.booksRead || 0}
                     </div>
                     <div className="text-sm text-gray-500">Прочитано</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
-                      {profile?.company_id ? 
-                        (companyStatsLoading ? "..." : companyStats?.reviews || 0) :
-                        (statsLoading ? "..." : profileStats?.reviews || 0)
-                      }
+                      {statsLoading ? "..." : profileStats?.reviews || 0}
                     </div>
                     <div className="text-sm text-gray-500">Отзывов</div>
                   </div>
@@ -282,87 +273,44 @@ const Profile = () => {
 
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Currently Reading / Company Employees */}
+            {/* Currently Reading */}
             <Card className="border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>{profile?.company_id ? "Сотрудники" : "Читаю сейчас"}</span>
-                  {profile?.company_id ? (
-                    <Badge variant="secondary">
-                      {companyStats?.totalEmployees || 0} сотрудников
-                    </Badge>
-                  ) : (
-                    <Link to="/diary">
-                      <Button variant="outline" size="sm">
-                        Открыть дневник
-                      </Button>
-                    </Link>
-                  )}
+                  <span>Читаю сейчас</span>
+                  <Link to="/diary">
+                    <Button variant="outline" size="sm">
+                      Открыть дневник
+                    </Button>
+                  </Link>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {profile?.company_id ? (
-                  // Company Employees
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {companyStats?.employees?.map((employee) => (
-                      <div key={employee.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            {employee.avatar_url ? (
-                              <img 
-                                src={employee.avatar_url} 
-                                alt="Avatar" 
-                                className="w-10 h-10 rounded-full"
+                <div className="grid md:grid-cols-2 gap-4">
+                  {mockData.currentlyReading.map((book) => (
+                    <div key={book.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-start space-x-3">
+                        <div className="text-2xl">{book.image}</div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm line-clamp-2">{book.title}</h4>
+                          <p className="text-xs text-gray-500 mb-2">{book.author}</p>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-xs">
+                              <span>Прогресс</span>
+                              <span>{book.progress}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1">
+                              <div 
+                                className="bg-blue-600 h-1 rounded-full" 
+                                style={{ width: `${book.progress}%` }}
                               />
-                            ) : (
-                              <User className="h-5 w-5 text-blue-600" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-sm truncate">
-                              {employee.full_name || "Пользователь"}
-                            </h4>
-                            <p className="text-xs text-gray-500 truncate">
-                              {employee.position || "Сотрудник"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    {companyStats?.employees?.length === 0 && (
-                      <div className="col-span-full text-center py-8 text-gray-500">
-                        Нет сотрудников в компании
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  // Currently Reading Books
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {mockData.currentlyReading.map((book) => (
-                      <div key={book.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex items-start space-x-3">
-                          <div className="text-2xl">{book.image}</div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-sm line-clamp-2">{book.title}</h4>
-                            <p className="text-xs text-gray-500 mb-2">{book.author}</p>
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-xs">
-                                <span>Прогресс</span>
-                                <span>{book.progress}%</span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-1">
-                                <div 
-                                  className="bg-blue-600 h-1 rounded-full" 
-                                  style={{ width: `${book.progress}%` }}
-                                />
-                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 

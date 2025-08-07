@@ -3,10 +3,29 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const DiaryNavigation = () => {
   const location = useLocation();
   const { user } = useAuth();
+  const [isCompanyProfile, setIsCompanyProfile] = useState(false);
+  
+  useEffect(() => {
+    const checkCompanyProfile = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('companies')
+          .select('id')
+          .eq('contact_person_id', user.id)
+          .single();
+        
+        setIsCompanyProfile(!!data);
+      }
+    };
+    
+    checkCompanyProfile();
+  }, [user]);
   
   const getButtonStyle = (path: string) => {
     return location.pathname === path 
@@ -26,16 +45,22 @@ const DiaryNavigation = () => {
             {user ? (
               <>
                 <Link to="/books">
-                  <Button variant="ghost" className={getButtonStyle("/books")}>Каталог книг</Button>
+                  <Button variant="ghost" className={getButtonStyle("/books")}>
+                    {isCompanyProfile ? "Моя библиотека" : "Каталог книг"}
+                  </Button>
                 </Link>
-                <Link to="/diary">
-                  <Button variant="ghost" className={getButtonStyle("/diary")}>Мой дневник</Button>
-                </Link>
+                {!isCompanyProfile && (
+                  <Link to="/diary">
+                    <Button variant="ghost" className={getButtonStyle("/diary")}>Мой дневник</Button>
+                  </Link>
+                )}
                 <Link to="/companies">
                   <Button variant="ghost" className={getButtonStyle("/companies")}>Компании</Button>
                 </Link>
-                <Link to="/profile">
-                  <Button variant="outline" className={getButtonStyle("/profile")}>Профиль</Button>
+                <Link to={isCompanyProfile ? "/company-profile" : "/profile"}>
+                  <Button variant="outline" className={getButtonStyle(isCompanyProfile ? "/company-profile" : "/profile")}>
+                    Профиль
+                  </Button>
                 </Link>
               </>
             ) : (

@@ -109,6 +109,7 @@ export type Database = {
       }
       companies: {
         Row: {
+          contact_person_id: string | null
           created_at: string
           description: string | null
           id: string
@@ -120,6 +121,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          contact_person_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -131,6 +133,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          contact_person_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -141,7 +144,15 @@ export type Database = {
           updated_at?: string
           website?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "companies_contact_person_id_fkey"
+            columns: ["contact_person_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       company_books: {
         Row: {
