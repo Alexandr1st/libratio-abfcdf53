@@ -200,8 +200,15 @@ const CompanyProfile = () => {
                 )}
 
                 <div className="space-y-2 pt-4">
-                  <Link to="/books">
+                  <Link to="/company-profile/edit">
                     <Button className="w-full">
+                      <Edit className="mr-2 h-4 w-4" />
+                      Редактировать профиль
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/books">
+                    <Button variant="outline" className="w-full">
                       <BookOpen className="mr-2 h-4 w-4" />
                       Моя библиотека
                     </Button>
