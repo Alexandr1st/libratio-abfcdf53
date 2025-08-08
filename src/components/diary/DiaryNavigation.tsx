@@ -46,9 +46,16 @@ const DiaryNavigation = () => {
               <>
                 <Link to="/books">
                   <Button variant="ghost" className={getButtonStyle("/books")}>
-                    {isCompanyProfile ? "Моя библиотека" : "Каталог книг"}
+                    Каталог книг
                   </Button>
                 </Link>
+                {isCompanyProfile && (
+                  <Link to="/company-library">
+                    <Button variant="ghost" className={getButtonStyle("/company-library")}>
+                      Моя библиотека
+                    </Button>
+                  </Link>
+                )}
                 {!isCompanyProfile && (
                   <Link to="/diary">
                     <Button variant="ghost" className={getButtonStyle("/diary")}>Мой дневник</Button>

@@ -14,6 +14,7 @@ import Diary from "./pages/Diary";
 import Companies from "./pages/Companies";
 import CompanyDetail from "./pages/CompanyDetail";
 import CompanyProfile from "./pages/CompanyProfile";
+import CompanyLibrary from "./pages/CompanyLibrary";
 import EditCompanyProfile from "./pages/EditCompanyProfile";
 import NotFound from "./pages/NotFound";
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/companies" element={<Companies />} />
             <Route path="/companies/:id" element={<CompanyDetail />} />
             <Route path="/company-profile" element={<CompanyProfile />} />
+            <Route path="/company-library" element={<CompanyLibrary />} />
             <Route path="/company-profile/edit" element={<EditCompanyProfile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
