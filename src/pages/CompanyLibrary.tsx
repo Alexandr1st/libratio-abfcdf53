@@ -223,45 +223,50 @@ const CompanyLibrary = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBooks.map((item) => (
               <Card key={item.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex space-x-4">
-                    <div className="flex-shrink-0">
-                      {item.books.image ? (
-                        <img
-                          src={item.books.image}
-                          alt={item.books.title}
-                          className="w-16 h-24 object-cover rounded"
-                        />
-                      ) : (
-                        <div className="w-16 h-24 bg-gray-200 rounded flex items-center justify-center">
-                          <BookOpen className="h-8 w-8 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-gray-900 truncate">
-                        {item.books.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {item.books.author}
+                {item.books.image && (
+                  <div className="aspect-[3/4] w-full">
+                    <img
+                      src={item.books.image}
+                      alt={item.books.title}
+                      className="w-full h-full object-cover rounded-t-lg"
+                    />
+                  </div>
+                )}
+                <CardHeader>
+                  <CardTitle className="text-lg">{item.books.title}</CardTitle>
+                  <CardDescription>{item.books.author}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <Badge variant="secondary">{item.books.genre}</Badge>
+                    
+                    {item.books.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {item.books.description}
                       </p>
-                      <Badge variant="secondary" className="mb-2">
-                        {item.books.genre}
-                      </Badge>
-                      
-                      {item.books.rating && (
-                        <div className="flex items-center mb-2">
-                          <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                          <span className="text-sm text-gray-600 ml-1">
-                            {item.books.rating}
-                          </span>
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center text-xs text-gray-500">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        Добавлена {new Date(item.added_at).toLocaleDateString('ru-RU')}
+                    )}
+                    
+                    {item.books.rating && (
+                      <div className="flex items-center">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < Math.floor(item.books.rating!)
+                                ? "text-yellow-400 fill-current"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
+                        <span className="text-sm text-muted-foreground ml-2">
+                          {item.books.rating}
+                        </span>
                       </div>
+                    )}
+                    
+                    <div className="flex items-center text-xs text-muted-foreground">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      Добавлена {new Date(item.added_at).toLocaleDateString('ru-RU')}
                     </div>
                   </div>
                 </CardContent>

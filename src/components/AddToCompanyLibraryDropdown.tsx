@@ -50,7 +50,6 @@ const AddToCompanyLibraryDropdown = ({ bookId, isInLibrary }: AddToCompanyLibrar
   return (
     <Button 
       size="sm" 
-      variant="secondary"
       disabled={addBookToLibrary.isPending}
       onClick={handleAddToLibrary}
     >
