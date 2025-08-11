@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Calendar, Search, Filter, Star } from "lucide-react";
+import BookCard from "@/components/BookCard";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,9 @@ interface CompanyBook {
     rating: number | null;
     pages: number | null;
     year: number | null;
+    created_at: string;
+    updated_at: string;
+    read_by_colleagues: number | null;
   };
 }
 
@@ -70,25 +74,28 @@ const CompanyLibrary = () => {
 
       setCompany(companyData);
 
-      // Получаем книги компании
-      const { data: booksData, error: booksError } = await supabase
-        .from('company_books')
-        .select(`
-          id,
-          book_id,
-          added_at,
-          books (
+        // Получаем книги компании
+        const { data: booksData, error: booksError } = await supabase
+          .from('company_books')
+          .select(`
             id,
-            title,
-            author,
-            genre,
-            description,
-            image,
-            rating,
-            pages,
-            year
-          )
-        `)
+            book_id,
+            added_at,
+            books (
+              id,
+              title,
+              author,
+              genre,
+              description,
+              image,
+              rating,
+              pages,
+              year,
+              created_at,
+              updated_at,
+              read_by_colleagues
+            )
+          `)
         .eq('company_id', companyData.id)
         .order('added_at', { ascending: false });
 
@@ -222,55 +229,12 @@ const CompanyLibrary = () => {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBooks.map((item) => (
-              <Card key={item.id} className="hover:shadow-lg transition-shadow">
-                {item.books.image && (
-                  <div className="aspect-[3/4] w-full">
-                    <img
-                      src={item.books.image}
-                      alt={item.books.title}
-                      className="w-full h-full object-cover rounded-t-lg"
-                    />
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle className="text-lg">{item.books.title}</CardTitle>
-                  <CardDescription>{item.books.author}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <Badge variant="secondary">{item.books.genre}</Badge>
-                    
-                    {item.books.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-3">
-                        {item.books.description}
-                      </p>
-                    )}
-                    
-                    {item.books.rating && (
-                      <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < Math.floor(item.books.rating!)
-                                ? "text-yellow-400 fill-current"
-                                : "text-gray-300"
-                            }`}
-                          />
-                        ))}
-                        <span className="text-sm text-muted-foreground ml-2">
-                          {item.books.rating}
-                        </span>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center text-xs text-muted-foreground">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      Добавлена {new Date(item.added_at).toLocaleDateString('ru-RU')}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <BookCard 
+                key={item.id}
+                book={item.books}
+                isInDiary={false}
+                isCompanyProfile={true}
+              />
             ))}
           </div>
         )}
