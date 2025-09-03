@@ -336,6 +336,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_profile: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
       update_book_rating: {
         Args: { book_id_param: string }
         Returns: undefined
