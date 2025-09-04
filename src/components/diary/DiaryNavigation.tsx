@@ -49,7 +49,7 @@ const DiaryNavigation = () => {
                     Каталог книг
                   </Button>
                 </Link>
-                {isCompanyProfile && (
+                {isCompanyProfile && location.pathname !== "/company-profile" && (
                   <Link to="/company-library">
                     <Button variant="ghost" className={getButtonStyle("/company-library")}>
                       Моя библиотека
