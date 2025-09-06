@@ -207,12 +207,6 @@ const CompanyProfile = () => {
                     </Button>
                   </Link>
                   
-                  <Link to="/company-library">
-                    <Button variant="outline" className="w-full">
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      Моя библиотека
-                    </Button>
-                  </Link>
                   
                   <Button 
                     variant="outline" 
