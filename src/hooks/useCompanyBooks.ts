@@ -101,6 +101,40 @@ export const useAddBookToCompanyLibrary = () => {
   });
 };
 
+export const useCompanyBooksWithDetails = (companyId: string) => {
+  return useQuery({
+    queryKey: ['company-books-details', companyId],
+    queryFn: async () => {
+      console.log('Fetching company books with details for company:', companyId);
+      
+      const { data, error } = await supabase
+        .from('company_books')
+        .select(`
+          *,
+          books (
+            id,
+            title,
+            author,
+            genre,
+            image,
+            description
+          )
+        `)
+        .eq('company_id', companyId)
+        .order('added_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching company books with details:', error);
+        throw error;
+      }
+
+      console.log('Company books with details fetched successfully:', data);
+      return data || [];
+    },
+    enabled: !!companyId,
+  });
+};
+
 export const useCheckBookInCompanyLibrary = (bookId: string) => {
   return useQuery({
     queryKey: ['company-book-check', bookId],

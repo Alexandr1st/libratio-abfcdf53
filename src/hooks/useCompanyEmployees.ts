@@ -6,18 +6,41 @@ export const useCompanyEmployees = (companyId: string) => {
   return useQuery({
     queryKey: ['company-employees', companyId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Сначала получаем сотрудников
+      const { data: employees, error: employeesError } = await supabase
         .from('company_employees')
-        .select('*, profiles(*)')
+        .select('*')
         .eq('company_id', companyId)
         .order('joined_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching company employees:', error);
-        throw error;
+      if (employeesError) {
+        console.error('Error fetching company employees:', employeesError);
+        throw employeesError;
       }
 
-      return data || [];
+      if (!employees || employees.length === 0) {
+        return [];
+      }
+
+      // Затем получаем профили для этих пользователей
+      const userIds = employees.map(emp => emp.user_id);
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, position')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
+
+      // Объединяем данные
+      const employeesWithProfiles = employees.map(employee => ({
+        ...employee,
+        profiles: profiles?.find(profile => profile.id === employee.user_id) || null
+      }));
+
+      return employeesWithProfiles;
     },
     enabled: !!companyId,
   });

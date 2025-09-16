@@ -44,6 +44,13 @@ const DiaryNavigation = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
+                {isCompanyProfile && (
+                  <Link to="/company-employees">
+                    <Button variant="ghost" className={getButtonStyle("/company-employees")}>
+                      Мои сотрудники
+                    </Button>
+                  </Link>
+                )}
                 <Link to="/books">
                   <Button variant="ghost" className={getButtonStyle("/books")}>
                     Каталог книг
