@@ -17,6 +17,11 @@ import CompanyProfile from "./pages/CompanyProfile";
 import CompanyLibrary from "./pages/CompanyLibrary";
 import CompanyEmployees from "./pages/CompanyEmployees";
 import EditCompanyProfile from "./pages/EditCompanyProfile";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminCompanies from "./pages/admin/AdminCompanies";
+import AdminBooks from "./pages/admin/AdminBooks";
+import AdminActivity from "./pages/admin/AdminActivity";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +46,11 @@ const App = () => (
             <Route path="/company-library" element={<CompanyLibrary />} />
             <Route path="/company-employees" element={<CompanyEmployees />} />
             <Route path="/company-profile/edit" element={<EditCompanyProfile />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/companies" element={<AdminCompanies />} />
+            <Route path="/admin/books" element={<AdminBooks />} />
+            <Route path="/admin/activity" element={<AdminActivity />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

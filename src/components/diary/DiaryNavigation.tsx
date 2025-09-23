@@ -5,11 +5,13 @@ import { BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useIsAdmin } from "@/hooks/useAdminRoles";
 
 const DiaryNavigation = () => {
   const location = useLocation();
   const { user } = useAuth();
   const [isCompanyProfile, setIsCompanyProfile] = useState(false);
+  const { data: isAdmin } = useIsAdmin();
   
   useEffect(() => {
     const checkCompanyProfile = async () => {
@@ -71,6 +73,13 @@ const DiaryNavigation = () => {
                 <Link to="/companies">
                   <Button variant="ghost" className={getButtonStyle("/companies")}>Компании</Button>
                 </Link>
+                {isAdmin && (
+                  <Link to="/admin/dashboard">
+                    <Button variant="ghost" className={getButtonStyle("/admin/dashboard")}>
+                      Админка
+                    </Button>
+                  </Link>
+                )}
                 <Link to={isCompanyProfile ? "/company-profile" : "/profile"}>
                   <Button variant="outline" className={getButtonStyle(isCompanyProfile ? "/company-profile" : "/profile")}>
                     Профиль
