@@ -102,11 +102,17 @@ const AdminBooks = () => {
                       <TableCell>
                         <div className="flex items-center space-x-3">
                           {book.image && (
-                            <img 
-                              src={book.image} 
-                              alt={book.title} 
-                              className="w-10 h-12 object-cover rounded"
-                            />
+                            book.image.startsWith('http') ? (
+                              <img 
+                                src={book.image} 
+                                alt={book.title} 
+                                className="w-10 h-12 object-cover rounded"
+                              />
+                            ) : (
+                              <div className="w-10 h-12 flex items-center justify-center text-2xl bg-gray-100 rounded">
+                                {book.image}
+                              </div>
+                            )
                           )}
                           <div>
                             <div className="font-medium">{book.title}</div>
