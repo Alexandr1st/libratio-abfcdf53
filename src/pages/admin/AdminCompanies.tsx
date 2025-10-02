@@ -8,9 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Search, Users, Globe } from "lucide-react";
+import EditCompanyDialog from "@/components/admin/EditCompanyDialog";
 
 const AdminCompanies = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingCompany, setEditingCompany] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: companies, isLoading } = useQuery({
     queryKey: ["adminCompanies"],
@@ -150,7 +153,14 @@ const AdminCompanies = () => {
                         {new Date(company.created_at).toLocaleDateString('ru-RU')}
                       </TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setEditingCompany(company);
+                            setDialogOpen(true);
+                          }}
+                        >
                           Редактировать
                         </Button>
                       </TableCell>
@@ -166,6 +176,12 @@ const AdminCompanies = () => {
           </CardContent>
         </Card>
       </div>
+
+      <EditCompanyDialog
+        company={editingCompany}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </AdminLayout>
   );
 };
