@@ -8,9 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Book, Search, Star, Calendar } from "lucide-react";
+import EditBookDialog from "@/components/admin/EditBookDialog";
 
 const AdminBooks = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingBook, setEditingBook] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: books, isLoading } = useQuery({
     queryKey: ["adminBooks"],
@@ -153,7 +156,14 @@ const AdminBooks = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setEditingBook(book);
+                            setDialogOpen(true);
+                          }}
+                        >
                           Редактировать
                         </Button>
                       </TableCell>
@@ -169,6 +179,12 @@ const AdminBooks = () => {
           </CardContent>
         </Card>
       </div>
+
+      <EditBookDialog
+        book={editingBook}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </AdminLayout>
   );
 };
