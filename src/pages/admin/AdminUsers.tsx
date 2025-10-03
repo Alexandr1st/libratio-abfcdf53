@@ -21,7 +21,7 @@ const AdminUsers = () => {
         .from("profiles")
         .select(`
           *,
-          companies(name)
+          companies!profiles_company_id_fkey(name)
         `)
         .order("created_at", { ascending: false });
 
