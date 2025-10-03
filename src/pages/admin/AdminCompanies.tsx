@@ -7,13 +7,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Search, Users, Globe } from "lucide-react";
+import { Building2, Search, Users, Globe, Plus } from "lucide-react";
 import EditCompanyDialog from "@/components/admin/EditCompanyDialog";
+import CreateCompanyDialog from "@/components/CreateCompanyDialog";
 
 const AdminCompanies = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingCompany, setEditingCompany] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const { data: companies, isLoading } = useQuery({
     queryKey: ["adminCompanies"],
@@ -60,14 +62,20 @@ const AdminCompanies = () => {
         {/* Search */}
         <Card>
           <CardContent className="p-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Поиск по названию, отрасли или местоположению..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Поиск по названию, отрасли или местоположению..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button onClick={() => setAddDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Добавить
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -181,6 +189,10 @@ const AdminCompanies = () => {
         company={editingCompany}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+      />
+      <CreateCompanyDialog
+        open={addDialogOpen}
+        setOpen={setAddDialogOpen}
       />
     </AdminLayout>
   );

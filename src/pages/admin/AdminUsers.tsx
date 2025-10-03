@@ -7,10 +7,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Shield, Search, Building2 } from "lucide-react";
+import { Shield, Search, Building2, Plus } from "lucide-react";
+import AddUserDialog from "@/components/admin/AddUserDialog";
 
 const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["adminUsers"],
@@ -69,14 +71,20 @@ const AdminUsers = () => {
         {/* Search */}
         <Card>
           <CardContent className="p-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Поиск по имени, username, должности или компании..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Поиск по имени, username, должности или компании..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button onClick={() => setAddDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Добавить
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -170,6 +178,11 @@ const AdminUsers = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AddUserDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+      />
     </AdminLayout>
   );
 };

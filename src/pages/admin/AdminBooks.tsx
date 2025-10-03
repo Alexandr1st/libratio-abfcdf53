@@ -7,13 +7,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Book, Search, Star, Calendar } from "lucide-react";
+import { Book, Search, Star, Calendar, Plus } from "lucide-react";
 import EditBookDialog from "@/components/admin/EditBookDialog";
+import AddBookDialog from "@/components/admin/AddBookDialog";
 
 const AdminBooks = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingBook, setEditingBook] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const { data: books, isLoading } = useQuery({
     queryKey: ["adminBooks"],
@@ -60,14 +62,20 @@ const AdminBooks = () => {
         {/* Search */}
         <Card>
           <CardContent className="p-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Поиск по названию, автору или жанру..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Поиск по названию, автору или жанру..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button onClick={() => setAddDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Добавить
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -190,6 +198,10 @@ const AdminBooks = () => {
         book={editingBook}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+      />
+      <AddBookDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
       />
     </AdminLayout>
   );
