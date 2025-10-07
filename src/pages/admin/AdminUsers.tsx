@@ -19,10 +19,7 @@ const AdminUsers = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select(`
-          *,
-          companies!profiles_company_id_fkey(name)
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -34,11 +31,35 @@ const AdminUsers = () => {
         .select("user_id, role")
         .in("user_id", userIds);
 
+      // Get company employees data
+      const { data: companyEmployees } = await supabase
+        .from("company_employees")
+        .select(`
+          user_id,
+          companies (
+            id,
+            name
+          )
+        `)
+        .in("user_id", userIds);
+
+      // Get companies where user is contact person
+      const { data: contactCompanies } = await supabase
+        .from("companies")
+        .select("contact_person_id, id, name")
+        .in("contact_person_id", userIds);
+
       // Merge the data
-      return data.map(user => ({
-        ...user,
-        admin_roles: adminRoles?.filter(role => role.user_id === user.id) || []
-      }));
+      return data.map(user => {
+        const employeeCompany = companyEmployees?.find(ce => ce.user_id === user.id)?.companies;
+        const contactCompany = contactCompanies?.find(c => c.contact_person_id === user.id);
+        
+        return {
+          ...user,
+          companies: employeeCompany || contactCompany || null,
+          admin_roles: adminRoles?.filter(role => role.user_id === user.id) || []
+        };
+      });
     },
   });
 
