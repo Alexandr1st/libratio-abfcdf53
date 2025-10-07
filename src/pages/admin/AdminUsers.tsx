@@ -31,6 +31,13 @@ const AdminUsers = () => {
         .select("user_id, role")
         .in("user_id", userIds);
 
+      // Get companies by company_id from profiles
+      const companyIds = data.map(user => user.company_id).filter(Boolean);
+      const { data: profileCompanies } = await supabase
+        .from("companies")
+        .select("id, name")
+        .in("id", companyIds);
+
       // Get company employees data
       const { data: companyEmployees } = await supabase
         .from("company_employees")
@@ -51,12 +58,13 @@ const AdminUsers = () => {
 
       // Merge the data
       return data.map(user => {
+        const profileCompany = profileCompanies?.find(c => c.id === user.company_id);
         const employeeCompany = companyEmployees?.find(ce => ce.user_id === user.id)?.companies;
         const contactCompany = contactCompanies?.find(c => c.contact_person_id === user.id);
         
         return {
           ...user,
-          companies: employeeCompany || contactCompany || null,
+          companies: profileCompany || employeeCompany || contactCompany || null,
           admin_roles: adminRoles?.filter(role => role.user_id === user.id) || []
         };
       });
