@@ -188,14 +188,14 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
           <div className="space-y-2">
             <Label htmlFor="company_id">Компания</Label>
             <Select
-              value={companyId}
-              onValueChange={(value) => setValue("company_id", value)}
+              value={companyId || "none"}
+              onValueChange={(value) => setValue("company_id", value === "none" ? "" : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Выберите компанию" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Нет компании</SelectItem>
+                <SelectItem value="none">Нет компании</SelectItem>
                 {companies?.map((company) => (
                   <SelectItem key={company.id} value={company.id}>
                     {company.name}
