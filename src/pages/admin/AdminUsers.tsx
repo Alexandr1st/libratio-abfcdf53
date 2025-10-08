@@ -9,10 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Shield, Search, Building2, Plus } from "lucide-react";
 import AddUserDialog from "@/components/admin/AddUserDialog";
+import EditUserDialog from "@/components/admin/EditUserDialog";
 
 const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["adminUsers"],
@@ -191,7 +194,14 @@ const AdminUsers = () => {
                         {user.created_at ? new Date(user.created_at).toLocaleDateString('ru-RU') : 'Не указано'}
                       </TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setEditDialogOpen(true);
+                          }}
+                        >
                           Редактировать
                         </Button>
                       </TableCell>
@@ -211,6 +221,12 @@ const AdminUsers = () => {
       <AddUserDialog
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
+      />
+
+      <EditUserDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        user={selectedUser}
       />
     </AdminLayout>
   );
