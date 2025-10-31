@@ -27,7 +27,7 @@ const AdminCompanyDetail = () => {
     website: "",
   });
 
-  const { data: company, isLoading } = useQuery({
+  const { data: company, isLoading, error } = useQuery({
     queryKey: ["adminCompany", id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -38,9 +38,12 @@ const AdminCompanyDetail = () => {
           company_employees(id, user_id, position, joined_at, profiles(full_name, username))
         `)
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching company:", error);
+        throw error;
+      }
       return data;
     },
     enabled: !!id,
