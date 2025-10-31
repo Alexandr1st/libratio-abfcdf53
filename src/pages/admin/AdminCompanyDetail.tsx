@@ -30,21 +30,61 @@ const AdminCompanyDetail = () => {
   const { data: company, isLoading, error } = useQuery({
     queryKey: ["adminCompany", id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch company data
+      const { data: companyData, error: companyError } = await supabase
         .from("companies")
         .select(`
           *,
-          profiles!companies_contact_person_id_fkey(full_name, username),
-          company_employees(id, user_id, position, joined_at, profiles(full_name, username))
+          profiles!companies_contact_person_id_fkey(full_name, username)
         `)
         .eq("id", id)
         .maybeSingle();
 
-      if (error) {
-        console.error("Error fetching company:", error);
-        throw error;
+      if (companyError) {
+        console.error("Error fetching company:", companyError);
+        throw companyError;
       }
-      return data;
+
+      if (!companyData) return null;
+
+      // Fetch company employees with their profiles separately
+      const { data: employees, error: employeesError } = await supabase
+        .from("company_employees")
+        .select("id, user_id, position, joined_at")
+        .eq("company_id", id);
+
+      if (employeesError) {
+        console.error("Error fetching employees:", employeesError);
+      }
+
+      // Fetch profiles for all employees
+      if (employees && employees.length > 0) {
+        const userIds = employees.map(e => e.user_id);
+        const { data: profiles, error: profilesError } = await supabase
+          .from("profiles")
+          .select("id, full_name, username")
+          .in("id", userIds);
+
+        if (profilesError) {
+          console.error("Error fetching profiles:", profilesError);
+        }
+
+        // Merge profiles with employees
+        const employeesWithProfiles = employees.map(emp => ({
+          ...emp,
+          profiles: profiles?.find(p => p.id === emp.user_id) || null
+        }));
+
+        return {
+          ...companyData,
+          company_employees: employeesWithProfiles
+        };
+      }
+
+      return {
+        ...companyData,
+        company_employees: []
+      };
     },
     enabled: !!id,
   });
