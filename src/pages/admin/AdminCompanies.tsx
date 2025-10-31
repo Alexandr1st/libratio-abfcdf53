@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,13 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Search, Users, Globe, Plus } from "lucide-react";
-import EditCompanyDialog from "@/components/admin/EditCompanyDialog";
 import CreateCompanyDialog from "@/components/CreateCompanyDialog";
 
 const AdminCompanies = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingCompany, setEditingCompany] = useState<any>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const { data: companies, isLoading } = useQuery({
@@ -99,7 +97,6 @@ const AdminCompanies = () => {
                     <TableHead>Местоположение</TableHead>
                     <TableHead>Сотрудники</TableHead>
                     <TableHead>Дата создания</TableHead>
-                    <TableHead>Действия</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -107,7 +104,10 @@ const AdminCompanies = () => {
                     <TableRow key={company.id}>
                       <TableCell>
                         <div className="space-y-1">
-                          <div className="font-medium flex items-center">
+                          <Link 
+                            to={`/admin/companies/${company.id}`}
+                            className="font-medium flex items-center hover:text-blue-600 transition-colors"
+                          >
                             {company.logo_url && (
                               <img 
                                 src={company.logo_url} 
@@ -116,7 +116,7 @@ const AdminCompanies = () => {
                               />
                             )}
                             {company.name}
-                          </div>
+                          </Link>
                           {company.website && (
                             <div className="flex items-center text-sm text-gray-500">
                               <Globe className="mr-1 h-3 w-3" />
@@ -160,18 +160,6 @@ const AdminCompanies = () => {
                       <TableCell>
                         {new Date(company.created_at).toLocaleDateString('ru-RU')}
                       </TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setEditingCompany(company);
-                            setDialogOpen(true);
-                          }}
-                        >
-                          Редактировать
-                        </Button>
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -185,11 +173,6 @@ const AdminCompanies = () => {
         </Card>
       </div>
 
-      <EditCompanyDialog
-        company={editingCompany}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-      />
       <CreateCompanyDialog
         open={addDialogOpen}
         setOpen={setAddDialogOpen}

@@ -20,6 +20,7 @@ import EditCompanyProfile from "./pages/EditCompanyProfile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminCompanies from "./pages/admin/AdminCompanies";
+import AdminCompanyDetail from "./pages/admin/AdminCompanyDetail";
 import AdminBooks from "./pages/admin/AdminBooks";
 import AdminActivity from "./pages/admin/AdminActivity";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/admin/companies" element={<AdminCompanies />} />
+            <Route path="/admin/companies/:id" element={<AdminCompanyDetail />} />
             <Route path="/admin/books" element={<AdminBooks />} />
             <Route path="/admin/activity" element={<AdminActivity />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
