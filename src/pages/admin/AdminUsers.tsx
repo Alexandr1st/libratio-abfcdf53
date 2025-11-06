@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,13 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Shield, Search, Building2, Plus } from "lucide-react";
 import AddUserDialog from "@/components/admin/AddUserDialog";
-import EditUserDialog from "@/components/admin/EditUserDialog";
 
 const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["adminUsers"],
@@ -139,21 +137,23 @@ const AdminUsers = () => {
                     <TableHead>Должность</TableHead>
                     <TableHead>Роль админа</TableHead>
                     <TableHead>Дата регистрации</TableHead>
-                    <TableHead>Действия</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredUsers.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
-                        <div className="space-y-1">
-                          <div className="font-medium">
+                        <Link 
+                          to={`/admin/users/${user.id}`}
+                          className="space-y-1 block hover:opacity-70 transition-opacity"
+                        >
+                          <div className="font-medium text-primary">
                             {user.full_name || 'Не указано'}
                           </div>
                           <div className="text-sm text-gray-500">
                             @{user.username || 'нет username'}
                           </div>
-                        </div>
+                        </Link>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center">
@@ -193,18 +193,6 @@ const AdminUsers = () => {
                       <TableCell>
                         {user.created_at ? new Date(user.created_at).toLocaleDateString('ru-RU') : 'Не указано'}
                       </TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setEditDialogOpen(true);
-                          }}
-                        >
-                          Редактировать
-                        </Button>
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -221,12 +209,6 @@ const AdminUsers = () => {
       <AddUserDialog
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
-      />
-
-      <EditUserDialog
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        user={selectedUser}
       />
     </AdminLayout>
   );
