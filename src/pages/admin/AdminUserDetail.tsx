@@ -268,16 +268,16 @@ const AdminUserDetail = () => {
             <div className="space-y-2">
               <Label htmlFor="company">Выберите компанию</Label>
               <Select
-                value={formData.company_id}
+                value={formData.company_id || "none"}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, company_id: value })
+                  setFormData({ ...formData, company_id: value === "none" ? "" : value })
                 }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Выберите компанию" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Без компании</SelectItem>
+                  <SelectItem value="none">Без компании</SelectItem>
                   {companies?.map((company) => (
                     <SelectItem key={company.id} value={company.id}>
                       {company.name}
