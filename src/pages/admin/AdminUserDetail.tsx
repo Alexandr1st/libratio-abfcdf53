@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -88,7 +88,7 @@ const AdminUserDetail = () => {
   });
 
   // Update form data when user data is loaded
-  useState(() => {
+  useEffect(() => {
     if (user) {
       setFormData({
         full_name: user.full_name || "",
@@ -99,7 +99,7 @@ const AdminUserDetail = () => {
         company_id: user.company_id || "",
       });
     }
-  });
+  }, [user]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {

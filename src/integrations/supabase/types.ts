@@ -393,22 +393,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      can_view_profile: {
-        Args: { profile_user_id: string }
-        Returns: boolean
-      }
+      can_view_profile: { Args: { profile_user_id: string }; Returns: boolean }
       has_admin_role: {
         Args: { required_role: string; user_uuid: string }
         Returns: boolean
       }
-      is_admin: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
-      is_super_admin: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { user_uuid: string }; Returns: boolean }
+      is_super_admin: { Args: { user_uuid: string }; Returns: boolean }
       update_book_rating: {
         Args: { book_id_param: string }
         Returns: undefined
