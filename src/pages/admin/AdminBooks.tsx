@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,13 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Book, Search, Star, Calendar, Plus } from "lucide-react";
-import EditBookDialog from "@/components/admin/EditBookDialog";
 import AddBookDialog from "@/components/admin/AddBookDialog";
 
 const AdminBooks = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingBook, setEditingBook] = useState<any>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const { data: books, isLoading } = useQuery({
@@ -99,14 +98,16 @@ const AdminBooks = () => {
                     <TableHead>Рейтинг</TableHead>
                     <TableHead>Страниц</TableHead>
                     <TableHead>Читателей</TableHead>
-                    <TableHead>Компании</TableHead>
                     <TableHead>Дата добавления</TableHead>
-                    <TableHead>Действия</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredBooks.map((book) => (
-                    <TableRow key={book.id}>
+                    <TableRow 
+                      key={book.id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => navigate(`/admin/books/${book.id}`)}
+                    >
                       <TableCell>
                         <div className="flex items-center space-x-3">
                           {book.image && (
@@ -155,31 +156,10 @@ const AdminBooks = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="space-y-1">
-                          {book.company_books?.map((companyBook, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {companyBook.companies?.name}
-                            </Badge>
-                          )) || <span className="text-gray-400">Нет в компаниях</span>}
-                        </div>
-                      </TableCell>
-                      <TableCell>
                         <div className="flex items-center text-sm text-gray-500">
                           <Calendar className="mr-1 h-4 w-4" />
                           {new Date(book.created_at).toLocaleDateString('ru-RU')}
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setEditingBook(book);
-                            setDialogOpen(true);
-                          }}
-                        >
-                          Редактировать
-                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -194,11 +174,6 @@ const AdminBooks = () => {
         </Card>
       </div>
 
-      <EditBookDialog
-        book={editingBook}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-      />
       <AddBookDialog
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
