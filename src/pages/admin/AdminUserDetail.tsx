@@ -163,10 +163,11 @@ const AdminUserDetail = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
+              type="button"
               variant="ghost"
               onClick={() => navigate("/admin/users")}
             >
@@ -179,7 +180,7 @@ const AdminUserDetail = () => {
               <p className="text-gray-600">@{user.username || "нет username"}</p>
             </div>
           </div>
-          <Button onClick={handleSubmit} disabled={updateMutation.isPending}>
+          <Button type="submit" disabled={updateMutation.isPending}>
             <Save className="mr-2 h-4 w-4" />
             {updateMutation.isPending ? "Сохранение..." : "Сохранить"}
           </Button>
@@ -194,7 +195,7 @@ const AdminUserDetail = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="full_name">Полное имя</Label>
@@ -252,7 +253,7 @@ const AdminUserDetail = () => {
                   rows={4}
                 />
               </div>
-            </form>
+            </div>
           </CardContent>
         </Card>
 
@@ -349,7 +350,7 @@ const AdminUserDetail = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </form>
     </AdminLayout>
   );
 };
