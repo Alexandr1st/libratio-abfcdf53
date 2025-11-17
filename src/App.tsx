@@ -23,6 +23,7 @@ import AdminCompanies from "./pages/admin/AdminCompanies";
 import AdminCompanyDetail from "./pages/admin/AdminCompanyDetail";
 import AdminUserDetail from "./pages/admin/AdminUserDetail";
 import AdminBooks from "./pages/admin/AdminBooks";
+import AdminBookDetail from "./pages/admin/AdminBookDetail";
 import AdminActivity from "./pages/admin/AdminActivity";
 import AdminSettings from "./pages/admin/AdminSettings";
 import NotFound from "./pages/NotFound";
@@ -55,6 +56,7 @@ const App = () => (
         <Route path="/admin/companies/:id" element={<AdminCompanyDetail />} />
         <Route path="/admin/users/:id" element={<AdminUserDetail />} />
             <Route path="/admin/books" element={<AdminBooks />} />
+            <Route path="/admin/books/:id" element={<AdminBookDetail />} />
             <Route path="/admin/activity" element={<AdminActivity />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
