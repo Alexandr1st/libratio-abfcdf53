@@ -20,12 +20,20 @@ const BookCard = ({ book, isInDiary, isCompanyProfile }: BookCardProps) => {
   return (
     <Card key={book.id} className="bg-white shadow-md rounded-lg overflow-hidden">
       <CardHeader className="flex items-center space-x-4 p-4">
-        <div className="w-16 h-24 bg-gray-200 rounded-md flex items-center justify-center text-2xl">
-          {book.image || "📚"}
+        <div className="w-16 h-24 bg-muted rounded-md flex items-center justify-center overflow-hidden flex-shrink-0">
+          {book.image && (book.image.startsWith('http://') || book.image.startsWith('https://')) ? (
+            <img 
+              src={book.image} 
+              alt={book.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-2xl">{book.image || "📚"}</span>
+          )}
         </div>
         <div>
           <CardTitle className="text-lg font-semibold">{book.title}</CardTitle>
-          <CardDescription className="text-gray-500">{book.author}</CardDescription>
+          <CardDescription className="text-muted-foreground">{book.author}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="p-4">
