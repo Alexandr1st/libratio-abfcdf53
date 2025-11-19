@@ -115,22 +115,15 @@ const AdminBooks = () => {
                               <img 
                                 src={book.image} 
                                 alt={book.title} 
-                                className="w-10 h-12 object-cover rounded"
+                                className="w-10 h-12 object-cover rounded flex-shrink-0"
                               />
                             ) : (
-                              <div className="w-10 h-12 flex items-center justify-center text-2xl bg-gray-100 rounded">
+                              <div className="w-10 h-12 flex items-center justify-center text-2xl bg-muted rounded flex-shrink-0">
                                 {book.image}
                               </div>
                             )
                           )}
-                          <div>
-                            <div className="font-medium">{book.title}</div>
-                            {book.description && (
-                              <div className="text-sm text-gray-500 max-w-xs truncate">
-                                {book.description}
-                              </div>
-                            )}
-                          </div>
+                          <div className="font-medium max-w-[200px] break-words">{book.title}</div>
                         </div>
                       </TableCell>
                       <TableCell className="font-medium">{book.author}</TableCell>
