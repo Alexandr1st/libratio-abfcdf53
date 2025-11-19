@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Book } from "lucide-react";
+import { ArrowLeft, Save, Book, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 const AdminBookDetail = () => {
@@ -25,6 +25,9 @@ const AdminBookDetail = () => {
     pages: "",
     year: "",
   });
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { data: book, isLoading, error } = useQuery({
     queryKey: ["adminBook", id],
@@ -61,6 +64,29 @@ const AdminBookDetail = () => {
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      let imageUrl = data.image;
+
+      // Upload file if selected
+      if (selectedFile) {
+        setIsUploading(true);
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${id}-${Date.now()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('book-covers')
+          .upload(filePath, selectedFile, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('book-covers')
+          .getPublicUrl(filePath);
+
+        imageUrl = publicUrl;
+        setIsUploading(false);
+      }
+
       const { error } = await supabase
         .from("books")
         .update({
@@ -68,7 +94,7 @@ const AdminBookDetail = () => {
           author: data.author,
           genre: data.genre,
           description: data.description,
-          image: data.image,
+          image: imageUrl,
           pages: data.pages ? parseInt(data.pages) : null,
           year: data.year ? parseInt(data.year) : null,
           updated_at: new Date().toISOString(),
@@ -86,6 +112,13 @@ const AdminBookDetail = () => {
       toast.error(`Ошибка при обновлении: ${error.message}`);
     },
   });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,17 +238,45 @@ const AdminBookDetail = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="image">URL обложки</Label>
+                  <Label htmlFor="cover-file">Загрузить обложку</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="cover-file"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="cursor-pointer"
+                    />
+                    {selectedFile && (
+                      <span className="text-sm text-muted-foreground">
+                        {selectedFile.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="image">Или укажите URL обложки</Label>
                   <Input
                     id="image"
                     value={formData.image}
                     onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                    placeholder="https://example.com/cover.jpg"
                   />
                 </div>
 
-                <Button type="submit" disabled={updateMutation.isPending}>
-                  <Save className="mr-2 h-4 w-4" />
-                  {updateMutation.isPending ? "Сохранение..." : "Сохранить"}
+                <Button type="submit" disabled={updateMutation.isPending || isUploading}>
+                  {isUploading ? (
+                    <>
+                      <Upload className="mr-2 h-4 w-4 animate-pulse" />
+                      Загрузка...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      {updateMutation.isPending ? "Сохранение..." : "Сохранить"}
+                    </>
+                  )}
                 </Button>
               </form>
             </CardContent>
