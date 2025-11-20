@@ -244,6 +244,9 @@ const AdminBookDetail = () => {
                               setFormData({ ...formData, year: format(date, "yyyy") });
                             }
                           }}
+                          captionLayout="dropdown"
+                          fromYear={1900}
+                          toYear={new Date().getFullYear() + 10}
                           initialFocus
                           className="pointer-events-auto"
                         />
