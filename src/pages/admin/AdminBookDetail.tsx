@@ -8,8 +8,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, Book, Upload } from "lucide-react";
+import { ArrowLeft, Save, Book, Upload, Check, ChevronsUpDown } from "lucide-react";
 import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
+
+const AVAILABLE_GENRES = [
+  "драма",
+  "комедия",
+  "трагедия",
+  "сказка",
+  "повесть",
+  "рассказ",
+  "роман",
+  "бизнес",
+  "личный рост",
+];
 
 const AdminBookDetail = () => {
   const { id } = useParams();
@@ -28,6 +43,8 @@ const AdminBookDetail = () => {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [genrePopoverOpen, setGenrePopoverOpen] = useState(false);
 
   const { data: book, isLoading, error } = useQuery({
     queryKey: ["adminBook", id],
@@ -50,6 +67,8 @@ const AdminBookDetail = () => {
 
   useEffect(() => {
     if (book) {
+      const genres = book.genre ? book.genre.split(",").map(g => g.trim()) : [];
+      setSelectedGenres(genres);
       setFormData({
         title: book.title || "",
         author: book.author || "",
@@ -61,6 +80,16 @@ const AdminBookDetail = () => {
       });
     }
   }, [book]);
+
+  const handleGenreToggle = (genre: string) => {
+    setSelectedGenres(prev => {
+      const newGenres = prev.includes(genre)
+        ? prev.filter(g => g !== genre)
+        : [...prev, genre];
+      setFormData({ ...formData, genre: newGenres.join(", ") });
+      return newGenres;
+    });
+  };
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -199,13 +228,49 @@ const AdminBookDetail = () => {
 
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="space-y-2">
-                    <Label htmlFor="genre">Жанр</Label>
-                    <Input
-                      id="genre"
-                      value={formData.genre}
-                      onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-                      required
-                    />
+                    <Label>Жанр</Label>
+                    <Popover open={genrePopoverOpen} onOpenChange={setGenrePopoverOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={genrePopoverOpen}
+                          className={cn(
+                            "w-full justify-between font-normal",
+                            !selectedGenres.length && "text-muted-foreground"
+                          )}
+                        >
+                          {selectedGenres.length > 0
+                            ? `Выбрано: ${selectedGenres.length}`
+                            : "Выберите жанры"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0 bg-background" align="start">
+                        <div className="max-h-64 overflow-y-auto p-4 space-y-2">
+                          {AVAILABLE_GENRES.map((genre) => (
+                            <div key={genre} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={genre}
+                                checked={selectedGenres.includes(genre)}
+                                onCheckedChange={() => handleGenreToggle(genre)}
+                              />
+                              <label
+                                htmlFor={genre}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                {genre}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    {selectedGenres.length > 0 && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {selectedGenres.join(", ")}
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="pages">Страниц</Label>
