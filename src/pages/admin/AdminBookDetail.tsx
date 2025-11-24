@@ -67,16 +67,24 @@ const AdminBookDetail = () => {
 
   useEffect(() => {
     if (book) {
-      const genresArray = book.genre ? book.genre.split(",").map(g => g.trim()) : [];
-      // Remove duplicates (case-insensitive)
-      const uniqueGenres = genresArray.filter((genre, index, self) => 
-        index === self.findIndex(g => g.toLowerCase() === genre.toLowerCase())
-      );
-      setSelectedGenres(uniqueGenres);
+      const rawGenres = book.genre ? book.genre.split(",").map((g) => g.trim()) : [];
+
+      // Приводим жанры к значениям из AVAILABLE_GENRES (если совпадают по регистронезависимому сравнению)
+      const mappedGenres = rawGenres
+        .map((genre) => {
+          const match = AVAILABLE_GENRES.find(
+            (available) => available.toLowerCase() === genre.toLowerCase()
+          );
+          return match || genre;
+        })
+        // Убираем дубликаты с учётом регистра
+        .filter((genre, index, self) => index === self.indexOf(genre));
+
+      setSelectedGenres(mappedGenres);
       setFormData({
         title: book.title || "",
         author: book.author || "",
-        genre: uniqueGenres.join(", "),
+        genre: mappedGenres.join(", "),
         description: book.description || "",
         image: book.image || "",
         pages: book.pages?.toString() || "",
