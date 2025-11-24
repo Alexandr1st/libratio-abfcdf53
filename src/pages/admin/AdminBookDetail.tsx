@@ -81,14 +81,16 @@ const AdminBookDetail = () => {
     }
   }, [book]);
 
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, genre: selectedGenres.join(", ") }));
+  }, [selectedGenres]);
+
   const handleGenreToggle = (genre: string) => {
-    setSelectedGenres(prev => {
-      const newGenres = prev.includes(genre)
+    setSelectedGenres(prev => 
+      prev.includes(genre)
         ? prev.filter(g => g !== genre)
-        : [...prev, genre];
-      setFormData({ ...formData, genre: newGenres.join(", ") });
-      return newGenres;
-    });
+        : [...prev, genre]
+    );
   };
 
   const updateMutation = useMutation({
