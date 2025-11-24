@@ -67,12 +67,16 @@ const AdminBookDetail = () => {
 
   useEffect(() => {
     if (book) {
-      const genres = book.genre ? book.genre.split(",").map(g => g.trim()) : [];
-      setSelectedGenres(genres);
+      const genresArray = book.genre ? book.genre.split(",").map(g => g.trim()) : [];
+      // Remove duplicates (case-insensitive)
+      const uniqueGenres = genresArray.filter((genre, index, self) => 
+        index === self.findIndex(g => g.toLowerCase() === genre.toLowerCase())
+      );
+      setSelectedGenres(uniqueGenres);
       setFormData({
         title: book.title || "",
         author: book.author || "",
-        genre: book.genre || "",
+        genre: uniqueGenres.join(", "),
         description: book.description || "",
         image: book.image || "",
         pages: book.pages?.toString() || "",
