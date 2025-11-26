@@ -77,7 +77,7 @@ const CompanyEmployees = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <BookOpen className="h-12 w-12 text-blue-600 mx-auto animate-pulse mb-4" />
-          <p className="text-lg text-gray-600">Загрузка сотрудников...</p>
+          <p className="text-lg text-gray-600">Загрузка участников...</p>
         </div>
       </div>
     );
@@ -97,11 +97,11 @@ const CompanyEmployees = () => {
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center">
                 <Users className="mr-3 h-6 w-6" />
-                Мои сотрудники
+                Мои участники
               </span>
             </CardTitle>
             <CardDescription>
-              Управляйте назначением книг для сотрудников вашей компании
+              Управляйте назначением книг для участников вашего клуба
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -109,7 +109,7 @@ const CompanyEmployees = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Сотрудник</TableHead>
+                    <TableHead>Участник</TableHead>
                     <TableHead>Должность</TableHead>
                     <TableHead>Текущая книга</TableHead>
                     <TableHead className="text-right">Действия</TableHead>
@@ -144,10 +144,10 @@ const CompanyEmployees = () => {
               <div className="text-center py-12">
                 <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Нет сотрудников
+                  Нет участников
                 </h3>
                 <p className="text-gray-500">
-                  В вашей компании пока нет зарегистрированных сотрудников
+                  В вашем клубе пока нет зарегистрированных участников
                 </p>
               </div>
             )}

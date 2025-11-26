@@ -73,9 +73,9 @@ const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookMod
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Назначить книгу сотруднику</DialogTitle>
+          <DialogTitle>Назначить книгу участнику</DialogTitle>
           <DialogDescription>
-            Выберите книгу из библиотеки компании для {employee?.profiles?.full_name}
+            Выберите книгу из библиотеки клуба для {employee?.profiles?.full_name}
           </DialogDescription>
         </DialogHeader>
 
@@ -139,7 +139,7 @@ const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookMod
                   <p className="text-gray-500">
                     {searchTerm
                       ? "Попробуйте изменить поисковый запрос"
-                      : "Добавьте книги в библиотеку компании"}
+                      : "Добавьте книги в библиотеку клуба"}
                   </p>
                 </div>
               )}

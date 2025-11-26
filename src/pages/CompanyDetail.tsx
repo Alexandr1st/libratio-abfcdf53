@@ -12,7 +12,7 @@ const CompanyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { data: companies, isLoading } = useCompanies();
   
-  // Получаем сотрудников компании из таблицы profiles
+  // Получаем участников клуба из таблицы profiles
   const { data: employees } = useQuery({
     queryKey: ['company-profiles', id],
     queryFn: async () => {
@@ -34,7 +34,7 @@ const CompanyDetail = () => {
     enabled: !!id,
   });
 
-  // Получаем книги компании
+  // Получаем книги клуба
   const { data: companyBooks } = useQuery({
     queryKey: ['company-books', id],
     queryFn: async () => {
@@ -80,11 +80,11 @@ const CompanyDetail = () => {
         <DiaryNavigation />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Компания не найдена</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Клуб не найден</h1>
             <Link to="/companies">
               <Button variant="outline">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Вернуться к компаниям
+                Вернуться к клубам
               </Button>
             </Link>
           </div>
@@ -102,7 +102,7 @@ const CompanyDetail = () => {
           <Link to="/companies">
             <Button variant="outline" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Назад к компаниям
+              Назад к клубам
             </Button>
           </Link>
         </div>
@@ -123,7 +123,7 @@ const CompanyDetail = () => {
               <CardContent className="space-y-6">
                 {company.description && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">О компании</h3>
+                    <h3 className="text-lg font-semibold mb-2">О клубе</h3>
                     <p className="text-gray-600">{company.description}</p>
                   </div>
                 )}
@@ -157,7 +157,7 @@ const CompanyDetail = () => {
                   
                   <div className="flex items-center space-x-2">
                     <Users className="h-5 w-5 text-gray-500" />
-                    <span>{employees?.length || 0} сотрудников</span>
+                    <span>{employees?.length || 0} участников</span>
                   </div>
                 </div>
               </CardContent>
@@ -171,7 +171,7 @@ const CompanyDetail = () => {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Users className="h-5 w-5" />
-                  <span>Сотрудники</span>
+                  <span>Участники</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -189,7 +189,7 @@ const CompanyDetail = () => {
                      ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">Нет сотрудников</p>
+                  <p className="text-gray-500">Нет участников</p>
                 )}
               </CardContent>
             </Card>
@@ -199,7 +199,7 @@ const CompanyDetail = () => {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Book className="h-5 w-5" />
-                  <span>Книги компании</span>
+                  <span>Книги клуба</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -226,7 +226,7 @@ const CompanyDetail = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">Нет книг в библиотеке компании</p>
+                  <p className="text-gray-500">Нет книг в библиотеке клуба</p>
                 )}
               </CardContent>
             </Card>

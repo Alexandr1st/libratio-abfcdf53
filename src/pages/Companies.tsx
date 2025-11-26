@@ -17,7 +17,7 @@ const Companies = () => {
   if (isError) {
     toast({
       title: "Ошибка",
-      description: "Не удалось загрузить компании",
+      description: "Не удалось загрузить клубы",
       variant: "destructive",
     });
     return <div>Error loading companies.</div>;
@@ -29,7 +29,7 @@ const Companies = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Компании</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Клубы</h1>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -43,7 +43,7 @@ const Companies = () => {
                 <CardContent className="space-y-3">
                   <div className="flex items-center space-x-2 text-gray-600">
                     <Users className="h-4 w-4" />
-                    <span>Сотрудники</span>
+                    <span>Участники</span>
                   </div>
                   <div className="flex items-center space-x-2 text-gray-600">
                     <MapPin className="h-4 w-4" />

@@ -98,7 +98,7 @@ const CompanyProfile = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <BookOpen className="h-12 w-12 text-blue-600 mx-auto animate-pulse mb-4" />
-          <p className="text-lg text-gray-600">Загрузка профиля компании...</p>
+          <p className="text-lg text-gray-600">Загрузка профиля клуба...</p>
         </div>
       </div>
     );
@@ -142,7 +142,7 @@ const CompanyProfile = () => {
                   {company.name}
                 </CardTitle>
                 <CardDescription className="text-base">
-                  {company.industry || "Компания"}
+                  {company.industry || "Клуб"}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -227,7 +227,7 @@ const CompanyProfile = () => {
             <Card className="border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>Библиотека компании</span>
+                  <span>Библиотека клуба</span>
                   <Badge variant="secondary">
                     0 книг
                   </Badge>
@@ -236,8 +236,8 @@ const CompanyProfile = () => {
               <CardContent>
                 <div className="text-center py-8 text-gray-500">
                   <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p>Библиотека компании пуста</p>
-                  <p className="text-sm">Добавьте книги в корпоративную библиотеку</p>
+                  <p>Библиотека клуба пуста</p>
+                  <p className="text-sm">Добавьте книги в библиотеку клуба</p>
                 </div>
               </CardContent>
             </Card>
@@ -247,14 +247,14 @@ const CompanyProfile = () => {
               <CardHeader>
                 <CardTitle>Популярные книги</CardTitle>
                 <CardDescription>
-                  Книги, которые чаще всего читают в вашей компании
+                  Книги, которые чаще всего читают в вашем клубе
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8 text-gray-500">
                   <Star className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                   <p>Пока нет популярных книг</p>
-                  <p className="text-sm">Статистика появится после добавления книг сотрудниками</p>
+                  <p className="text-sm">Статистика появится после добавления книг участниками</p>
                 </div>
               </CardContent>
             </Card>

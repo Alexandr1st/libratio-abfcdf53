@@ -53,8 +53,8 @@ const AdminCompanies = () => {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Управление компаниями</h1>
-          <p className="text-gray-600">Просмотр и управление компаниями в системе</p>
+          <h1 className="text-3xl font-bold text-gray-900">Управление клубами</h1>
+          <p className="text-gray-600">Просмотр и управление клубами в системе</p>
         </div>
 
         {/* Search */}
@@ -83,7 +83,7 @@ const AdminCompanies = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Building2 className="mr-2 h-5 w-5" />
-              Компании ({filteredCompanies?.length || 0})
+              Клубы ({filteredCompanies?.length || 0})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -91,11 +91,11 @@ const AdminCompanies = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Компания</TableHead>
+                    <TableHead>Клуб</TableHead>
                     <TableHead>Контактное лицо</TableHead>
                     <TableHead>Отрасль</TableHead>
                     <TableHead>Местоположение</TableHead>
-                    <TableHead>Сотрудники</TableHead>
+                    <TableHead>Участники</TableHead>
                     <TableHead>Дата создания</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -166,7 +166,7 @@ const AdminCompanies = () => {
               </Table>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                {searchTerm ? 'Компании не найдены' : 'Нет компаний в системе'}
+                {searchTerm ? 'Клубы не найдены' : 'Нет клубов в системе'}
               </div>
             )}
           </CardContent>

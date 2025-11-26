@@ -72,15 +72,15 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminCompanies"] });
       toast({
-        title: "Компания обновлена",
-        description: "Информация о компании успешно обновлена",
+        title: "Клуб обновлен",
+        description: "Информация о клубе успешно обновлена",
       });
       onOpenChange(false);
     },
     onError: (error) => {
       toast({
         title: "Ошибка",
-        description: "Не удалось обновить компанию: " + error.message,
+        description: "Не удалось обновить клуб: " + error.message,
         variant: "destructive",
       });
     },
@@ -95,7 +95,7 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Редактировать компанию</DialogTitle>
+          <DialogTitle>Редактировать клуб</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

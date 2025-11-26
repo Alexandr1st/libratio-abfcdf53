@@ -49,7 +49,7 @@ const DiaryNavigation = () => {
                 {isCompanyProfile && (
                   <Link to="/company-employees">
                     <Button variant="ghost" className={getButtonStyle("/company-employees")}>
-                      Мои сотрудники
+                      Мои участники
                     </Button>
                   </Link>
                 )}
@@ -71,7 +71,7 @@ const DiaryNavigation = () => {
                   </Link>
                 )}
                 <Link to="/companies">
-                  <Button variant="ghost" className={getButtonStyle("/companies")}>Компании</Button>
+                  <Button variant="ghost" className={getButtonStyle("/companies")}>Клубы</Button>
                 </Link>
                 {isAdmin && (
                   <Link to="/admin/dashboard">
