@@ -62,9 +62,9 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Регистрация новой компании</DialogTitle>
+          <DialogTitle>Регистрация нового клуба</DialogTitle>
           <DialogDescription>
-            Заполните информацию о вашей компании для создания корпоративного читательского сообщества.
+            Заполните информацию о вашем клубе для создания читательского сообщества.
           </DialogDescription>
         </DialogHeader>
         
@@ -73,10 +73,10 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
             <FormField
               control={form.control}
               name="name"
-              rules={{ required: "Название компании обязательно" }}
+              rules={{ required: "Название клуба обязательно" }}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Название компании *</FormLabel>
+                  <FormLabel>Название клуба *</FormLabel>
                   <FormControl>
                     <Input placeholder="ООО 'Технологии будущего'" {...field} />
                   </FormControl>
@@ -132,10 +132,10 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Описание компании</FormLabel>
+                  <FormLabel>Описание клуба</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Расскажите о вашей компании..."
+                    <Textarea
+                      placeholder="Расскажите о вашем клубе..."
                       className="min-h-[100px]"
                       {...field}
                     />
@@ -161,7 +161,7 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
                     Создание...
                   </>
                 ) : (
-                  "Создать компанию"
+                  "Создать клуб"
                 )}
               </Button>
             </div>

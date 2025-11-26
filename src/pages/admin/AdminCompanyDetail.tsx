@@ -123,14 +123,14 @@ const AdminCompanyDetail = () => {
       queryClient.invalidateQueries({ queryKey: ["adminCompany", id] });
       queryClient.invalidateQueries({ queryKey: ["adminCompanies"] });
       toast({
-        title: "Компания обновлена",
-        description: "Информация о компании успешно обновлена",
+        title: "Клуб обновлен",
+        description: "Информация о клубе успешно обновлена",
       });
     },
     onError: (error) => {
       toast({
         title: "Ошибка",
-        description: "Не удалось обновить компанию: " + error.message,
+        description: "Не удалось обновить клуб: " + error.message,
         variant: "destructive",
       });
     },
@@ -156,7 +156,7 @@ const AdminCompanyDetail = () => {
     return (
       <AdminLayout>
         <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">Компания не найдена</p>
+          <p className="text-gray-500 mb-4">Клуб не найден</p>
           <Button onClick={() => navigate("/admin/companies")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Вернуться к списку
@@ -190,7 +190,7 @@ const AdminCompanyDetail = () => {
                 )}
                 {company.name}
               </h1>
-              <p className="text-gray-600">Детали и редактирование компании</p>
+              <p className="text-gray-600">Детали и редактирование клуба</p>
             </div>
           </div>
         </div>
@@ -315,7 +315,7 @@ const AdminCompanyDetail = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-center py-4">Нет сотрудников</p>
+                  <p className="text-gray-500 text-center py-4">Нет участников</p>
                 )}
               </CardContent>
             </Card>
@@ -363,7 +363,7 @@ const AdminCompanyDetail = () => {
                 <div className="flex items-start">
                   <Users className="mr-3 h-5 w-5 text-gray-400 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-500">Сотрудников</p>
+                    <p className="text-sm text-gray-500">Участников</p>
                     <p className="font-medium">{company.company_employees?.length || 0}</p>
                   </div>
                 </div>

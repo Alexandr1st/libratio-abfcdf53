@@ -70,7 +70,7 @@ const Auth = () => {
       if (!companyName || !companyIndustry || !fullName) {
         toast({
           title: "Ошибка",
-          description: "Пожалуйста, заполните название компании, сферу деятельности и ваше имя",
+          description: "Пожалуйста, заполните название клуба, сферу деятельности и ваше имя",
           variant: "destructive",
         });
         return;
@@ -151,7 +151,7 @@ const Auth = () => {
       toast({
         title: "Регистрация успешна!",
         description: accountType === "company" 
-          ? "Компания зарегистрирована. Проверьте почту для подтверждения аккаунта" 
+          ? "Клуб зарегистрирован. Проверьте почту для подтверждения аккаунта" 
           : "Проверьте свою почту для подтверждения аккаунта",
       });
 
@@ -218,7 +218,7 @@ const Auth = () => {
             <CardDescription className="text-center">
               {isLogin 
                 ? "Войдите в свой аккаунт ReadConnect" 
-                : "Создайте личный аккаунт или зарегистрируйте компанию"
+                : "Создайте личный аккаунт или зарегистрируйте клуб"
               }
             </CardDescription>
           </CardHeader>
@@ -245,7 +245,7 @@ const Auth = () => {
                         <RadioGroupItem value="company" id="company" />
                         <Label htmlFor="company" className="flex items-center space-x-2 cursor-pointer">
                           <Building2 className="h-4 w-4" />
-                          <span>Компания</span>
+                          <span>Клуб</span>
                         </Label>
                       </div>
                     </RadioGroup>
@@ -285,7 +285,7 @@ const Auth = () => {
                   {accountType === "company" && (
                     <>
                       <div className="space-y-2">
-                        <Label htmlFor="companyName">Название компании *</Label>
+                        <Label htmlFor="companyName">Название клуба *</Label>
                         <Input
                           id="companyName"
                           type="text"
@@ -331,10 +331,10 @@ const Auth = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="companyDescription">Описание компании</Label>
+                        <Label htmlFor="companyDescription">Описание клуба</Label>
                         <Textarea
                           id="companyDescription"
-                          placeholder="Краткое описание деятельности компании..."
+                          placeholder="Краткое описание деятельности клуба..."
                           value={companyDescription}
                           onChange={(e) => setCompanyDescription(e.target.value)}
                           rows={3}

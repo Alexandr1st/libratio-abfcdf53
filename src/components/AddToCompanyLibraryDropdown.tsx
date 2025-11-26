@@ -26,7 +26,7 @@ const AddToCompanyLibraryDropdown = ({ bookId, isInLibrary }: AddToCompanyLibrar
       setIsOpen(false);
       toast({
         title: "Успешно",
-        description: "Книга добавлена в библиотеку компании",
+        description: "Книга добавлена в библиотеку клуба",
       });
     } catch (error) {
       console.error('Error adding book to company library:', error);

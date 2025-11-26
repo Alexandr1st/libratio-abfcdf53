@@ -82,7 +82,7 @@ const EditCompanyProfile = () => {
       console.error('Error fetching company data:', error);
       toast({
         title: "Ошибка",
-        description: "Не удалось загрузить данные компании",
+        description: "Не удалось загрузить данные клуба",
         variant: "destructive",
       });
     } finally {
@@ -113,7 +113,7 @@ const EditCompanyProfile = () => {
 
       toast({
         title: "Успешно!",
-        description: "Данные компании обновлены",
+        description: "Данные клуба обновлены",
       });
 
       navigate("/company-profile");
@@ -121,7 +121,7 @@ const EditCompanyProfile = () => {
       console.error('Error updating company:', error);
       toast({
         title: "Ошибка",
-        description: "Не удалось обновить данные компании",
+        description: "Не удалось обновить данные клуба",
         variant: "destructive",
       });
     } finally {
@@ -163,10 +163,10 @@ const EditCompanyProfile = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Building2 className="h-6 w-6 mr-2" />
-              Редактирование профиля компании
+              Редактирование профиля клуба
             </CardTitle>
             <CardDescription>
-              Обновите информацию о вашей компании
+              Обновите информацию о вашем клубе
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -212,10 +212,10 @@ const EditCompanyProfile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Описание компании</Label>
+                <Label htmlFor="description">Описание клуба</Label>
                 <Textarea
                   id="description"
-                  placeholder="Расскажите о вашей компании, её миссии и деятельности"
+                  placeholder="Расскажите о вашем клубе, его миссии и деятельности"
                   className="min-h-[120px]"
                   {...register('description')}
                 />
