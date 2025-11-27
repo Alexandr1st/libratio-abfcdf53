@@ -15,7 +15,6 @@ import DiaryNavigation from "@/components/diary/DiaryNavigation";
 interface Company {
   id: string;
   description: string | null;
-  industry: string | null;
   location: string | null;
   logo_url: string | null;
   website: string | null;
@@ -23,10 +22,8 @@ interface Company {
 
 interface CompanyFormData {
   description: string;
-  industry: string;
   location: string;
-  website: string;
-  logo_url: string;
+  chat_link: string;
 }
 
 const EditCompanyProfile = () => {
@@ -34,6 +31,7 @@ const EditCompanyProfile = () => {
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -60,7 +58,7 @@ const EditCompanyProfile = () => {
     try {
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
-        .select('id, description, industry, location, logo_url, website')
+        .select('id, description, location, logo_url, website')
         .eq('contact_person_id', user.id)
         .single();
 
@@ -73,10 +71,8 @@ const EditCompanyProfile = () => {
       
       // Заполняем форму данными компании
       setValue('description', companyData.description || '');
-      setValue('industry', companyData.industry || '');
       setValue('location', companyData.location || '');
-      setValue('website', companyData.website || '');
-      setValue('logo_url', companyData.logo_url || '');
+      setValue('chat_link', companyData.website || '');
 
     } catch (error) {
       console.error('Error fetching company data:', error);
@@ -95,14 +91,33 @@ const EditCompanyProfile = () => {
 
     setSaving(true);
     try {
+      let logoUrl = company.logo_url;
+
+      // Upload logo if file is selected
+      if (logoFile) {
+        const fileExt = logoFile.name.split('.').pop();
+        const fileName = `${company.id}-${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('club-logos')
+          .upload(fileName, logoFile, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('club-logos')
+          .getPublicUrl(fileName);
+
+        logoUrl = publicUrl;
+      }
+
       const { error } = await supabase
         .from('companies')
         .update({
           description: data.description || null,
-          industry: data.industry || null,
           location: data.location || null,
-          website: data.website || null,
-          logo_url: data.logo_url || null,
+          website: data.chat_link || null,
+          logo_url: logoUrl || null,
           updated_at: new Date().toISOString()
         })
         .eq('id', company.id);
@@ -171,43 +186,40 @@ const EditCompanyProfile = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="industry">Отрасль</Label>
-                  <Input
-                    id="industry"
-                    placeholder="Например: IT, Финансы, Образование"
-                    {...register('industry')}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="location">Местоположение</Label>
-                  <Input
-                    id="location"
-                    placeholder="Город, страна"
-                    {...register('location')}
-                  />
-                </div>
-              </div>
-
               <div className="space-y-2">
-                <Label htmlFor="website">Веб-сайт</Label>
+                <Label htmlFor="location">Местоположение</Label>
                 <Input
-                  id="website"
-                  type="url"
-                  placeholder="https://example.com"
-                  {...register('website')}
+                  id="location"
+                  placeholder="Город, страна"
+                  {...register('location')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="logo_url">URL логотипа</Label>
+                <Label htmlFor="chat_link">Ссылка на чат</Label>
                 <Input
-                  id="logo_url"
+                  id="chat_link"
                   type="url"
-                  placeholder="https://example.com/logo.png"
-                  {...register('logo_url')}
+                  placeholder="https://t.me/yourgroup"
+                  {...register('chat_link')}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="logo">Логотип клуба</Label>
+                {company?.logo_url && (
+                  <div className="mb-2">
+                    <img src={company.logo_url} alt="Current logo" className="w-20 h-20 object-cover rounded" />
+                  </div>
+                )}
+                <Input
+                  id="logo"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setLogoFile(file);
+                  }}
                 />
               </div>
 

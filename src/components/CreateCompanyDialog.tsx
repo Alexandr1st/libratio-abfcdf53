@@ -25,9 +25,9 @@ import { Loader2 } from "lucide-react";
 interface CompanyFormData {
   name: string;
   description?: string;
-  industry?: string;
   location?: string;
-  website?: string;
+  chat_link?: string;
+  logo?: File;
 }
 
 interface CreateCompanyDialogProps {
@@ -37,22 +37,31 @@ interface CreateCompanyDialogProps {
 
 export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps) => {
   const createCompany = useCreateCompany();
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const form = useForm<CompanyFormData>({
     defaultValues: {
       name: "",
       description: "",
-      industry: "",
       location: "",
-      website: "",
+      chat_link: "",
     },
   });
 
   const onSubmit = async (data: CompanyFormData) => {
     try {
-      await createCompany.mutateAsync(data);
+      await createCompany.mutateAsync({ 
+        companyData: {
+          name: data.name,
+          description: data.description || null,
+          location: data.location || null,
+          website: data.chat_link || null,
+        },
+        logo: logoFile 
+      });
       setOpen(false);
       form.reset();
+      setLogoFile(null);
     } catch (error) {
       console.error("Error creating company:", error);
     }
@@ -87,20 +96,6 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
 
             <FormField
               control={form.control}
-              name="industry"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Отрасль</FormLabel>
-                  <FormControl>
-                    <Input placeholder="IT, финансы, образование..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="location"
               render={({ field }) => (
                 <FormItem>
@@ -115,17 +110,32 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
 
             <FormField
               control={form.control}
-              name="website"
+              name="chat_link"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Веб-сайт</FormLabel>
+                  <FormLabel>Ссылка на чат</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com" {...field} />
+                    <Input placeholder="https://t.me/yourgroup" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <FormItem>
+              <FormLabel>Логотип клуба</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setLogoFile(file);
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
 
             <FormField
               control={form.control}

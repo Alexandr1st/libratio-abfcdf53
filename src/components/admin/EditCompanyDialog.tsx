@@ -27,14 +27,14 @@ interface EditCompanyDialogProps {
 const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    industry: "",
     location: "",
     logo_url: "",
-    website: "",
+    chat_link: "",
   });
 
   useEffect(() => {
@@ -42,27 +42,46 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
       setFormData({
         name: company.name || "",
         description: company.description || "",
-        industry: company.industry || "",
         location: company.location || "",
         logo_url: company.logo_url || "",
-        website: company.website || "",
+        chat_link: company.website || "",
       });
     }
+    setLogoFile(null);
   }, [company]);
 
   const updateCompanyMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       if (!company) return;
 
+      let logoUrl = data.logo_url;
+
+      // Upload logo if file is selected
+      if (logoFile) {
+        const fileExt = logoFile.name.split('.').pop();
+        const fileName = `${company.id}-${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('club-logos')
+          .upload(fileName, logoFile, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('club-logos')
+          .getPublicUrl(fileName);
+
+        logoUrl = publicUrl;
+      }
+
       const { error } = await supabase
         .from("companies")
         .update({
           name: data.name,
           description: data.description || null,
-          industry: data.industry || null,
           location: data.location || null,
-          logo_url: data.logo_url || null,
-          website: data.website || null,
+          logo_url: logoUrl || null,
+          website: data.chat_link || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", company.id);
@@ -119,15 +138,6 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
           </div>
 
           <div>
-            <Label htmlFor="industry">Отрасль</Label>
-            <Input
-              id="industry"
-              value={formData.industry}
-              onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-            />
-          </div>
-
-          <div>
             <Label htmlFor="location">Местоположение</Label>
             <Input
               id="location"
@@ -137,22 +147,30 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
           </div>
 
           <div>
-            <Label htmlFor="logo_url">URL логотипа</Label>
+            <Label htmlFor="chat_link">Ссылка на чат</Label>
             <Input
-              id="logo_url"
-              value={formData.logo_url}
-              onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-              placeholder="https://example.com/logo.png"
+              id="chat_link"
+              value={formData.chat_link}
+              onChange={(e) => setFormData({ ...formData, chat_link: e.target.value })}
+              placeholder="https://t.me/yourgroup"
             />
           </div>
 
           <div>
-            <Label htmlFor="website">Веб-сайт</Label>
+            <Label htmlFor="logo">Логотип клуба</Label>
+            {formData.logo_url && (
+              <div className="mb-2">
+                <img src={formData.logo_url} alt="Current logo" className="w-20 h-20 object-cover rounded" />
+              </div>
+            )}
             <Input
-              id="website"
-              value={formData.website}
-              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-              placeholder="https://example.com"
+              id="logo"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) setLogoFile(file);
+              }}
             />
           </div>
 
