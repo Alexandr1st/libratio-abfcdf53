@@ -34,7 +34,6 @@ const AdminCompanies = () => {
 
   const filteredCompanies = companies?.filter(company => 
     company.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    company.industry?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     company.location?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -64,7 +63,7 @@ const AdminCompanies = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Поиск по названию, отрасли или местоположению..."
+                  placeholder="Поиск по названию или местоположению..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -93,7 +92,6 @@ const AdminCompanies = () => {
                   <TableRow>
                     <TableHead>Клуб</TableHead>
                     <TableHead>Контактное лицо</TableHead>
-                    <TableHead>Отрасль</TableHead>
                     <TableHead>Местоположение</TableHead>
                     <TableHead>Участники</TableHead>
                     <TableHead>Дата создания</TableHead>
@@ -139,13 +137,6 @@ const AdminCompanies = () => {
                           </div>
                         ) : (
                           <span className="text-gray-400">Не назначено</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {company.industry ? (
-                          <Badge variant="outline">{company.industry}</Badge>
-                        ) : (
-                          <span className="text-gray-400">Не указано</span>
                         )}
                       </TableCell>
                       <TableCell>

@@ -31,17 +31,40 @@ export const useCreateCompany = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (companyData: CompanyInsert) => {
+    mutationFn: async ({ companyData, logo }: { companyData: Omit<CompanyInsert, 'logo_url'>; logo?: File | null }) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         throw new Error('Пользователь не авторизован');
       }
 
+      let logoUrl = null;
+
+      // Upload logo if provided
+      if (logo) {
+        const fileExt = logo.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('club-logos')
+          .upload(fileName, logo);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('club-logos')
+          .getPublicUrl(fileName);
+
+        logoUrl = publicUrl;
+      }
+
       // Create company
       const { data: company, error: companyError } = await supabase
         .from('companies')
-        .insert(companyData)
+        .insert({
+          ...companyData,
+          logo_url: logoUrl,
+        })
         .select()
         .single();
 
