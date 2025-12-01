@@ -16,7 +16,6 @@ import { useCompanies } from "@/hooks/useCompanies";
 interface ProfileData {
   full_name: string | null;
   bio: string | null;
-  location: string | null;
   company_id: string | null;
 }
 
@@ -25,7 +24,6 @@ const EditProfile = () => {
   const [profileData, setProfileData] = useState<ProfileData>({
     full_name: "",
     bio: "",
-    location: "",
     company_id: null
   });
   const [loading, setLoading] = useState(true);
@@ -50,7 +48,7 @@ const EditProfile = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, bio, location, company_id')
+        .select('full_name, bio, company_id')
         .eq('id', user.id)
         .single();
 
@@ -66,7 +64,6 @@ const EditProfile = () => {
       setProfileData({
         full_name: data.full_name || "",
         bio: data.bio || "",
-        location: data.location || "",
         company_id: data.company_id || null
       });
     } catch (error) {
@@ -87,7 +84,6 @@ const EditProfile = () => {
         .update({
           full_name: profileData.full_name || null,
           bio: profileData.bio || null,
-          location: profileData.location || null,
           company_id: profileData.company_id,
           updated_at: new Date().toISOString()
         })
@@ -169,18 +165,7 @@ const EditProfile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="location">Местоположение</Label>
-                <Input
-                  id="location"
-                  type="text"
-                  value={profileData.location}
-                  onChange={(e) => setProfileData(prev => ({ ...prev, location: e.target.value }))}
-                  placeholder="Город, страна"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="company">Место работы</Label>
+                <Label htmlFor="company">Клуб</Label>
                 <Select
                   value={profileData.company_id || undefined}
                   onValueChange={(value) => setProfileData(prev => ({ ...prev, company_id: value || null }))}

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Building2, Calendar, Edit, MapPin, Star, TrendingUp, User, LogOut } from "lucide-react";
+import { BookOpen, Building2, Calendar, Edit, Star, TrendingUp, User, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,8 +17,6 @@ interface Profile {
   avatar_url: string | null;
   bio: string | null;
   company: string | null;
-  position: string | null;
-  location: string | null;
   created_at: string | null;
   company_id: string | null;
 }
@@ -181,9 +179,6 @@ const Profile = () => {
                 <CardTitle className="text-2xl">
                   {profile.full_name || user.email}
                 </CardTitle>
-                <CardDescription className="text-base">
-                  {profile.position || "Reader"}
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {profile.bio && (
@@ -195,12 +190,6 @@ const Profile = () => {
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Building2 className="h-4 w-4" />
                     <span>{profile.company}</span>
-                  </div>
-                )}
-                {profile.location && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <MapPin className="h-4 w-4" />
-                    <span>{profile.location}</span>
                   </div>
                 )}
                 <div className="flex items-center space-x-2 text-sm text-gray-600">

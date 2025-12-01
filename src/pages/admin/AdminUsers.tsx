@@ -75,7 +75,6 @@ const AdminUsers = () => {
   const filteredUsers = users?.filter(user => 
     user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.position?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.companies?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -105,7 +104,7 @@ const AdminUsers = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Поиск по имени, username, должности или компании..."
+                  placeholder="Поиск по имени, username или компании..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -134,7 +133,6 @@ const AdminUsers = () => {
                   <TableRow>
                     <TableHead>Пользователь</TableHead>
                     <TableHead>Компания</TableHead>
-                    <TableHead>Должность</TableHead>
                     <TableHead>Роль админа</TableHead>
                     <TableHead>Дата регистрации</TableHead>
                   </TableRow>
@@ -166,9 +164,6 @@ const AdminUsers = () => {
                             <span className="text-gray-400">Нет компании</span>
                           )}
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        {user.position || <span className="text-gray-400">Не указано</span>}
                       </TableCell>
                       <TableCell>
                         {user.admin_roles && user.admin_roles.length > 0 ? (
