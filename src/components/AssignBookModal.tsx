@@ -52,18 +52,18 @@ const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookMod
     if (!employee) return;
 
     try {
-      // Здесь будет логика назначения книги сотруднику
+      // Здесь будет логика назначения книги участнику
       // Пока что просто показываем уведомление
       toast({
         title: "Книга назначена",
-        description: `Книга "${book.title}" назначена сотруднику ${employee.profiles?.full_name}`,
+        description: `Книга "${book.title}" назначена участнику ${employee.profiles?.full_name}`,
       });
       onClose();
     } catch (error) {
       console.error('Error assigning book:', error);
       toast({
         title: "Ошибка",
-        description: "Не удалось назначить книгу сотруднику",
+        description: "Не удалось назначить книгу участнику",
         variant: "destructive",
       });
     }

@@ -21,11 +21,11 @@ const AdminCompanyDetail = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    industry: "",
     location: "",
     logo_url: "",
-    website: "",
+    chat_link: "",
   });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const { data: company, isLoading, error } = useQuery({
     queryKey: ["adminCompany", id],
@@ -94,25 +94,43 @@ const AdminCompanyDetail = () => {
       setFormData({
         name: company.name || "",
         description: company.description || "",
-        industry: company.industry || "",
         location: company.location || "",
         logo_url: company.logo_url || "",
-        website: company.website || "",
+        chat_link: company.website || "",
       });
+      setLogoFile(null);
     }
   }, [company]);
 
   const updateCompanyMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      let logoUrl = data.logo_url;
+
+      if (logoFile && company) {
+        const fileExt = logoFile.name.split(".").pop();
+        const fileName = `${company.id}-${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("club-logos")
+          .upload(fileName, logoFile, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("club-logos").getPublicUrl(fileName);
+
+        logoUrl = publicUrl;
+      }
+
       const { error } = await supabase
         .from("companies")
         .update({
           name: data.name,
           description: data.description || null,
-          industry: data.industry || null,
           location: data.location || null,
-          logo_url: data.logo_url || null,
-          website: data.website || null,
+          logo_url: logoUrl || null,
+          website: data.chat_link || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", id);
@@ -225,43 +243,44 @@ const AdminCompanyDetail = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="industry">Отрасль</Label>
-                      <Input
-                        id="industry"
-                        value={formData.industry}
-                        onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="location">Местоположение</Label>
-                      <Input
-                        id="location"
-                        value={formData.location}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
                   <div>
-                    <Label htmlFor="logo_url">URL логотипа</Label>
+                    <Label htmlFor="location">Местоположение</Label>
                     <Input
-                      id="logo_url"
-                      value={formData.logo_url}
-                      onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                      placeholder="https://example.com/logo.png"
+                      id="location"
+                      value={formData.location}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="website">Веб-сайт</Label>
+                    <Label htmlFor="logo">Логотип клуба</Label>
+                    {formData.logo_url && (
+                      <div className="mb-2">
+                        <img
+                          src={formData.logo_url}
+                          alt={company.name}
+                          className="w-20 h-20 object-cover rounded"
+                        />
+                      </div>
+                    )}
                     <Input
-                      id="website"
-                      value={formData.website}
-                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                      placeholder="https://example.com"
+                      id="logo"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setLogoFile(file);
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="chat_link">Ссылка на чат</Label>
+                    <Input
+                      id="chat_link"
+                      value={formData.chat_link}
+                      onChange={(e) => setFormData({ ...formData, chat_link: e.target.value })}
+                      placeholder="https://t.me/yourgroup"
                     />
                   </div>
 
@@ -286,7 +305,7 @@ const AdminCompanyDetail = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Users className="mr-2 h-5 w-5" />
-                  Сотрудники ({company.company_employees?.length || 0})
+                  Участники ({company.company_employees?.length || 0})
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -330,25 +349,13 @@ const AdminCompanyDetail = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-start">
-                  <Building2 className="mr-3 h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-gray-500">Отрасль</p>
-                    {company.industry ? (
-                      <Badge variant="outline">{company.industry}</Badge>
-                    ) : (
-                      <p className="text-gray-400">Не указано</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-start">
                   <Globe className="mr-3 h-5 w-5 text-gray-400 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-500">Веб-сайт</p>
+                    <p className="text-sm text-gray-500">Ссылка на чат</p>
                     {company.website ? (
-                      <a 
-                        href={company.website} 
-                        target="_blank" 
+                      <a
+                        href={company.website}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"
                       >
@@ -373,7 +380,7 @@ const AdminCompanyDetail = () => {
                   <div>
                     <p className="text-sm text-gray-500">Дата создания</p>
                     <p className="font-medium">
-                      {new Date(company.created_at).toLocaleDateString('ru-RU')}
+                      {new Date(company.created_at).toLocaleDateString("ru-RU")}
                     </p>
                   </div>
                 </div>
