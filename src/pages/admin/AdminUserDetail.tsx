@@ -21,9 +21,7 @@ const AdminUserDetail = () => {
   const [formData, setFormData] = useState({
     full_name: "",
     username: "",
-    position: "",
     bio: "",
-    location: "",
     company_id: "",
   });
 
@@ -93,9 +91,7 @@ const AdminUserDetail = () => {
       setFormData({
         full_name: user.full_name || "",
         username: user.username || "",
-        position: user.position || "",
         bio: user.bio || "",
-        location: user.location || "",
         company_id: user.company_id || "",
       });
     }
@@ -108,9 +104,7 @@ const AdminUserDetail = () => {
         .update({
           full_name: data.full_name,
           username: data.username,
-          position: data.position,
           bio: data.bio,
-          location: data.location,
           company_id: data.company_id || null,
           updated_at: new Date().toISOString(),
         })
@@ -215,28 +209,6 @@ const AdminUserDetail = () => {
                     value={formData.username}
                     onChange={(e) =>
                       setFormData({ ...formData, username: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="position">Должность</Label>
-                  <Input
-                    id="position"
-                    value={formData.position}
-                    onChange={(e) =>
-                      setFormData({ ...formData, position: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="location">Местоположение</Label>
-                  <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) =>
-                      setFormData({ ...formData, location: e.target.value })
                     }
                   />
                 </div>

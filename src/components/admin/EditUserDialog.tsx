@@ -29,7 +29,6 @@ interface EditUserDialogProps {
     id: string;
     full_name: string | null;
     username: string | null;
-    position: string | null;
     company_id: string | null;
   } | null;
 }
@@ -37,7 +36,6 @@ interface EditUserDialogProps {
 interface UserFormData {
   full_name: string;
   username: string;
-  position: string;
   company_id: string;
 }
 
@@ -66,7 +64,6 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
       reset({
         full_name: user.full_name || "",
         username: user.username || "",
-        position: user.position || "",
         company_id: user.company_id || "",
       });
     }
@@ -82,7 +79,6 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
         .update({
           full_name: formData.full_name,
           username: formData.username,
-          position: formData.position,
           company_id: formData.company_id || null,
         })
         .eq("id", user.id);
@@ -173,15 +169,6 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
               id="username"
               {...register("username")}
               placeholder="ivan_ivanov"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="position">Должность</Label>
-            <Input
-              id="position"
-              {...register("position")}
-              placeholder="Разработчик"
             />
           </div>
 
