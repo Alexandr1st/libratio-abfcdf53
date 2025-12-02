@@ -10,9 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Building2, Users, Globe, Calendar } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
-const AdminCompanyDetail = () => {
+const AdminClubDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -27,39 +26,39 @@ const AdminCompanyDetail = () => {
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
-  const { data: company, isLoading, error } = useQuery({
-    queryKey: ["adminCompany", id],
+  const { data: club, isLoading } = useQuery({
+    queryKey: ["adminClub", id],
     queryFn: async () => {
-      // Fetch company data
-      const { data: companyData, error: companyError } = await supabase
-        .from("companies")
+      // Fetch club data
+      const { data: clubData, error: clubError } = await supabase
+        .from("clubs")
         .select(`
           *,
-          profiles!companies_contact_person_id_fkey(full_name, username)
+          profiles!clubs_contact_person_id_fkey(full_name, username)
         `)
         .eq("id", id)
         .maybeSingle();
 
-      if (companyError) {
-        console.error("Error fetching company:", companyError);
-        throw companyError;
+      if (clubError) {
+        console.error("Error fetching club:", clubError);
+        throw clubError;
       }
 
-      if (!companyData) return null;
+      if (!clubData) return null;
 
-      // Fetch company employees with their profiles separately
-      const { data: employees, error: employeesError } = await supabase
-        .from("company_employees")
+      // Fetch club members with their profiles separately
+      const { data: members, error: membersError } = await supabase
+        .from("club_members")
         .select("id, user_id, position, joined_at")
-        .eq("company_id", id);
+        .eq("club_id", id);
 
-      if (employeesError) {
-        console.error("Error fetching employees:", employeesError);
+      if (membersError) {
+        console.error("Error fetching members:", membersError);
       }
 
-      // Fetch profiles for all employees
-      if (employees && employees.length > 0) {
-        const userIds = employees.map(e => e.user_id);
+      // Fetch profiles for all members
+      if (members && members.length > 0) {
+        const userIds = members.map(e => e.user_id);
         const { data: profiles, error: profilesError } = await supabase
           .from("profiles")
           .select("id, full_name, username")
@@ -69,46 +68,46 @@ const AdminCompanyDetail = () => {
           console.error("Error fetching profiles:", profilesError);
         }
 
-        // Merge profiles with employees
-        const employeesWithProfiles = employees.map(emp => ({
-          ...emp,
-          profiles: profiles?.find(p => p.id === emp.user_id) || null
+        // Merge profiles with members
+        const membersWithProfiles = members.map(member => ({
+          ...member,
+          profiles: profiles?.find(p => p.id === member.user_id) || null
         }));
 
         return {
-          ...companyData,
-          company_employees: employeesWithProfiles
+          ...clubData,
+          club_members: membersWithProfiles
         };
       }
 
       return {
-        ...companyData,
-        company_employees: []
+        ...clubData,
+        club_members: []
       };
     },
     enabled: !!id,
   });
 
   useEffect(() => {
-    if (company) {
+    if (club) {
       setFormData({
-        name: company.name || "",
-        description: company.description || "",
-        location: company.location || "",
-        logo_url: company.logo_url || "",
-        chat_link: company.website || "",
+        name: club.name || "",
+        description: club.description || "",
+        location: club.location || "",
+        logo_url: club.logo_url || "",
+        chat_link: club.website || "",
       });
       setLogoFile(null);
     }
-  }, [company]);
+  }, [club]);
 
-  const updateCompanyMutation = useMutation({
+  const updateClubMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       let logoUrl = data.logo_url;
 
-      if (logoFile && company) {
+      if (logoFile && club) {
         const fileExt = logoFile.name.split(".").pop();
-        const fileName = `${company.id}-${Date.now()}.${fileExt}`;
+        const fileName = `${club.id}-${Date.now()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
           .from("club-logos")
@@ -124,7 +123,7 @@ const AdminCompanyDetail = () => {
       }
 
       const { error } = await supabase
-        .from("companies")
+        .from("clubs")
         .update({
           name: data.name,
           description: data.description || null,
@@ -138,8 +137,8 @@ const AdminCompanyDetail = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["adminCompany", id] });
-      queryClient.invalidateQueries({ queryKey: ["adminCompanies"] });
+      queryClient.invalidateQueries({ queryKey: ["adminClub", id] });
+      queryClient.invalidateQueries({ queryKey: ["adminClubs"] });
       toast({
         title: "Клуб обновлен",
         description: "Информация о клубе успешно обновлена",
@@ -156,7 +155,7 @@ const AdminCompanyDetail = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateCompanyMutation.mutate(formData);
+    updateClubMutation.mutate(formData);
   };
 
   if (isLoading) {
@@ -170,12 +169,12 @@ const AdminCompanyDetail = () => {
     );
   }
 
-  if (!company) {
+  if (!club) {
     return (
       <AdminLayout>
         <div className="text-center py-12">
           <p className="text-gray-500 mb-4">Клуб не найден</p>
-          <Button onClick={() => navigate("/admin/companies")}>
+          <Button onClick={() => navigate("/admin/clubs")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Вернуться к списку
           </Button>
@@ -192,21 +191,21 @@ const AdminCompanyDetail = () => {
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
-              onClick={() => navigate("/admin/companies")}
+              onClick={() => navigate("/admin/clubs")}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Назад
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                {company.logo_url && (
+                {club.logo_url && (
                   <img 
-                    src={company.logo_url} 
-                    alt={company.name} 
+                    src={club.logo_url} 
+                    alt={club.name} 
                     className="w-8 h-8 rounded mr-3"
                   />
                 )}
-                {company.name}
+                {club.name}
               </h1>
               <p className="text-gray-600">Детали и редактирование клуба</p>
             </div>
@@ -258,7 +257,7 @@ const AdminCompanyDetail = () => {
                       <div className="mb-2">
                         <img
                           src={formData.logo_url}
-                          alt={company.name}
+                          alt={club.name}
                           className="w-20 h-20 object-cover rounded"
                         />
                       </div>
@@ -288,47 +287,47 @@ const AdminCompanyDetail = () => {
                     <Button 
                       type="button" 
                       variant="outline" 
-                      onClick={() => navigate("/admin/companies")}
+                      onClick={() => navigate("/admin/clubs")}
                     >
                       Отмена
                     </Button>
-                    <Button type="submit" disabled={updateCompanyMutation.isPending}>
-                      {updateCompanyMutation.isPending ? "Сохранение..." : "Сохранить изменения"}
+                    <Button type="submit" disabled={updateClubMutation.isPending}>
+                      {updateClubMutation.isPending ? "Сохранение..." : "Сохранить изменения"}
                     </Button>
                   </div>
                 </form>
               </CardContent>
             </Card>
 
-            {/* Employees List */}
+            {/* Members List */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Users className="mr-2 h-5 w-5" />
-                  Участники ({company.company_employees?.length || 0})
+                  Участники ({club.club_members?.length || 0})
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {company.company_employees && company.company_employees.length > 0 ? (
+                {club.club_members && club.club_members.length > 0 ? (
                   <div className="space-y-3">
-                    {company.company_employees.map((employee: any) => (
+                    {club.club_members.map((member: any) => (
                       <div 
-                        key={employee.id} 
+                        key={member.id} 
                         className="flex items-center justify-between p-3 border rounded-lg"
                       >
                         <div>
                           <p className="font-medium">
-                            {employee.profiles?.full_name || "Без имени"}
+                            {member.profiles?.full_name || "Без имени"}
                           </p>
                           <p className="text-sm text-gray-500">
-                            @{employee.profiles?.username || "нет username"}
+                            @{member.profiles?.username || "нет username"}
                           </p>
-                          {employee.position && (
-                            <p className="text-sm text-gray-600 mt-1">{employee.position}</p>
+                          {member.position && (
+                            <p className="text-sm text-gray-600 mt-1">{member.position}</p>
                           )}
                         </div>
                         <div className="text-sm text-gray-500">
-                          Присоединился: {new Date(employee.joined_at).toLocaleDateString('ru-RU')}
+                          Присоединился: {new Date(member.joined_at).toLocaleDateString('ru-RU')}
                         </div>
                       </div>
                     ))}
@@ -352,14 +351,14 @@ const AdminCompanyDetail = () => {
                   <Globe className="mr-3 h-5 w-5 text-gray-400 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500">Ссылка на чат</p>
-                    {company.website ? (
+                    {club.website ? (
                       <a
-                        href={company.website}
+                        href={club.website}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"
                       >
-                        {company.website}
+                        {club.website}
                       </a>
                     ) : (
                       <p className="text-gray-400">Не указано</p>
@@ -371,7 +370,7 @@ const AdminCompanyDetail = () => {
                   <Users className="mr-3 h-5 w-5 text-gray-400 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500">Участников</p>
-                    <p className="font-medium">{company.company_employees?.length || 0}</p>
+                    <p className="font-medium">{club.club_members?.length || 0}</p>
                   </div>
                 </div>
 
@@ -380,7 +379,7 @@ const AdminCompanyDetail = () => {
                   <div>
                     <p className="text-sm text-gray-500">Дата создания</p>
                     <p className="font-medium">
-                      {new Date(company.created_at).toLocaleDateString("ru-RU")}
+                      {new Date(club.created_at).toLocaleDateString("ru-RU")}
                     </p>
                   </div>
                 </div>
@@ -388,16 +387,16 @@ const AdminCompanyDetail = () => {
             </Card>
 
             {/* Contact Person */}
-            {company.profiles && (
+            {club.profiles && (
               <Card>
                 <CardHeader>
                   <CardTitle>Контактное лицо</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div>
-                    <p className="font-medium">{company.profiles.full_name || "Не указано"}</p>
+                    <p className="font-medium">{club.profiles.full_name || "Не указано"}</p>
                     <p className="text-sm text-gray-500">
-                      @{company.profiles.username || "нет username"}
+                      @{club.profiles.username || "нет username"}
                     </p>
                   </div>
                 </CardContent>
@@ -410,4 +409,4 @@ const AdminCompanyDetail = () => {
   );
 };
 
-export default AdminCompanyDetail;
+export default AdminClubDetail;

@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useCreateCompany } from "@/hooks/useCompanies";
+import { useCreateClub } from "@/hooks/useClubs";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 
-interface CompanyFormData {
+interface ClubFormData {
   name: string;
   description?: string;
   location?: string;
@@ -30,16 +29,16 @@ interface CompanyFormData {
   logo?: File;
 }
 
-interface CreateCompanyDialogProps {
+interface CreateClubDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
 
-export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps) => {
-  const createCompany = useCreateCompany();
+export const CreateClubDialog = ({ open, setOpen }: CreateClubDialogProps) => {
+  const createClub = useCreateClub();
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
-  const form = useForm<CompanyFormData>({
+  const form = useForm<ClubFormData>({
     defaultValues: {
       name: "",
       description: "",
@@ -48,10 +47,10 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
     },
   });
 
-  const onSubmit = async (data: CompanyFormData) => {
+  const onSubmit = async (data: ClubFormData) => {
     try {
-      await createCompany.mutateAsync({ 
-        companyData: {
+      await createClub.mutateAsync({ 
+        clubData: {
           name: data.name,
           description: data.description || null,
           location: data.location || null,
@@ -63,7 +62,7 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
       form.reset();
       setLogoFile(null);
     } catch (error) {
-      console.error("Error creating company:", error);
+      console.error("Error creating club:", error);
     }
   };
 
@@ -87,7 +86,7 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
                 <FormItem>
                   <FormLabel>Название клуба *</FormLabel>
                   <FormControl>
-                    <Input placeholder="ООО 'Технологии будущего'" {...field} />
+                    <Input placeholder="Книжный клуб 'Читатели'" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -160,12 +159,12 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
-                disabled={createCompany.isPending}
+                disabled={createClub.isPending}
               >
                 Отмена
               </Button>
-              <Button type="submit" disabled={createCompany.isPending}>
-                {createCompany.isPending ? (
+              <Button type="submit" disabled={createClub.isPending}>
+                {createClub.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Создание...
@@ -182,4 +181,4 @@ export const CreateCompanyDialog = ({ open, setOpen }: CreateCompanyDialogProps)
   );
 };
 
-export default CreateCompanyDialog;
+export default CreateClubDialog;

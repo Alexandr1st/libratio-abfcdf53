@@ -8,23 +8,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
-interface Company {
+interface Club {
   id: string;
   name: string;
   description?: string;
-  industry?: string;
   location?: string;
   logo_url?: string;
   website?: string;
 }
 
-interface EditCompanyDialogProps {
-  company: Company | null;
+interface EditClubDialogProps {
+  club: Club | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogProps) => {
+const EditClubDialog = ({ club, open, onOpenChange }: EditClubDialogProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -38,28 +37,28 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
   });
 
   useEffect(() => {
-    if (company) {
+    if (club) {
       setFormData({
-        name: company.name || "",
-        description: company.description || "",
-        location: company.location || "",
-        logo_url: company.logo_url || "",
-        chat_link: company.website || "",
+        name: club.name || "",
+        description: club.description || "",
+        location: club.location || "",
+        logo_url: club.logo_url || "",
+        chat_link: club.website || "",
       });
     }
     setLogoFile(null);
-  }, [company]);
+  }, [club]);
 
-  const updateCompanyMutation = useMutation({
+  const updateClubMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      if (!company) return;
+      if (!club) return;
 
       let logoUrl = data.logo_url;
 
       // Upload logo if file is selected
       if (logoFile) {
         const fileExt = logoFile.name.split('.').pop();
-        const fileName = `${company.id}-${Date.now()}.${fileExt}`;
+        const fileName = `${club.id}-${Date.now()}.${fileExt}`;
         
         const { error: uploadError } = await supabase.storage
           .from('club-logos')
@@ -75,7 +74,7 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
       }
 
       const { error } = await supabase
-        .from("companies")
+        .from("clubs")
         .update({
           name: data.name,
           description: data.description || null,
@@ -84,12 +83,12 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
           website: data.chat_link || null,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", company.id);
+        .eq("id", club.id);
 
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["adminCompanies"] });
+      queryClient.invalidateQueries({ queryKey: ["adminClubs"] });
       toast({
         title: "Клуб обновлен",
         description: "Информация о клубе успешно обновлена",
@@ -107,7 +106,7 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateCompanyMutation.mutate(formData);
+    updateClubMutation.mutate(formData);
   };
 
   return (
@@ -178,8 +177,8 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Отмена
             </Button>
-            <Button type="submit" disabled={updateCompanyMutation.isPending}>
-              {updateCompanyMutation.isPending ? "Сохранение..." : "Сохранить"}
+            <Button type="submit" disabled={updateClubMutation.isPending}>
+              {updateClubMutation.isPending ? "Сохранение..." : "Сохранить"}
             </Button>
           </div>
         </form>
@@ -188,4 +187,4 @@ const EditCompanyDialog = ({ company, open, onOpenChange }: EditCompanyDialogPro
   );
 };
 
-export default EditCompanyDialog;
+export default EditClubDialog;

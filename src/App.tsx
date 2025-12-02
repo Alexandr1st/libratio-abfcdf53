@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,16 +10,16 @@ import Books from "./pages/Books";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import Diary from "./pages/Diary";
-import Companies from "./pages/Companies";
-import CompanyDetail from "./pages/CompanyDetail";
-import CompanyProfile from "./pages/CompanyProfile";
-import CompanyLibrary from "./pages/CompanyLibrary";
-import CompanyEmployees from "./pages/CompanyEmployees";
-import EditCompanyProfile from "./pages/EditCompanyProfile";
+import Clubs from "./pages/Clubs";
+import ClubDetail from "./pages/ClubDetail";
+import ClubProfile from "./pages/ClubProfile";
+import ClubLibrary from "./pages/ClubLibrary";
+import ClubMembers from "./pages/ClubMembers";
+import EditClubProfile from "./pages/EditClubProfile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
-import AdminCompanies from "./pages/admin/AdminCompanies";
-import AdminCompanyDetail from "./pages/admin/AdminCompanyDetail";
+import AdminClubs from "./pages/admin/AdminClubs";
+import AdminClubDetail from "./pages/admin/AdminClubDetail";
 import AdminUserDetail from "./pages/admin/AdminUserDetail";
 import AdminBooks from "./pages/admin/AdminBooks";
 import AdminBookDetail from "./pages/admin/AdminBookDetail";
@@ -44,22 +43,21 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/edit" element={<EditProfile />} />
             <Route path="/diary" element={<Diary />} />
-            <Route path="/companies" element={<Companies />} />
-            <Route path="/companies/:id" element={<CompanyDetail />} />
-            <Route path="/company-profile" element={<CompanyProfile />} />
-            <Route path="/company-library" element={<CompanyLibrary />} />
-            <Route path="/company-employees" element={<CompanyEmployees />} />
-            <Route path="/company-profile/edit" element={<EditCompanyProfile />} />
+            <Route path="/clubs" element={<Clubs />} />
+            <Route path="/clubs/:id" element={<ClubDetail />} />
+            <Route path="/club-profile" element={<ClubProfile />} />
+            <Route path="/club-library" element={<ClubLibrary />} />
+            <Route path="/club-members" element={<ClubMembers />} />
+            <Route path="/club-profile/edit" element={<EditClubProfile />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/companies" element={<AdminCompanies />} />
-        <Route path="/admin/companies/:id" element={<AdminCompanyDetail />} />
-        <Route path="/admin/users/:id" element={<AdminUserDetail />} />
+            <Route path="/admin/clubs" element={<AdminClubs />} />
+            <Route path="/admin/clubs/:id" element={<AdminClubDetail />} />
+            <Route path="/admin/users/:id" element={<AdminUserDetail />} />
             <Route path="/admin/books" element={<AdminBooks />} />
             <Route path="/admin/books/:id" element={<AdminBookDetail />} />
             <Route path="/admin/activity" element={<AdminActivity />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

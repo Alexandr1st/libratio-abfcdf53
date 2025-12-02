@@ -1,27 +1,21 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Plus, Loader2, Building2 } from "lucide-react";
-import { useAddBookToCompanyLibrary } from "@/hooks/useCompanyBooks";
+import { useAddBookToClubLibrary } from "@/hooks/useClubBooks";
 import { toast } from "@/hooks/use-toast";
 
-interface AddToCompanyLibraryDropdownProps {
+interface AddToClubLibraryDropdownProps {
   bookId: string;
   isInLibrary: boolean;
 }
 
-const AddToCompanyLibraryDropdown = ({ bookId, isInLibrary }: AddToCompanyLibraryDropdownProps) => {
+const AddToClubLibraryDropdown = ({ bookId, isInLibrary }: AddToClubLibraryDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const addBookToLibrary = useAddBookToCompanyLibrary();
+  const addBookToLibrary = useAddBookToClubLibrary();
 
   const handleAddToLibrary = async () => {
     try {
-      console.log('Adding book to company library:', { bookId });
+      console.log('Adding book to club library:', { bookId });
       await addBookToLibrary.mutateAsync({ bookId });
       setIsOpen(false);
       toast({
@@ -29,7 +23,7 @@ const AddToCompanyLibraryDropdown = ({ bookId, isInLibrary }: AddToCompanyLibrar
         description: "Книга добавлена в библиотеку клуба",
       });
     } catch (error) {
-      console.error('Error adding book to company library:', error);
+      console.error('Error adding book to club library:', error);
       toast({
         title: "Ошибка",
         description: "Не удалось добавить книгу в библиотеку",
@@ -63,4 +57,4 @@ const AddToCompanyLibraryDropdown = ({ bookId, isInLibrary }: AddToCompanyLibrar
   );
 };
 
-export default AddToCompanyLibraryDropdown;
+export default AddToClubLibraryDropdown;

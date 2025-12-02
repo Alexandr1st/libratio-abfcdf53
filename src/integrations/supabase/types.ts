@@ -164,7 +164,81 @@ export type Database = {
         }
         Relationships: []
       }
-      companies: {
+      club_books: {
+        Row: {
+          added_at: string
+          added_by: string | null
+          book_id: string
+          club_id: string
+          id: string
+        }
+        Insert: {
+          added_at?: string
+          added_by?: string | null
+          book_id: string
+          club_id: string
+          id?: string
+        }
+        Update: {
+          added_at?: string
+          added_by?: string | null
+          book_id?: string
+          club_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_books_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_books_company_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_members: {
+        Row: {
+          club_id: string
+          id: string
+          is_admin: boolean | null
+          joined_at: string
+          position: string | null
+          user_id: string
+        }
+        Insert: {
+          club_id: string
+          id?: string
+          is_admin?: boolean | null
+          joined_at?: string
+          position?: string | null
+          user_id: string
+        }
+        Update: {
+          club_id?: string
+          id?: string
+          is_admin?: boolean | null
+          joined_at?: string
+          position?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_employees_company_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clubs: {
         Row: {
           contact_person_id: string | null
           created_at: string
@@ -207,80 +281,6 @@ export type Database = {
             columns: ["contact_person_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      company_books: {
-        Row: {
-          added_at: string
-          added_by: string | null
-          book_id: string
-          company_id: string
-          id: string
-        }
-        Insert: {
-          added_at?: string
-          added_by?: string | null
-          book_id: string
-          company_id: string
-          id?: string
-        }
-        Update: {
-          added_at?: string
-          added_by?: string | null
-          book_id?: string
-          company_id?: string
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "company_books_book_id_fkey"
-            columns: ["book_id"]
-            isOneToOne: false
-            referencedRelation: "books"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "company_books_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      company_employees: {
-        Row: {
-          company_id: string
-          id: string
-          is_admin: boolean | null
-          joined_at: string
-          position: string | null
-          user_id: string
-        }
-        Insert: {
-          company_id: string
-          id?: string
-          is_admin?: boolean | null
-          joined_at?: string
-          position?: string | null
-          user_id: string
-        }
-        Update: {
-          company_id?: string
-          id?: string
-          is_admin?: boolean | null
-          joined_at?: string
-          position?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "company_employees_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -342,8 +342,8 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
-          company: string | null
-          company_id: string | null
+          club_id: string | null
+          club_name: string | null
           created_at: string | null
           full_name: string | null
           id: string
@@ -355,8 +355,8 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
-          company?: string | null
-          company_id?: string | null
+          club_id?: string | null
+          club_name?: string | null
           created_at?: string | null
           full_name?: string | null
           id: string
@@ -368,8 +368,8 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
-          company?: string | null
-          company_id?: string | null
+          club_id?: string | null
+          club_name?: string | null
           created_at?: string | null
           full_name?: string | null
           id?: string
@@ -381,9 +381,9 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "profiles_company_id_fkey"
-            columns: ["company_id"]
+            columns: ["club_id"]
             isOneToOne: false
-            referencedRelation: "companies"
+            referencedRelation: "clubs"
             referencedColumns: ["id"]
           },
         ]

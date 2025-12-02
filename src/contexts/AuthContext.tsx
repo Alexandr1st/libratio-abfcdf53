@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,10 +36,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Check if user needs company creation
+        // Check if user needs club creation
         if (session?.user) {
           setTimeout(() => {
-            checkAndCreateCompany(session.user);
+            checkAndCreateClub(session.user);
           }, 0);
         }
       }
@@ -52,10 +51,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setUser(session?.user ?? null);
       setLoading(false);
       
-      // Check if user needs company creation
+      // Check if user needs club creation
       if (session?.user) {
         setTimeout(() => {
-          checkAndCreateCompany(session.user);
+          checkAndCreateClub(session.user);
         }, 0);
       }
     });
@@ -63,21 +62,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkAndCreateCompany = async (user: User) => {
+  const checkAndCreateClub = async (user: User) => {
     const accountType = user.user_metadata?.account_type;
     
     if (accountType === 'company') {
-      // Check if user already has a company
+      // Check if user already has a club
       const { data: profile } = await supabase
         .from('profiles')
-        .select('company_id')
+        .select('club_id')
         .eq('id', user.id)
         .single();
       
-      if (!profile?.company_id) {
-        // User is company type but has no company - they might have registered but company creation failed
-        // For now, we'll just log this. You might want to show a modal to collect company details
-        console.log('Company user without company detected:', user.id);
+      if (!profile?.club_id) {
+        // User is club type but has no club - they might have registered but club creation failed
+        console.log('Club user without club detected:', user.id);
       }
     }
   };

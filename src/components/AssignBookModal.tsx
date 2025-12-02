@@ -4,21 +4,20 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookOpen, Search, Plus } from "lucide-react";
-import { useCompanyBooksWithDetails } from "@/hooks/useCompanyBooks";
+import { useClubBooksWithDetails } from "@/hooks/useClubBooks";
 import { useToast } from "@/hooks/use-toast";
 
-interface Employee {
+interface Member {
   id: string;
   user_id: string;
   profiles: {
     full_name: string | null;
-    position: string | null;
   } | null;
 }
 
-interface CompanyBookWithDetails {
+interface ClubBookWithDetails {
   id: string;
-  company_id: string;
+  club_id: string;
   book_id: string;
   added_at: string;
   books: {
@@ -34,26 +33,25 @@ interface CompanyBookWithDetails {
 interface AssignBookModalProps {
   isOpen: boolean;
   onClose: () => void;
-  employee: Employee | null;
+  employee: Member | null;
   companyId: string;
 }
 
 const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookModalProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
-  const { data: companyBooks, isLoading } = useCompanyBooksWithDetails(companyId);
+  const { data: clubBooks, isLoading } = useClubBooksWithDetails(companyId);
 
-  const filteredBooks = companyBooks?.filter((companyBook: CompanyBookWithDetails) =>
-    companyBook.books.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    companyBook.books.author.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBooks = (clubBooks as ClubBookWithDetails[] | undefined)?.filter((clubBook) =>
+    clubBook.books.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    clubBook.books.author.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAssignBook = async (book: CompanyBookWithDetails['books']) => {
+  const handleAssignBook = async (book: ClubBookWithDetails['books']) => {
     if (!employee) return;
 
     try {
       // Здесь будет логика назначения книги участнику
-      // Пока что просто показываем уведомление
       toast({
         title: "Книга назначена",
         description: `Книга "${book.title}" назначена участнику ${employee.profiles?.full_name}`,
@@ -99,16 +97,16 @@ const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookMod
             <ScrollArea className="h-[400px]">
               {filteredBooks && filteredBooks.length > 0 ? (
                 <div className="space-y-3">
-                  {filteredBooks.map((companyBook: CompanyBookWithDetails) => (
+                  {filteredBooks.map((clubBook) => (
                     <div
-                      key={companyBook.id}
+                      key={clubBook.id}
                       className="flex items-center space-x-4 p-3 border rounded-lg hover:bg-gray-50"
                     >
                       <div className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center flex-shrink-0">
-                        {companyBook.books.image ? (
+                        {clubBook.books.image ? (
                           <img
-                            src={companyBook.books.image}
-                            alt={companyBook.books.title}
+                            src={clubBook.books.image}
+                            alt={clubBook.books.title}
                             className="w-full h-full object-cover rounded"
                           />
                         ) : (
@@ -116,13 +114,13 @@ const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookMod
                         )}
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-medium">{companyBook.books.title}</h4>
-                        <p className="text-sm text-gray-600">{companyBook.books.author}</p>
-                        <p className="text-xs text-gray-500">{companyBook.books.genre}</p>
+                        <h4 className="font-medium">{clubBook.books.title}</h4>
+                        <p className="text-sm text-gray-600">{clubBook.books.author}</p>
+                        <p className="text-xs text-gray-500">{clubBook.books.genre}</p>
                       </div>
                       <Button
                         size="sm"
-                        onClick={() => handleAssignBook(companyBook.books)}
+                        onClick={() => handleAssignBook(clubBook.books)}
                       >
                         <Plus className="mr-2 h-4 w-4" />
                         Назначить
