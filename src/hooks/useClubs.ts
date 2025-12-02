@@ -1,23 +1,38 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { Tables, TablesInsert } from '@/integrations/supabase/types';
 import { useToast } from '@/hooks/use-toast';
 
-type Company = Tables<'companies'>;
-type CompanyInsert = TablesInsert<'companies'>;
+interface Club {
+  id: string;
+  name: string;
+  description: string | null;
+  location: string | null;
+  logo_url: string | null;
+  website: string | null;
+  contact_person_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
-export const useCompanies = () => {
+interface ClubInsert {
+  name: string;
+  description?: string | null;
+  location?: string | null;
+  logo_url?: string | null;
+  website?: string | null;
+}
+
+export const useClubs = () => {
   return useQuery({
-    queryKey: ['companies'],
-    queryFn: async (): Promise<Company[]> => {
+    queryKey: ['clubs'],
+    queryFn: async (): Promise<Club[]> => {
       const { data, error } = await supabase
-        .from('companies')
+        .from('clubs')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching companies:', error);
+        console.error('Error fetching clubs:', error);
         throw error;
       }
 
@@ -26,12 +41,12 @@ export const useCompanies = () => {
   });
 };
 
-export const useCreateCompany = () => {
+export const useCreateClub = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ companyData, logo }: { companyData: Omit<CompanyInsert, 'logo_url'>; logo?: File | null }) => {
+    mutationFn: async ({ clubData, logo }: { clubData: Omit<ClubInsert, 'logo_url'>; logo?: File | null }) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -58,41 +73,40 @@ export const useCreateCompany = () => {
         logoUrl = publicUrl;
       }
 
-      // Create company
-      const { data: company, error: companyError } = await supabase
-        .from('companies')
+      // Create club
+      const { data: club, error: clubError } = await supabase
+        .from('clubs')
         .insert({
-          ...companyData,
+          ...clubData,
           logo_url: logoUrl,
         })
         .select()
         .single();
 
-      if (companyError) {
-        throw companyError;
+      if (clubError) {
+        throw clubError;
       }
 
-      // Add user as company admin
-      const { error: employeeError } = await supabase
-        .from('company_employees')
+      // Add user as club admin
+      const { error: memberError } = await supabase
+        .from('club_members')
         .insert({
-          company_id: company.id,
+          club_id: club.id,
           user_id: user.id,
           is_admin: true,
           position: "Администратор",
         });
 
-      if (employeeError) {
-        throw employeeError;
+      if (memberError) {
+        throw memberError;
       }
 
-      // Update user profile with company info
+      // Update user profile with club info
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          company_id: company.id,
-          company: companyData.name,
-          position: "Администратор",
+          club_id: club.id,
+          club_name: clubData.name,
         })
         .eq('id', user.id);
 
@@ -100,32 +114,32 @@ export const useCreateCompany = () => {
         throw profileError;
       }
 
-      return company;
+      return club;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      queryClient.invalidateQueries({ queryKey: ['clubs'] });
       toast({
         title: "Успешно!",
-        description: "Компания создана и вы добавлены как администратор",
+        description: "Клуб создан и вы добавлены как администратор",
       });
     },
     onError: (error) => {
-      console.error('Error creating company:', error);
+      console.error('Error creating club:', error);
       toast({
         title: "Ошибка",
-        description: "Не удалось создать компанию",
+        description: "Не удалось создать клуб",
         variant: "destructive",
       });
     },
   });
 };
 
-export const useJoinCompany = () => {
+export const useJoinClub = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ companyId, position }: { companyId: string; position?: string }) => {
+    mutationFn: async ({ clubId, position }: { clubId: string; position?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -133,9 +147,9 @@ export const useJoinCompany = () => {
       }
 
       const { data, error } = await supabase
-        .from('company_employees')
+        .from('club_members')
         .insert({
-          company_id: companyId,
+          club_id: clubId,
           user_id: user.id,
           position: position || null,
           is_admin: false,
@@ -144,31 +158,31 @@ export const useJoinCompany = () => {
         .single();
 
       if (error) {
-        console.error('Error joining company:', error);
+        console.error('Error joining club:', error);
         throw error;
       }
 
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      queryClient.invalidateQueries({ queryKey: ['clubs'] });
       toast({
         title: "Успешно!",
-        description: "Вы присоединились к компании",
+        description: "Вы присоединились к клубу",
       });
     },
     onError: (error: any) => {
-      console.error('Error joining company:', error);
+      console.error('Error joining club:', error);
       if (error.code === '23505') {
         toast({
           title: "Уже участник",
-          description: "Вы уже участник этой компании",
+          description: "Вы уже участник этого клуба",
           variant: "destructive",
         });
       } else {
         toast({
           title: "Ошибка",
-          description: "Не удалось присоединиться к компании",
+          description: "Не удалось присоединиться к клубу",
           variant: "destructive",
         });
       }

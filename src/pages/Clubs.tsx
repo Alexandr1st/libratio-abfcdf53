@@ -1,17 +1,16 @@
-
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, MapPin, Globe } from "lucide-react";
-import { useCompanies } from "@/hooks/useCompanies";
+import { useClubs } from "@/hooks/useClubs";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 
-const Companies = () => {
-  const { data: companies, isLoading, isError } = useCompanies();
+const Clubs = () => {
+  const { data: clubs, isLoading, isError } = useClubs();
   const { toast } = useToast();
 
   if (isLoading) {
-    return <div>Loading companies...</div>;
+    return <div>Loading clubs...</div>;
   }
 
   if (isError) {
@@ -20,7 +19,7 @@ const Companies = () => {
       description: "Не удалось загрузить клубы",
       variant: "destructive",
     });
-    return <div>Error loading companies.</div>;
+    return <div>Error loading clubs.</div>;
   }
 
   return (
@@ -33,26 +32,28 @@ const Companies = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {companies?.map((company) => (
-            <Card key={company.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
-              <Link to={`/companies/${company.id}`} className="block">
+          {clubs?.map((club) => (
+            <Card key={club.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+              <Link to={`/clubs/${club.id}`} className="block">
                 <CardHeader>
-                  <CardTitle className="text-xl font-semibold">{company.name}</CardTitle>
-                  <CardDescription>{company.industry}</CardDescription>
+                  <CardTitle className="text-xl font-semibold">{club.name}</CardTitle>
+                  <CardDescription>{club.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center space-x-2 text-gray-600">
                     <Users className="h-4 w-4" />
                     <span>Участники</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <MapPin className="h-4 w-4" />
-                    <span>{company.location}</span>
-                  </div>
-                  {company.website && (
+                  {club.location && (
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <MapPin className="h-4 w-4" />
+                      <span>{club.location}</span>
+                    </div>
+                  )}
+                  {club.website && (
                     <div className="flex items-center space-x-2 text-gray-600">
                       <Globe className="h-4 w-4" />
-                      <span className="text-blue-500">Веб-сайт</span>
+                      <span className="text-blue-500">Чат</span>
                     </div>
                   )}
                 </CardContent>
@@ -65,4 +66,4 @@ const Companies = () => {
   );
 };
 
-export default Companies;
+export default Clubs;

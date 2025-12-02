@@ -7,23 +7,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Building2, Search, Users, Globe, Plus } from "lucide-react";
-import CreateCompanyDialog from "@/components/CreateCompanyDialog";
+import CreateClubDialog from "@/components/CreateClubDialog";
 
-const AdminCompanies = () => {
+const AdminClubs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
-  const { data: companies, isLoading } = useQuery({
-    queryKey: ["adminCompanies"],
+  const { data: clubs, isLoading } = useQuery({
+    queryKey: ["adminClubs"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("companies")
+        .from("clubs")
         .select(`
           *,
-          profiles!companies_contact_person_id_fkey(full_name, username),
-          company_employees(id)
+          profiles!clubs_contact_person_id_fkey(full_name, username),
+          club_members(id)
         `)
         .order("created_at", { ascending: false });
 
@@ -32,9 +31,9 @@ const AdminCompanies = () => {
     },
   });
 
-  const filteredCompanies = companies?.filter(company => 
-    company.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    company.location?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredClubs = clubs?.filter(club => 
+    club.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    club.location?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (isLoading) {
@@ -77,16 +76,16 @@ const AdminCompanies = () => {
           </CardContent>
         </Card>
 
-        {/* Companies Table */}
+        {/* Clubs Table */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <Building2 className="mr-2 h-5 w-5" />
-              Клубы ({filteredCompanies?.length || 0})
+              Клубы ({filteredClubs?.length || 0})
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {filteredCompanies && filteredCompanies.length > 0 ? (
+            {filteredClubs && filteredClubs.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -98,41 +97,41 @@ const AdminCompanies = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCompanies.map((company) => (
-                    <TableRow key={company.id}>
+                  {filteredClubs.map((club) => (
+                    <TableRow key={club.id}>
                       <TableCell>
                         <div className="space-y-1">
                           <Link 
-                            to={`/admin/companies/${company.id}`}
+                            to={`/admin/clubs/${club.id}`}
                             className="font-medium flex items-center hover:text-blue-600 transition-colors"
                           >
-                            {company.logo_url && (
+                            {club.logo_url && (
                               <img 
-                                src={company.logo_url} 
-                                alt={company.name} 
+                                src={club.logo_url} 
+                                alt={club.name} 
                                 className="w-6 h-6 rounded mr-2"
                               />
                             )}
-                            {company.name}
+                            {club.name}
                           </Link>
-                          {company.website && (
+                          {club.website && (
                             <div className="flex items-center text-sm text-gray-500">
                               <Globe className="mr-1 h-3 w-3" />
-                              <a href={company.website} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                                {company.website}
+                              <a href={club.website} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                {club.website}
                               </a>
                             </div>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        {company.profiles ? (
+                        {club.profiles ? (
                           <div>
                             <div className="font-medium">
-                              {company.profiles.full_name || 'Не указано'}
+                              {club.profiles.full_name || 'Не указано'}
                             </div>
                             <div className="text-sm text-gray-500">
-                              @{company.profiles.username || 'нет username'}
+                              @{club.profiles.username || 'нет username'}
                             </div>
                           </div>
                         ) : (
@@ -140,16 +139,16 @@ const AdminCompanies = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        {company.location || <span className="text-gray-400">Не указано</span>}
+                        {club.location || <span className="text-gray-400">Не указано</span>}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center">
                           <Users className="mr-2 h-4 w-4 text-gray-400" />
-                          {company.company_employees?.length || 0}
+                          {club.club_members?.length || 0}
                         </div>
                       </TableCell>
                       <TableCell>
-                        {new Date(company.created_at).toLocaleDateString('ru-RU')}
+                        {new Date(club.created_at).toLocaleDateString('ru-RU')}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -164,7 +163,7 @@ const AdminCompanies = () => {
         </Card>
       </div>
 
-      <CreateCompanyDialog
+      <CreateClubDialog
         open={addDialogOpen}
         setOpen={setAddDialogOpen}
       />
@@ -172,4 +171,4 @@ const AdminCompanies = () => {
   );
 };
 
-export default AdminCompanies;
+export default AdminClubs;

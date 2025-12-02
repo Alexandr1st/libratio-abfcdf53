@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
@@ -10,23 +9,23 @@ import { useIsAdmin } from "@/hooks/useAdminRoles";
 const DiaryNavigation = () => {
   const location = useLocation();
   const { user } = useAuth();
-  const [isCompanyProfile, setIsCompanyProfile] = useState(false);
+  const [isClubProfile, setIsClubProfile] = useState(false);
   const { data: isAdmin } = useIsAdmin();
   
   useEffect(() => {
-    const checkCompanyProfile = async () => {
+    const checkClubProfile = async () => {
       if (user) {
         const { data } = await supabase
-          .from('companies')
+          .from('clubs')
           .select('id')
           .eq('contact_person_id', user.id)
           .single();
         
-        setIsCompanyProfile(!!data);
+        setIsClubProfile(!!data);
       }
     };
     
-    checkCompanyProfile();
+    checkClubProfile();
   }, [user]);
   
   const getButtonStyle = (path: string) => {
@@ -46,9 +45,9 @@ const DiaryNavigation = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                {isCompanyProfile && (
-                  <Link to="/company-employees">
-                    <Button variant="ghost" className={getButtonStyle("/company-employees")}>
+                {isClubProfile && (
+                  <Link to="/club-members">
+                    <Button variant="ghost" className={getButtonStyle("/club-members")}>
                       Мои участники
                     </Button>
                   </Link>
@@ -58,20 +57,20 @@ const DiaryNavigation = () => {
                     Каталог книг
                   </Button>
                 </Link>
-                {isCompanyProfile && (
-                  <Link to="/company-library">
-                    <Button variant="ghost" className={getButtonStyle("/company-library")}>
+                {isClubProfile && (
+                  <Link to="/club-library">
+                    <Button variant="ghost" className={getButtonStyle("/club-library")}>
                       Моя библиотека
                     </Button>
                   </Link>
                 )}
-                {!isCompanyProfile && (
+                {!isClubProfile && (
                   <Link to="/diary">
                     <Button variant="ghost" className={getButtonStyle("/diary")}>Мой дневник</Button>
                   </Link>
                 )}
-                <Link to="/companies">
-                  <Button variant="ghost" className={getButtonStyle("/companies")}>Клубы</Button>
+                <Link to="/clubs">
+                  <Button variant="ghost" className={getButtonStyle("/clubs")}>Клубы</Button>
                 </Link>
                 {isAdmin && (
                   <Link to="/admin/dashboard">
@@ -80,8 +79,8 @@ const DiaryNavigation = () => {
                     </Button>
                   </Link>
                 )}
-                <Link to={isCompanyProfile ? "/company-profile" : "/profile"}>
-                  <Button variant="outline" className={getButtonStyle(isCompanyProfile ? "/company-profile" : "/profile")}>
+                <Link to={isClubProfile ? "/club-profile" : "/profile"}>
+                  <Button variant="outline" className={getButtonStyle(isClubProfile ? "/club-profile" : "/profile")}>
                     Профиль
                   </Button>
                 </Link>
