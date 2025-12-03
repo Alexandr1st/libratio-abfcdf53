@@ -61,7 +61,7 @@ const ClubLibrary = () => {
         {filteredBooks.length === 0 ? (
           <Card><CardContent className="text-center py-12"><BookOpen className="h-16 w-16 text-gray-300 mx-auto mb-4" /><h3 className="text-lg font-medium text-gray-900 mb-2">{searchTerm ? "Книги не найдены" : "Библиотека пуста"}</h3>{!searchTerm && <Link to="/books"><Button>Перейти к каталогу книг</Button></Link>}</CardContent></Card>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">{filteredBooks.map((item) => <BookCard key={item.id} book={item.books} isInDiary={false} isCompanyProfile={true} />)}</div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">{filteredBooks.map((item) => <BookCard key={item.id} book={item.books} isInDiary={false} isClubProfile={true} />)}</div>
         )}
       </div>
     </div>

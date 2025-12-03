@@ -32,40 +32,40 @@ const AdminUsers = () => {
         .select("user_id, role")
         .in("user_id", userIds);
 
-      // Get companies by company_id from profiles
-      const companyIds = data.map(user => user.company_id).filter(Boolean);
-      const { data: profileCompanies } = await supabase
-        .from("companies")
+      // Get clubs by club_id from profiles
+      const clubIds = data.map(user => user.club_id).filter(Boolean);
+      const { data: profileClubs } = await supabase
+        .from("clubs")
         .select("id, name")
-        .in("id", companyIds);
+        .in("id", clubIds);
 
-      // Get company employees data
-      const { data: companyEmployees } = await supabase
-        .from("company_employees")
+      // Get club members data
+      const { data: clubMembers } = await supabase
+        .from("club_members")
         .select(`
           user_id,
-          companies (
+          clubs (
             id,
             name
           )
         `)
         .in("user_id", userIds);
 
-      // Get companies where user is contact person
-      const { data: contactCompanies } = await supabase
-        .from("companies")
+      // Get clubs where user is contact person
+      const { data: contactClubs } = await supabase
+        .from("clubs")
         .select("contact_person_id, id, name")
         .in("contact_person_id", userIds);
 
       // Merge the data
       return data.map(user => {
-        const profileCompany = profileCompanies?.find(c => c.id === user.company_id);
-        const employeeCompany = companyEmployees?.find(ce => ce.user_id === user.id)?.companies;
-        const contactCompany = contactCompanies?.find(c => c.contact_person_id === user.id);
+        const profileClub = profileClubs?.find(c => c.id === user.club_id);
+        const memberClub = clubMembers?.find(cm => cm.user_id === user.id)?.clubs;
+        const contactClub = contactClubs?.find(c => c.contact_person_id === user.id);
         
         return {
           ...user,
-          companies: profileCompany || employeeCompany || contactCompany || null,
+          clubs: profileClub || memberClub || contactClub || null,
           admin_roles: adminRoles?.filter(role => role.user_id === user.id) || []
         };
       });
@@ -75,7 +75,7 @@ const AdminUsers = () => {
   const filteredUsers = users?.filter(user => 
     user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.companies?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    user.clubs?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (isLoading) {
@@ -104,7 +104,7 @@ const AdminUsers = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Поиск по имени, username или компании..."
+                  placeholder="Поиск по имени, username или клубу..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -132,7 +132,7 @@ const AdminUsers = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Пользователь</TableHead>
-                    <TableHead>Компания</TableHead>
+                    <TableHead>Клуб</TableHead>
                     <TableHead>Роль админа</TableHead>
                     <TableHead>Дата регистрации</TableHead>
                   </TableRow>
@@ -155,20 +155,20 @@ const AdminUsers = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center">
-                          {user.companies ? (
+                          {user.clubs ? (
                             <>
                               <Building2 className="mr-2 h-4 w-4 text-gray-400" />
-                              {user.companies.name}
+                              {user.clubs.name}
                             </>
                           ) : (
-                            <span className="text-gray-400">Нет компании</span>
+                            <span className="text-gray-400">Нет клуба</span>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
                         {user.admin_roles && user.admin_roles.length > 0 ? (
                           <div className="space-y-1">
-                            {user.admin_roles.map((adminRole, index) => (
+                            {user.admin_roles.map((adminRole: { role: string }, index: number) => (
                               <Badge 
                                 key={index} 
                                 variant={

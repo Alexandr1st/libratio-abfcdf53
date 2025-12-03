@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,14 +17,13 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
-  const [accountType, setAccountType] = useState<"individual" | "company">("individual");
+  const [accountType, setAccountType] = useState<"individual" | "club">("individual");
   
-  // Company specific fields
-  const [companyName, setCompanyName] = useState("");
-  const [companyDescription, setCompanyDescription] = useState("");
-  const [companyIndustry, setCompanyIndustry] = useState("");
-  const [companyLocation, setCompanyLocation] = useState("");
-  const [companyWebsite, setCompanyWebsite] = useState("");
+  // Club specific fields
+  const [clubName, setClubName] = useState("");
+  const [clubDescription, setClubDescription] = useState("");
+  const [clubLocation, setClubLocation] = useState("");
+  const [clubChatLink, setClubChatLink] = useState("");
   
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -67,10 +65,10 @@ const Auth = () => {
         return;
       }
     } else {
-      if (!companyName || !companyIndustry || !fullName) {
+      if (!clubName || !fullName) {
         toast({
           title: "Ошибка",
-          description: "Пожалуйста, заполните название клуба, сферу деятельности и ваше имя",
+          description: "Пожалуйста, заполните название клуба и ваше имя",
           variant: "destructive",
         });
         return;
@@ -99,46 +97,42 @@ const Auth = () => {
         throw authError;
       }
 
-      // If company registration and user was created, create company
-      if (accountType === "company" && authData.user) {
-        // Create company
-        const { data: companyData, error: companyError } = await supabase
-          .from('companies')
+      // If club registration and user was created, create club
+      if (accountType === "club" && authData.user) {
+        // Create club
+        const { data: clubData, error: clubError } = await supabase
+          .from('clubs')
           .insert({
-            name: companyName,
-            description: companyDescription || null,
-            industry: companyIndustry,
-            location: companyLocation || null,
-            website: companyWebsite || null,
+            name: clubName,
+            description: clubDescription || null,
+            location: clubLocation || null,
+            website: clubChatLink || null,
           })
           .select()
           .single();
 
-        if (companyError) {
-          console.error('Error creating company:', companyError);
-          // Note: User is still created, we could handle this better
-        } else if (companyData) {
-          // Add user as company admin
-          const { error: employeeError } = await supabase
-            .from('company_employees')
+        if (clubError) {
+          console.error('Error creating club:', clubError);
+        } else if (clubData) {
+          // Add user as club admin
+          const { error: memberError } = await supabase
+            .from('club_members')
             .insert({
-              company_id: companyData.id,
+              club_id: clubData.id,
               user_id: authData.user.id,
               is_admin: true,
-              position: "Администратор",
             });
 
-          if (employeeError) {
-            console.error('Error adding user to company:', employeeError);
+          if (memberError) {
+            console.error('Error adding user to club:', memberError);
           }
 
-          // Update user profile with company info
+          // Update user profile with club info
           const { error: profileError } = await supabase
             .from('profiles')
             .update({
-              company_id: companyData.id,
-              company: companyName,
-              position: "Администратор",
+              club_id: clubData.id,
+              club_name: clubName,
             })
             .eq('id', authData.user.id);
 
@@ -150,7 +144,7 @@ const Auth = () => {
 
       toast({
         title: "Регистрация успешна!",
-        description: accountType === "company" 
+        description: accountType === "club" 
           ? "Клуб зарегистрирован. Проверьте почту для подтверждения аккаунта" 
           : "Проверьте свою почту для подтверждения аккаунта",
       });
@@ -231,7 +225,7 @@ const Auth = () => {
                     <Label>Тип аккаунта</Label>
                     <RadioGroup 
                       value={accountType} 
-                      onValueChange={(value) => setAccountType(value as "individual" | "company")}
+                      onValueChange={(value) => setAccountType(value as "individual" | "club")}
                       className="flex space-x-6"
                     >
                       <div className="flex items-center space-x-2">
@@ -242,8 +236,8 @@ const Auth = () => {
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="company" id="company" />
-                        <Label htmlFor="company" className="flex items-center space-x-2 cursor-pointer">
+                        <RadioGroupItem value="club" id="club" />
+                        <Label htmlFor="club" className="flex items-center space-x-2 cursor-pointer">
                           <Building2 className="h-4 w-4" />
                           <span>Клуб</span>
                         </Label>
@@ -254,12 +248,12 @@ const Auth = () => {
                   {/* Common Fields */}
                   <div className="space-y-2">
                     <Label htmlFor="fullName">
-                      {accountType === "company" ? "Ваше имя (контактное лицо)" : "Полное имя"}
+                      {accountType === "club" ? "Ваше имя (контактное лицо)" : "Полное имя"}
                     </Label>
                     <Input
                       id="fullName"
                       type="text"
-                      placeholder={accountType === "company" ? "Иван Петров" : "Иван Петров"}
+                      placeholder={accountType === "club" ? "Иван Петров" : "Иван Петров"}
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required={!isLogin}
@@ -281,62 +275,50 @@ const Auth = () => {
                     </div>
                   )}
 
-                  {/* Company-specific fields */}
-                  {accountType === "company" && (
+                  {/* Club-specific fields */}
+                  {accountType === "club" && (
                     <>
                       <div className="space-y-2">
-                        <Label htmlFor="companyName">Название клуба *</Label>
+                        <Label htmlFor="clubName">Название клуба *</Label>
                         <Input
-                          id="companyName"
+                          id="clubName"
                           type="text"
-                          placeholder="ООО 'Технологии'"
-                          value={companyName}
-                          onChange={(e) => setCompanyName(e.target.value)}
+                          placeholder="Книжный клуб"
+                          value={clubName}
+                          onChange={(e) => setClubName(e.target.value)}
                           required
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="companyIndustry">Сфера деятельности *</Label>
+                        <Label htmlFor="clubLocation">Местоположение</Label>
                         <Input
-                          id="companyIndustry"
-                          type="text"
-                          placeholder="IT, Финансы, Образование и т.д."
-                          value={companyIndustry}
-                          onChange={(e) => setCompanyIndustry(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="companyLocation">Местоположение</Label>
-                        <Input
-                          id="companyLocation"
+                          id="clubLocation"
                           type="text"
                           placeholder="Москва, Россия"
-                          value={companyLocation}
-                          onChange={(e) => setCompanyLocation(e.target.value)}
+                          value={clubLocation}
+                          onChange={(e) => setClubLocation(e.target.value)}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="companyWebsite">Веб-сайт</Label>
+                        <Label htmlFor="clubChatLink">Ссылка на чат</Label>
                         <Input
-                          id="companyWebsite"
+                          id="clubChatLink"
                           type="url"
-                          placeholder="https://company.com"
-                          value={companyWebsite}
-                          onChange={(e) => setCompanyWebsite(e.target.value)}
+                          placeholder="https://t.me/yourgroup"
+                          value={clubChatLink}
+                          onChange={(e) => setClubChatLink(e.target.value)}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="companyDescription">Описание клуба</Label>
+                        <Label htmlFor="clubDescription">Описание клуба</Label>
                         <Textarea
-                          id="companyDescription"
-                          placeholder="Краткое описание деятельности клуба..."
-                          value={companyDescription}
-                          onChange={(e) => setCompanyDescription(e.target.value)}
+                          id="clubDescription"
+                          placeholder="Краткое описание клуба..."
+                          value={clubDescription}
+                          onChange={(e) => setClubDescription(e.target.value)}
                           rows={3}
                         />
                       </div>

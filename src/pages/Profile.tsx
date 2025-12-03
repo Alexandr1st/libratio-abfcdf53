@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Building2, Calendar, Edit, Star, TrendingUp, User, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,9 +15,9 @@ interface Profile {
   username: string | null;
   avatar_url: string | null;
   bio: string | null;
-  company: string | null;
+  club_name: string | null;
   created_at: string | null;
-  company_id: string | null;
+  club_id: string | null;
 }
 
 const Profile = () => {
@@ -45,7 +44,7 @@ const Profile = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, full_name, username, avatar_url, bio, club_name, created_at, club_id')
         .eq('id', user.id)
         .single();
 
@@ -58,16 +57,16 @@ const Profile = () => {
         return;
       }
 
-      // Check if user is a company contact person and redirect
-      const { data: companyData } = await supabase
-        .from('companies')
+      // Check if user is a club contact person and redirect
+      const { data: clubData } = await supabase
+        .from('clubs')
         .select('id')
         .eq('contact_person_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (companyData) {
-        // User is a company contact person, redirect to company profile
-        navigate('/company-profile');
+      if (clubData) {
+        // User is a club contact person, redirect to club profile
+        navigate('/club-profile');
         return;
       }
 
@@ -186,10 +185,10 @@ const Profile = () => {
                     <p>{profile.bio}</p>
                   </div>
                 )}
-                {profile.company && (
+                {profile.club_name && (
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Building2 className="h-4 w-4" />
-                    <span>{profile.company}</span>
+                    <span>{profile.club_name}</span>
                   </div>
                 )}
                 <div className="flex items-center space-x-2 text-sm text-gray-600">

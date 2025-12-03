@@ -35,7 +35,7 @@ const AdminActivity = () => {
       const userIds = data.map(entry => entry.user_id);
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, full_name, username, company_id")
+        .select("id, full_name, username, club_id")
         .in("id", userIds);
 
       // Merge the data

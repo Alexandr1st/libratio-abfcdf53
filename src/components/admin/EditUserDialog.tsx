@@ -29,14 +29,14 @@ interface EditUserDialogProps {
     id: string;
     full_name: string | null;
     username: string | null;
-    company_id: string | null;
+    club_id: string | null;
   } | null;
 }
 
 interface UserFormData {
   full_name: string;
   username: string;
-  company_id: string;
+  club_id: string;
 }
 
 const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
@@ -44,13 +44,13 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
   const queryClient = useQueryClient();
   const { register, handleSubmit, reset, setValue, watch } = useForm<UserFormData>();
 
-  const companyId = watch("company_id");
+  const clubId = watch("club_id");
 
-  const { data: companies } = useQuery({
-    queryKey: ["companies"],
+  const { data: clubs } = useQuery({
+    queryKey: ["clubs"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("companies")
+        .from("clubs")
         .select("id, name")
         .order("name");
       
@@ -64,7 +64,7 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
       reset({
         full_name: user.full_name || "",
         username: user.username || "",
-        company_id: user.company_id || "",
+        club_id: user.club_id || "",
       });
     }
   }, [user, reset]);
@@ -79,44 +79,44 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
         .update({
           full_name: formData.full_name,
           username: formData.username,
-          company_id: formData.company_id || null,
+          club_id: formData.club_id || null,
         })
         .eq("id", user.id);
 
       if (profileError) throw profileError;
 
-      // Update company_employees if company is selected
-      if (formData.company_id) {
-        // Check if employee record exists
-        const { data: existingEmployee } = await supabase
-          .from("company_employees")
+      // Update club_members if club is selected
+      if (formData.club_id) {
+        // Check if member record exists
+        const { data: existingMember } = await supabase
+          .from("club_members")
           .select("id")
           .eq("user_id", user.id)
           .maybeSingle();
 
-        if (existingEmployee) {
+        if (existingMember) {
           // Update existing record
           const { error: updateError } = await supabase
-            .from("company_employees")
-            .update({ company_id: formData.company_id })
+            .from("club_members")
+            .update({ club_id: formData.club_id })
             .eq("user_id", user.id);
           
           if (updateError) throw updateError;
         } else {
           // Create new record
           const { error: insertError } = await supabase
-            .from("company_employees")
+            .from("club_members")
             .insert({
               user_id: user.id,
-              company_id: formData.company_id,
+              club_id: formData.club_id,
             });
           
           if (insertError) throw insertError;
         }
       } else {
-        // Remove from company_employees if no company selected
+        // Remove from club_members if no club selected
         await supabase
-          .from("company_employees")
+          .from("club_members")
           .delete()
           .eq("user_id", user.id);
       }
@@ -173,19 +173,19 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="company_id">Клуб</Label>
+            <Label htmlFor="club_id">Клуб</Label>
             <Select
-              value={companyId || "none"}
-              onValueChange={(value) => setValue("company_id", value === "none" ? "" : value)}
+              value={clubId || "none"}
+              onValueChange={(value) => setValue("club_id", value === "none" ? "" : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Выберите клуб" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Нет клуба</SelectItem>
-                {companies?.map((company) => (
-                  <SelectItem key={company.id} value={company.id}>
-                    {company.name}
+                {clubs?.map((club) => (
+                  <SelectItem key={club.id} value={club.id}>
+                    {club.name}
                   </SelectItem>
                 ))}
               </SelectContent>
