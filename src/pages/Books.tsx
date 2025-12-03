@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import BookCard from "@/components/BookCard";
@@ -12,22 +11,22 @@ const Books = () => {
   const { user } = useAuth();
   const { data: books, isLoading, error } = useBooks();
   const { data: diaryEntries } = useDiaryEntries();
-  const [isCompanyProfile, setIsCompanyProfile] = useState(false);
+  const [isClubProfile, setIsClubProfile] = useState(false);
 
   useEffect(() => {
-    const checkCompanyProfile = async () => {
+    const checkClubProfile = async () => {
       if (user) {
         const { data } = await supabase
-          .from('companies')
+          .from('clubs')
           .select('id')
           .eq('contact_person_id', user.id)
-          .single();
+          .maybeSingle();
         
-        setIsCompanyProfile(!!data);
+        setIsClubProfile(!!data);
       }
     };
     
-    checkCompanyProfile();
+    checkClubProfile();
   }, [user]);
 
   console.log('Books data:', books);
@@ -74,7 +73,7 @@ const Books = () => {
                 key={book.id}
                 book={book}
                 isInDiary={diaryEntries?.some(entry => entry.book_id === book.id) || false}
-                isCompanyProfile={isCompanyProfile}
+                isClubProfile={isClubProfile}
               />
             ))}
           </div>

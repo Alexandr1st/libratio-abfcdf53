@@ -8,16 +8,16 @@ const AdminDashboard = () => {
   const { data: stats, isLoading } = useQuery({
     queryKey: ["adminStats"],
     queryFn: async () => {
-      const [usersCount, companiesCount, booksCount, diaryEntriesCount] = await Promise.all([
+      const [usersCount, clubsCount, booksCount, diaryEntriesCount] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("companies").select("id", { count: "exact", head: true }),
+        supabase.from("clubs").select("id", { count: "exact", head: true }),
         supabase.from("books").select("id", { count: "exact", head: true }),
         supabase.from("diary_entries").select("id", { count: "exact", head: true }),
       ]);
 
       return {
         users: usersCount.count || 0,
-        companies: companiesCount.count || 0,
+        clubs: clubsCount.count || 0,
         books: booksCount.count || 0,
         diaryEntries: diaryEntriesCount.count || 0,
       };
@@ -79,8 +79,8 @@ const AdminDashboard = () => {
       color: "text-blue-600",
     },
     {
-      title: "Компании",
-      value: stats?.companies || 0,
+      title: "Клубы",
+      value: stats?.clubs || 0,
       icon: Building2,
       color: "text-green-600",
     },

@@ -1,22 +1,22 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save, User } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Save, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useCompanies } from "@/hooks/useCompanies";
+import { useClubs } from "@/hooks/useClubs";
 
 interface ProfileData {
   full_name: string | null;
   bio: string | null;
-  company_id: string | null;
+  club_id: string | null;
 }
 
 const EditProfile = () => {
@@ -24,13 +24,13 @@ const EditProfile = () => {
   const [profileData, setProfileData] = useState<ProfileData>({
     full_name: "",
     bio: "",
-    company_id: null
+    club_id: null
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { data: companies = [], isLoading: companiesLoading } = useCompanies();
+  const { data: clubs = [], isLoading: clubsLoading } = useClubs();
 
   useEffect(() => {
     if (!authLoading) {
@@ -48,7 +48,7 @@ const EditProfile = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, bio, company_id')
+        .select('full_name, bio, club_id')
         .eq('id', user.id)
         .single();
 
@@ -64,7 +64,7 @@ const EditProfile = () => {
       setProfileData({
         full_name: data.full_name || "",
         bio: data.bio || "",
-        company_id: data.company_id || null
+        club_id: data.club_id || null
       });
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -84,7 +84,7 @@ const EditProfile = () => {
         .update({
           full_name: profileData.full_name || null,
           bio: profileData.bio || null,
-          company_id: profileData.company_id,
+          club_id: profileData.club_id,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -147,7 +147,7 @@ const EditProfile = () => {
                 <Input
                   id="full_name"
                   type="text"
-                  value={profileData.full_name}
+                  value={profileData.full_name || ""}
                   onChange={(e) => setProfileData(prev => ({ ...prev, full_name: e.target.value }))}
                   placeholder="Введите ваше полное имя"
                 />
@@ -157,7 +157,7 @@ const EditProfile = () => {
                 <Label htmlFor="bio">О себе</Label>
                 <Textarea
                   id="bio"
-                  value={profileData.bio}
+                  value={profileData.bio || ""}
                   onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
                   placeholder="Расскажите о себе"
                   rows={4}
@@ -165,18 +165,18 @@ const EditProfile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="company">Клуб</Label>
+                <Label htmlFor="club">Клуб</Label>
                 <Select
-                  value={profileData.company_id || undefined}
-                  onValueChange={(value) => setProfileData(prev => ({ ...prev, company_id: value || null }))}
+                  value={profileData.club_id || undefined}
+                  onValueChange={(value) => setProfileData(prev => ({ ...prev, club_id: value || null }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Выберите компанию или оставьте пустым" />
+                    <SelectValue placeholder="Выберите клуб или оставьте пустым" />
                   </SelectTrigger>
                   <SelectContent>
-                    {companies.map((company) => (
-                      <SelectItem key={company.id} value={company.id}>
-                        {company.name}
+                    {clubs.map((club) => (
+                      <SelectItem key={club.id} value={club.id}>
+                        {club.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

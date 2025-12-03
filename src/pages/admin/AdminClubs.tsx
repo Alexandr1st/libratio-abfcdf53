@@ -17,17 +17,34 @@ const AdminClubs = () => {
   const { data: clubs, isLoading } = useQuery({
     queryKey: ["adminClubs"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch clubs
+      const { data: clubsData, error: clubsError } = await supabase
         .from("clubs")
-        .select(`
-          *,
-          profiles!clubs_contact_person_id_fkey(full_name, username),
-          club_members(id)
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (clubsError) throw clubsError;
+
+      // Fetch contact persons separately
+      const contactPersonIds = clubsData.map(c => c.contact_person_id).filter(Boolean);
+      const { data: contactPersons } = await supabase
+        .from("profiles")
+        .select("id, full_name, username")
+        .in("id", contactPersonIds);
+
+      // Fetch member counts
+      const clubIds = clubsData.map(c => c.id);
+      const { data: members } = await supabase
+        .from("club_members")
+        .select("club_id")
+        .in("club_id", clubIds);
+
+      // Merge data
+      return clubsData.map(club => ({
+        ...club,
+        profiles: contactPersons?.find(p => p.id === club.contact_person_id) || null,
+        club_members: members?.filter(m => m.club_id === club.id) || []
+      }));
     },
   });
 

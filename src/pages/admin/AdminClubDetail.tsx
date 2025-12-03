@@ -32,10 +32,7 @@ const AdminClubDetail = () => {
       // Fetch club data
       const { data: clubData, error: clubError } = await supabase
         .from("clubs")
-        .select(`
-          *,
-          profiles!clubs_contact_person_id_fkey(full_name, username)
-        `)
+        .select("*")
         .eq("id", id)
         .maybeSingle();
 
@@ -45,6 +42,17 @@ const AdminClubDetail = () => {
       }
 
       if (!clubData) return null;
+
+      // Fetch contact person separately
+      let contactPerson = null;
+      if (clubData.contact_person_id) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("id, full_name, username")
+          .eq("id", clubData.contact_person_id)
+          .maybeSingle();
+        contactPerson = profile;
+      }
 
       // Fetch club members with their profiles separately
       const { data: members, error: membersError } = await supabase
@@ -76,12 +84,14 @@ const AdminClubDetail = () => {
 
         return {
           ...clubData,
+          profiles: contactPerson,
           club_members: membersWithProfiles
         };
       }
 
       return {
         ...clubData,
+        profiles: contactPerson,
         club_members: []
       };
     },

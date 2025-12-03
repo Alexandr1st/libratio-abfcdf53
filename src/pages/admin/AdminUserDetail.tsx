@@ -22,7 +22,7 @@ const AdminUserDetail = () => {
     full_name: "",
     username: "",
     bio: "",
-    company_id: "",
+    club_id: "",
   });
 
   const { data: user, isLoading, error } = useQuery({
@@ -52,31 +52,31 @@ const AdminUserDetail = () => {
         console.error("Error fetching admin roles:", rolesError);
       }
 
-      // Fetch company info
-      let companyData = null;
-      if (userData.company_id) {
-        const { data: company } = await supabase
-          .from("companies")
+      // Fetch club info
+      let clubData = null;
+      if (userData.club_id) {
+        const { data: club } = await supabase
+          .from("clubs")
           .select("id, name")
-          .eq("id", userData.company_id)
-          .single();
-        companyData = company;
+          .eq("id", userData.club_id)
+          .maybeSingle();
+        clubData = club;
       }
 
       return {
         ...userData,
         admin_roles: adminRoles || [],
-        companies: companyData
+        clubs: clubData
       };
     },
     enabled: !!id,
   });
 
-  const { data: companies } = useQuery({
-    queryKey: ["companies"],
+  const { data: clubs } = useQuery({
+    queryKey: ["clubs"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("companies")
+        .from("clubs")
         .select("id, name")
         .order("name");
 
@@ -92,7 +92,7 @@ const AdminUserDetail = () => {
         full_name: user.full_name || "",
         username: user.username || "",
         bio: user.bio || "",
-        company_id: user.company_id || "",
+        club_id: user.club_id || "",
       });
     }
   }, [user]);
@@ -105,7 +105,7 @@ const AdminUserDetail = () => {
           full_name: data.full_name,
           username: data.username,
           bio: data.bio,
-          company_id: data.company_id || null,
+          club_id: data.club_id || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", id);
@@ -229,31 +229,31 @@ const AdminUserDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Company Card */}
+        {/* Club Card */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <Building2 className="mr-2 h-5 w-5" />
-              Компания
+              Клуб
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <Label htmlFor="company">Выберите компанию</Label>
+              <Label htmlFor="club">Выберите клуб</Label>
               <Select
-                value={formData.company_id || "none"}
+                value={formData.club_id || "none"}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, company_id: value === "none" ? "" : value })
+                  setFormData({ ...formData, club_id: value === "none" ? "" : value })
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Выберите компанию" />
+                  <SelectValue placeholder="Выберите клуб" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Без компании</SelectItem>
-                  {companies?.map((company) => (
-                    <SelectItem key={company.id} value={company.id}>
-                      {company.name}
+                  <SelectItem value="none">Без клуба</SelectItem>
+                  {clubs?.map((club) => (
+                    <SelectItem key={club.id} value={club.id}>
+                      {club.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -273,7 +273,7 @@ const AdminUserDetail = () => {
           <CardContent>
             {user.admin_roles && user.admin_roles.length > 0 ? (
               <div className="flex gap-2">
-                {user.admin_roles.map((adminRole, index) => (
+                {user.admin_roles.map((adminRole: { role: string }, index: number) => (
                   <Badge
                     key={index}
                     variant={

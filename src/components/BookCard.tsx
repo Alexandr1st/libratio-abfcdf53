@@ -2,8 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Star, Users, Clock } from "lucide-react";
 import AddToDiaryDropdown from "@/components/AddToDiaryDropdown";
-import AddToCompanyLibraryDropdown from "@/components/AddToCompanyLibraryDropdown";
-import { useCheckBookInCompanyLibrary } from "@/hooks/useCompanyBooks";
+import AddToClubLibraryDropdown from "@/components/AddToClubLibraryDropdown";
+import { useCheckBookInClubLibrary } from "@/hooks/useClubBooks";
 import type { Tables } from '@/integrations/supabase/types';
 
 type Book = Tables<'books'>;
@@ -11,11 +11,11 @@ type Book = Tables<'books'>;
 interface BookCardProps {
   book: Book;
   isInDiary: boolean;
-  isCompanyProfile: boolean;
+  isClubProfile: boolean;
 }
 
-const BookCard = ({ book, isInDiary, isCompanyProfile }: BookCardProps) => {
-  const { data: isInCompanyLibrary = false } = useCheckBookInCompanyLibrary(book.id);
+const BookCard = ({ book, isInDiary, isClubProfile }: BookCardProps) => {
+  const { data: isInClubLibrary = false } = useCheckBookInClubLibrary(book.id);
 
   return (
     <Card key={book.id} className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -68,10 +68,10 @@ const BookCard = ({ book, isInDiary, isCompanyProfile }: BookCardProps) => {
         )}
       </CardContent>
       <div className="p-4 border-t space-y-2">
-        {isCompanyProfile ? (
-          <AddToCompanyLibraryDropdown 
+        {isClubProfile ? (
+          <AddToClubLibraryDropdown 
             bookId={book.id} 
-            isInLibrary={isInCompanyLibrary} 
+            isInLibrary={isInClubLibrary} 
           />
         ) : (
           <AddToDiaryDropdown 
