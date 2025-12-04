@@ -42,7 +42,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const adminNavItems = [
     { path: '/admin/dashboard', label: 'Главная', icon: Home },
     { path: '/admin/users', label: 'Пользователи', icon: Users },
-    { path: '/admin/companies', label: 'Клубы', icon: Building2 },
+    { path: '/admin/clubs', label: 'Клубы', icon: Building2 },
     { path: '/admin/books', label: 'Книги', icon: Book },
     { path: '/admin/activity', label: 'Активность', icon: Activity },
     { path: '/admin/settings', label: 'Настройки', icon: Settings },
