@@ -24,7 +24,7 @@ const AdminBooks = () => {
         .select(`
           *,
           diary_entries(id),
-          company_books(id, companies(name))
+          club_books(id, clubs(name))
         `)
         .order("created_at", { ascending: false });
 
