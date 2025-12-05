@@ -54,7 +54,7 @@ const AdminBookDetail = () => {
         .select(`
           *,
           diary_entries(id),
-          company_books(id, companies(name))
+          club_books(id, clubs(name))
         `)
         .eq("id", id)
         .single();
@@ -377,8 +377,8 @@ const AdminBookDetail = () => {
                   <p className="text-2xl font-bold">{book.diary_entries?.length || 0}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">В библиотеках компаний</p>
-                  <p className="text-2xl font-bold">{book.company_books?.length || 0}</p>
+                  <p className="text-sm text-gray-600">В библиотеках клубов</p>
+                  <p className="text-2xl font-bold">{book.club_books?.length || 0}</p>
                 </div>
               </CardContent>
             </Card>
