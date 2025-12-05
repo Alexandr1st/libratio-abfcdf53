@@ -9,7 +9,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
-import { useClubMembers } from "@/hooks/useClubMembers";
 import { useQuery } from "@tanstack/react-query";
 
 const ClubProfile = () => {
@@ -39,7 +38,19 @@ const ClubProfile = () => {
     }
   };
 
-  const { data: members = [], isLoading: membersLoading } = useClubMembers(club?.id);
+  // Fetch members from profiles table (users with this club_id)
+  const { data: members = [], isLoading: membersLoading } = useQuery({
+    queryKey: ['club-members-profiles', club?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .eq('club_id', club.id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!club?.id,
+  });
 
   const { data: clubBooks = [] } = useQuery({
     queryKey: ['club-books', club?.id],
@@ -154,21 +165,18 @@ const ClubProfile = () => {
                       <div key={member.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10">
-                            <AvatarImage src="" />
+                            <AvatarImage src={member.avatar_url || ""} />
                             <AvatarFallback className="bg-blue-100 text-blue-600">
-                              {member.profiles?.full_name?.charAt(0) || <User className="h-4 w-4" />}
+                              {member.full_name?.charAt(0) || <User className="h-4 w-4" />}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{member.profiles?.full_name || 'Без имени'}</p>
-                            {member.position && (
-                              <p className="text-sm text-gray-500">{member.position}</p>
+                            <p className="font-medium">{member.full_name || 'Без имени'}</p>
+                            {member.username && (
+                              <p className="text-sm text-gray-500">@{member.username}</p>
                             )}
                           </div>
                         </div>
-                        {member.is_admin && (
-                          <Badge variant="outline" className="text-xs">Админ</Badge>
-                        )}
                       </div>
                     ))}
                   </div>
