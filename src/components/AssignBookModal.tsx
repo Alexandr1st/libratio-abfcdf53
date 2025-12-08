@@ -6,13 +6,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookOpen, Search, Plus } from "lucide-react";
 import { useClubBooksWithDetails } from "@/hooks/useClubBooks";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Member {
   id: string;
-  user_id: string;
-  profiles: {
-    full_name: string | null;
-  } | null;
+  full_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
 }
 
 interface ClubBookWithDetails {
@@ -39,7 +40,9 @@ interface AssignBookModalProps {
 
 const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookModalProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAssigning, setIsAssigning] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { data: clubBooks, isLoading } = useClubBooksWithDetails(companyId);
 
   const filteredBooks = (clubBooks as ClubBookWithDetails[] | undefined)?.filter((clubBook) =>
@@ -50,11 +53,44 @@ const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookMod
   const handleAssignBook = async (book: ClubBookWithDetails['books']) => {
     if (!employee) return;
 
+    setIsAssigning(true);
     try {
-      // Здесь будет логика назначения книги участнику
+      // Check if member already has this book assigned
+      const { data: existing } = await supabase
+        .from('diary_entries')
+        .select('id')
+        .eq('user_id', employee.id)
+        .eq('book_id', book.id)
+        .eq('status', 'reading')
+        .maybeSingle();
+
+      if (existing) {
+        toast({
+          title: "Книга уже назначена",
+          description: `Эта книга уже назначена участнику для чтения`,
+          variant: "destructive",
+        });
+        setIsAssigning(false);
+        return;
+      }
+
+      // Create diary entry for the member
+      const { error } = await supabase
+        .from('diary_entries')
+        .insert({
+          user_id: employee.id,
+          book_id: book.id,
+          status: 'reading',
+          started_at: new Date().toISOString(),
+        });
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['club-members-profiles'] });
+      
       toast({
         title: "Книга назначена",
-        description: `Книга "${book.title}" назначена участнику ${employee.profiles?.full_name}`,
+        description: `Книга "${book.title}" назначена участнику ${employee.full_name}`,
       });
       onClose();
     } catch (error) {
@@ -64,6 +100,8 @@ const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookMod
         description: "Не удалось назначить книгу участнику",
         variant: "destructive",
       });
+    } finally {
+      setIsAssigning(false);
     }
   };
 
@@ -73,7 +111,7 @@ const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookMod
         <DialogHeader>
           <DialogTitle>Назначить книгу участнику</DialogTitle>
           <DialogDescription>
-            Выберите книгу из библиотеки клуба для {employee?.profiles?.full_name}
+            Выберите книгу из библиотеки клуба для {employee?.full_name}
           </DialogDescription>
         </DialogHeader>
 
@@ -121,9 +159,10 @@ const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookMod
                       <Button
                         size="sm"
                         onClick={() => handleAssignBook(clubBook.books)}
+                        disabled={isAssigning}
                       >
                         <Plus className="mr-2 h-4 w-4" />
-                        Назначить
+                        {isAssigning ? "Назначение..." : "Назначить"}
                       </Button>
                     </div>
                   ))}

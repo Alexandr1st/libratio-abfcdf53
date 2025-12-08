@@ -19,16 +19,34 @@ const ClubMembers = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Fetch members from profiles table (users with this club_id)
+  // Fetch members from profiles table with their current reading book
   const { data: members, isLoading } = useQuery({
     queryKey: ['club-members-profiles', clubId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First get all members
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, full_name, username, avatar_url')
         .eq('club_id', clubId!);
-      if (error) throw error;
-      return data || [];
+      if (profilesError) throw profilesError;
+      
+      if (!profiles || profiles.length === 0) return [];
+      
+      // Get current reading books for all members
+      const memberIds = profiles.map(p => p.id);
+      const { data: diaryEntries, error: diaryError } = await supabase
+        .from('diary_entries')
+        .select('user_id, book_id, books(title)')
+        .in('user_id', memberIds)
+        .eq('status', 'reading');
+      
+      if (diaryError) throw diaryError;
+      
+      // Map diary entries to members
+      return profiles.map(profile => ({
+        ...profile,
+        currentBook: diaryEntries?.find(e => e.user_id === profile.id)?.books?.title || null
+      }));
     },
     enabled: !!clubId,
   });
@@ -73,7 +91,7 @@ const ClubMembers = () => {
                   {members.map((member) => (
                     <TableRow key={member.id}>
                       <TableCell className="font-medium">{member.full_name || "Не указано"}</TableCell>
-                      <TableCell className="text-gray-600">Не назначена</TableCell>
+                      <TableCell className="text-muted-foreground">{member.currentBook || "Не назначена"}</TableCell>
                       <TableCell className="text-right"><Button size="sm" onClick={() => handleAssignBook(member)}><Plus className="mr-2 h-4 w-4" />Добавить книгу</Button></TableCell>
                     </TableRow>
                   ))}
