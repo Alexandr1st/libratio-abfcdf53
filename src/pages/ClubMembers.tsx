@@ -5,11 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { BookOpen, Plus, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useClubMembers } from "@/hooks/useClubMembers";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import AssignBookModal from "@/components/AssignBookModal";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const ClubMembers = () => {
   const { user, loading: authLoading } = useAuth();
@@ -18,7 +18,20 @@ const ClubMembers = () => {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { data: members, isLoading } = useClubMembers(clubId || "");
+  
+  // Fetch members from profiles table (users with this club_id)
+  const { data: members, isLoading } = useQuery({
+    queryKey: ['club-members-profiles', clubId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .eq('club_id', clubId!);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!clubId,
+  });
 
   useEffect(() => {
     if (!authLoading) {
@@ -59,7 +72,7 @@ const ClubMembers = () => {
                 <TableBody>
                   {members.map((member) => (
                     <TableRow key={member.id}>
-                      <TableCell className="font-medium">{member.profiles?.full_name || "Не указано"}</TableCell>
+                      <TableCell className="font-medium">{member.full_name || "Не указано"}</TableCell>
                       <TableCell className="text-gray-600">Не назначена</TableCell>
                       <TableCell className="text-right"><Button size="sm" onClick={() => handleAssignBook(member)}><Plus className="mr-2 h-4 w-4" />Добавить книгу</Button></TableCell>
                     </TableRow>
