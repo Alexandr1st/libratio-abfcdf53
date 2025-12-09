@@ -55,21 +55,28 @@ const AssignBookModal = ({ isOpen, onClose, employee, companyId }: AssignBookMod
 
     setIsAssigning(true);
     try {
-      // Check if member already has this book assigned
+      // Check if member already has this book in diary (any status)
       const { data: existing } = await supabase
         .from('diary_entries')
-        .select('id')
+        .select('id, status')
         .eq('user_id', employee.id)
         .eq('book_id', book.id)
-        .eq('status', 'reading')
         .maybeSingle();
 
       if (existing) {
-        toast({
-          title: "Книга уже назначена",
-          description: `Эта книга уже назначена участнику для чтения`,
-          variant: "destructive",
-        });
+        if (existing.status === 'reading') {
+          toast({
+            title: "Книга уже назначена",
+            description: `Эта книга уже назначена участнику для чтения`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Книга уже в дневнике",
+            description: `Эта книга уже есть в дневнике участника со статусом "${existing.status}"`,
+            variant: "destructive",
+          });
+        }
         setIsAssigning(false);
         return;
       }
