@@ -1,9 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Users, Clock } from "lucide-react";
+import { Star, Users, BookOpen } from "lucide-react";
 import AddToDiaryDropdown from "@/components/AddToDiaryDropdown";
 import AddToClubLibraryDropdown from "@/components/AddToClubLibraryDropdown";
 import { useCheckBookInClubLibrary } from "@/hooks/useClubBooks";
+import { useBookReadersCount } from "@/hooks/useBookReaders";
 import type { Tables } from '@/integrations/supabase/types';
 
 type Book = Tables<'books'>;
@@ -16,6 +17,7 @@ interface BookCardProps {
 
 const BookCard = ({ book, isInDiary, isClubProfile }: BookCardProps) => {
   const { data: isInClubLibrary = false } = useCheckBookInClubLibrary(book.id);
+  const { data: readersCount = 0 } = useBookReadersCount(book.id);
 
   return (
     <Card key={book.id} className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -60,10 +62,10 @@ const BookCard = ({ book, isInDiary, isClubProfile }: BookCardProps) => {
             </div>
           </div>
         )}
-        {book.read_by_colleagues && (
-          <div className="mt-2 flex items-center space-x-2 text-sm text-gray-600">
-            <Clock className="h-4 w-4" />
-            <span>Читают коллеги: {book.read_by_colleagues}</span>
+        {readersCount > 0 && (
+          <div className="mt-2 flex items-center space-x-2 text-sm text-muted-foreground">
+            <BookOpen className="h-4 w-4" />
+            <span>Читают: {readersCount}</span>
           </div>
         )}
       </CardContent>
