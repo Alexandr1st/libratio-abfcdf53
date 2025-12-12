@@ -47,27 +47,23 @@ const BookCard = ({ book, isInDiary, isClubProfile }: BookCardProps) => {
             {book.description}
           </div>
         )}
-        {book.rating && (
-          <div className="mt-2 flex items-center space-x-2 text-sm text-gray-600">
-            <Users className="h-4 w-4" />
-            <span>Рейтинг:</span>
-            <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-4 w-4 ${i < Math.floor(book.rating || 0) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
-                />
-              ))}
-              <span className="ml-1">({book.rating})</span>
-            </div>
+        <div className="mt-2 flex items-center space-x-2 text-sm text-muted-foreground">
+          <Star className="h-4 w-4" />
+          <span>Рейтинг:</span>
+          <div className="flex items-center">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`h-4 w-4 ${i < Math.floor(book.rating || 0) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+              />
+            ))}
+            <span className="ml-1">({book.rating || 0})</span>
           </div>
-        )}
-        {readersCount > 0 && (
-          <div className="mt-2 flex items-center space-x-2 text-sm text-muted-foreground">
-            <BookOpen className="h-4 w-4" />
-            <span>Читают: {readersCount}</span>
-          </div>
-        )}
+        </div>
+        <div className="mt-2 flex items-center space-x-2 text-sm text-muted-foreground">
+          <BookOpen className="h-4 w-4" />
+          <span>Читают: {readersCount}</span>
+        </div>
       </CardContent>
       <div className="p-4 border-t space-y-2">
         {isClubProfile ? (
