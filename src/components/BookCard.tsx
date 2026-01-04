@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, Users, BookOpen } from "lucide-react";
@@ -34,7 +35,11 @@ const BookCard = ({ book, isInDiary, isClubProfile }: BookCardProps) => {
           )}
         </div>
         <div>
-          <CardTitle className="text-lg font-semibold">{book.title}</CardTitle>
+          <Link to={`/books/${book.id}`}>
+            <CardTitle className="text-lg font-semibold hover:text-primary hover:underline cursor-pointer">
+              {book.title}
+            </CardTitle>
+          </Link>
           <CardDescription className="text-muted-foreground">{book.author}</CardDescription>
         </div>
       </CardHeader>
