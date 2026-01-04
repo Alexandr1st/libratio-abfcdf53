@@ -7,9 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Star, BookOpen, Calendar, FileText, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBookReadersCount } from "@/hooks/useBookReaders";
+import { useAuth } from "@/contexts/AuthContext";
+import { useBookDiaryEntry, useUpdateBookDiaryEntry } from "@/hooks/useBookDiaryEntry";
+import MyOpinionBlock from "@/components/book/MyOpinionBlock";
+import MyQuotesBlock from "@/components/book/MyQuotesBlock";
 
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
 
   const { data: book, isLoading, error } = useQuery({
     queryKey: ['book', id],
@@ -27,6 +32,8 @@ const BookDetail = () => {
   });
 
   const { data: readersCount = 0 } = useBookReadersCount(id || '');
+  const { data: diaryEntry, isLoading: isDiaryLoading } = useBookDiaryEntry(id || '');
+  const updateDiaryEntry = useUpdateBookDiaryEntry();
 
   if (isLoading) {
     return (
@@ -135,6 +142,22 @@ const BookDetail = () => {
                 <p className="text-muted-foreground leading-relaxed">
                   {book.description}
                 </p>
+              </div>
+            )}
+
+            {/* Personal blocks for authenticated users */}
+            {user && !isDiaryLoading && (
+              <div className="space-y-6 pt-4 border-t">
+                <MyOpinionBlock
+                  notes={diaryEntry?.notes || null}
+                  onSave={(notes) => updateDiaryEntry.mutate({ bookId: id!, updates: { notes } })}
+                  isSaving={updateDiaryEntry.isPending}
+                />
+                <MyQuotesBlock
+                  quotes={diaryEntry?.quotes || null}
+                  onSave={(quotes) => updateDiaryEntry.mutate({ bookId: id!, updates: { quotes } })}
+                  isSaving={updateDiaryEntry.isPending}
+                />
               </div>
             )}
           </div>
