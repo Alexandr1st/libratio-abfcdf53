@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -14,26 +15,33 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { bookSchema, type BookFormData } from "@/lib/validations";
 
 interface AddBookDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-interface BookFormData {
-  title: string;
-  author: string;
-  genre: string;
-  description?: string;
-  image?: string;
-  pages?: number;
-  year?: number;
-}
-
 const AddBookDialog = ({ open, onOpenChange }: AddBookDialogProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm<BookFormData>();
+  const { 
+    register, 
+    handleSubmit, 
+    reset, 
+    formState: { errors } 
+  } = useForm<BookFormData>({
+    resolver: zodResolver(bookSchema),
+    defaultValues: {
+      title: '',
+      author: '',
+      genre: '',
+      description: null,
+      image: null,
+      pages: null,
+      year: null,
+    }
+  });
 
   const addBookMutation = useMutation({
     mutationFn: async (formData: BookFormData) => {
@@ -45,8 +53,8 @@ const AddBookDialog = ({ open, onOpenChange }: AddBookDialogProps) => {
           genre: formData.genre,
           description: formData.description || null,
           image: formData.image || null,
-          pages: formData.pages || null,
-          year: formData.year || null,
+          pages: typeof formData.pages === 'number' ? formData.pages : null,
+          year: typeof formData.year === 'number' ? formData.year : null,
         })
         .select()
         .single();
@@ -91,17 +99,25 @@ const AddBookDialog = ({ open, onOpenChange }: AddBookDialogProps) => {
               <Label htmlFor="title">Название *</Label>
               <Input
                 id="title"
-                {...register("title", { required: true })}
+                {...register("title")}
                 placeholder="Название книги"
+                maxLength={500}
               />
+              {errors.title && (
+                <p className="text-sm text-destructive">{errors.title.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="author">Автор *</Label>
               <Input
                 id="author"
-                {...register("author", { required: true })}
+                {...register("author")}
                 placeholder="Автор книги"
+                maxLength={200}
               />
+              {errors.author && (
+                <p className="text-sm text-destructive">{errors.author.message}</p>
+              )}
             </div>
           </div>
 
@@ -110,9 +126,13 @@ const AddBookDialog = ({ open, onOpenChange }: AddBookDialogProps) => {
               <Label htmlFor="genre">Жанр *</Label>
               <Input
                 id="genre"
-                {...register("genre", { required: true })}
+                {...register("genre")}
                 placeholder="Жанр"
+                maxLength={100}
               />
+              {errors.genre && (
+                <p className="text-sm text-destructive">{errors.genre.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="year">Год издания</Label>
@@ -121,7 +141,12 @@ const AddBookDialog = ({ open, onOpenChange }: AddBookDialogProps) => {
                 type="number"
                 {...register("year", { valueAsNumber: true })}
                 placeholder="2024"
+                min={1000}
+                max={new Date().getFullYear() + 5}
               />
+              {errors.year && (
+                <p className="text-sm text-destructive">{errors.year.message}</p>
+              )}
             </div>
           </div>
 
@@ -133,7 +158,12 @@ const AddBookDialog = ({ open, onOpenChange }: AddBookDialogProps) => {
                 type="number"
                 {...register("pages", { valueAsNumber: true })}
                 placeholder="300"
+                min={1}
+                max={50000}
               />
+              {errors.pages && (
+                <p className="text-sm text-destructive">{errors.pages.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="image">Обложка (URL или эмодзи)</Label>
@@ -141,7 +171,11 @@ const AddBookDialog = ({ open, onOpenChange }: AddBookDialogProps) => {
                 id="image"
                 {...register("image")}
                 placeholder="https://... или 📚"
+                maxLength={1000}
               />
+              {errors.image && (
+                <p className="text-sm text-destructive">{errors.image.message}</p>
+              )}
             </div>
           </div>
 
@@ -152,7 +186,11 @@ const AddBookDialog = ({ open, onOpenChange }: AddBookDialogProps) => {
               {...register("description")}
               placeholder="Описание книги"
               rows={4}
+              maxLength={2000}
             />
+            {errors.description && (
+              <p className="text-sm text-destructive">{errors.description.message}</p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2">
