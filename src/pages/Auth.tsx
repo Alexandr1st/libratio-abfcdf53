@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { BookOpen, Eye, EyeOff, User, Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { userRegistrationSchema, userLoginSchema, clubSchema, getFirstError } from "@/lib/validations";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -44,31 +45,36 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate common fields
-    if (!email || !password) {
+    // Validate user registration data
+    const userValidation = userRegistrationSchema.safeParse({
+      email,
+      password,
+      full_name: fullName,
+      username: accountType === "individual" ? username : null,
+    });
+
+    if (!userValidation.success) {
       toast({
-        title: "Ошибка",
-        description: "Пожалуйста, заполните email и пароль",
+        title: "Ошибка валидации",
+        description: getFirstError(userValidation.error),
         variant: "destructive",
       });
       return;
     }
 
-    // Validate based on account type
-    if (accountType === "individual") {
-      if (!fullName || !username) {
+    // Validate club data if registering as club
+    if (accountType === "club") {
+      const clubValidation = clubSchema.safeParse({
+        name: clubName,
+        description: clubDescription || null,
+        location: clubLocation || null,
+        website: clubChatLink || null,
+      });
+
+      if (!clubValidation.success) {
         toast({
-          title: "Ошибка",
-          description: "Пожалуйста, заполните все поля",
-          variant: "destructive",
-        });
-        return;
-      }
-    } else {
-      if (!clubName || !fullName) {
-        toast({
-          title: "Ошибка",
-          description: "Пожалуйста, заполните название клуба и ваше имя",
+          title: "Ошибка валидации клуба",
+          description: getFirstError(clubValidation.error),
           variant: "destructive",
         });
         return;
@@ -164,10 +170,14 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+    
+    // Validate login data
+    const loginValidation = userLoginSchema.safeParse({ email, password });
+    
+    if (!loginValidation.success) {
       toast({
         title: "Ошибка",
-        description: "Пожалуйста, заполните все поля",
+        description: getFirstError(loginValidation.error),
         variant: "destructive",
       });
       return;
@@ -256,6 +266,7 @@ const Auth = () => {
                       placeholder={accountType === "club" ? "Иван Петров" : "Иван Петров"}
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
+                      maxLength={100}
                       required={!isLogin}
                     />
                   </div>
@@ -270,6 +281,9 @@ const Auth = () => {
                         placeholder="ivan_petrov"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        maxLength={30}
+                        pattern="^[a-zA-Z0-9_]+$"
+                        title="Только буквы, цифры и подчеркивания"
                         required={!isLogin}
                       />
                     </div>
@@ -286,6 +300,7 @@ const Auth = () => {
                           placeholder="Книжный клуб"
                           value={clubName}
                           onChange={(e) => setClubName(e.target.value)}
+                          maxLength={200}
                           required
                         />
                       </div>
@@ -298,6 +313,7 @@ const Auth = () => {
                           placeholder="Москва, Россия"
                           value={clubLocation}
                           onChange={(e) => setClubLocation(e.target.value)}
+                          maxLength={200}
                         />
                       </div>
 
@@ -309,6 +325,7 @@ const Auth = () => {
                           placeholder="https://t.me/yourgroup"
                           value={clubChatLink}
                           onChange={(e) => setClubChatLink(e.target.value)}
+                          maxLength={500}
                         />
                       </div>
 
@@ -320,6 +337,7 @@ const Auth = () => {
                           value={clubDescription}
                           onChange={(e) => setClubDescription(e.target.value)}
                           rows={3}
+                          maxLength={1000}
                         />
                       </div>
                     </>
@@ -335,12 +353,13 @@ const Auth = () => {
                   placeholder="ivan@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  maxLength={255}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Пароль</Label>
+                <Label htmlFor="password">Пароль {!isLogin && "(мин. 8 символов, A-Z, a-z, 0-9)"}</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -348,6 +367,7 @@ const Auth = () => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    maxLength={72}
                     required
                   />
                   <Button

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { profileUpdateSchema, type ProfileUpdateFormData } from "@/lib/validations";
 
 interface EditUserDialogProps {
   open: boolean;
@@ -33,16 +35,24 @@ interface EditUserDialogProps {
   } | null;
 }
 
-interface UserFormData {
-  full_name: string;
-  username: string;
-  club_id: string;
-}
-
 const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset, setValue, watch } = useForm<UserFormData>();
+  const { 
+    register, 
+    handleSubmit, 
+    reset, 
+    setValue, 
+    watch,
+    formState: { errors }
+  } = useForm<ProfileUpdateFormData>({
+    resolver: zodResolver(profileUpdateSchema),
+    defaultValues: {
+      full_name: '',
+      username: '',
+      club_id: '',
+    }
+  });
 
   const clubId = watch("club_id");
 
@@ -70,15 +80,15 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
   }, [user, reset]);
 
   const updateUserMutation = useMutation({
-    mutationFn: async (formData: UserFormData) => {
+    mutationFn: async (formData: ProfileUpdateFormData) => {
       if (!user) return;
 
       // Update profile
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
-          full_name: formData.full_name,
-          username: formData.username,
+          full_name: formData.full_name || null,
+          username: formData.username || null,
           club_id: formData.club_id || null,
         })
         .eq("id", user.id);
@@ -138,7 +148,7 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
     },
   });
 
-  const onSubmit = (data: UserFormData) => {
+  const onSubmit = (data: ProfileUpdateFormData) => {
     updateUserMutation.mutate(data);
   };
 
@@ -160,16 +170,24 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
               id="full_name"
               {...register("full_name")}
               placeholder="Иван Иванов"
+              maxLength={100}
             />
+            {errors.full_name && (
+              <p className="text-sm text-destructive">{errors.full_name.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">Username (буквы, цифры, подчеркивания)</Label>
             <Input
               id="username"
               {...register("username")}
               placeholder="ivan_ivanov"
+              maxLength={30}
             />
+            {errors.username && (
+              <p className="text-sm text-destructive">{errors.username.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -190,6 +208,9 @@ const EditUserDialog = ({ open, onOpenChange, user }: EditUserDialogProps) => {
                 ))}
               </SelectContent>
             </Select>
+            {errors.club_id && (
+              <p className="text-sm text-destructive">{errors.club_id.message}</p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { bookSchema, getFirstError } from "@/lib/validations";
 
 interface Book {
   id: string;
@@ -56,6 +57,21 @@ const EditBookDialog = ({ book, open, onOpenChange }: EditBookDialogProps) => {
   const updateBookMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       if (!book) return;
+
+      // Validate with zod schema
+      const validationResult = bookSchema.safeParse({
+        title: data.title,
+        author: data.author,
+        genre: data.genre,
+        description: data.description || null,
+        image: data.image || null,
+        pages: data.pages ? parseInt(data.pages) : null,
+        year: data.year ? parseInt(data.year) : null,
+      });
+
+      if (!validationResult.success) {
+        throw new Error(getFirstError(validationResult.error));
+      }
 
       const { error } = await supabase
         .from("books")
@@ -108,6 +124,7 @@ const EditBookDialog = ({ book, open, onOpenChange }: EditBookDialogProps) => {
               id="title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              maxLength={500}
               required
             />
           </div>
@@ -118,6 +135,7 @@ const EditBookDialog = ({ book, open, onOpenChange }: EditBookDialogProps) => {
               id="author"
               value={formData.author}
               onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+              maxLength={200}
               required
             />
           </div>
@@ -128,6 +146,7 @@ const EditBookDialog = ({ book, open, onOpenChange }: EditBookDialogProps) => {
               id="genre"
               value={formData.genre}
               onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
+              maxLength={100}
               required
             />
           </div>
@@ -139,6 +158,7 @@ const EditBookDialog = ({ book, open, onOpenChange }: EditBookDialogProps) => {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
+              maxLength={2000}
             />
           </div>
 
@@ -149,6 +169,7 @@ const EditBookDialog = ({ book, open, onOpenChange }: EditBookDialogProps) => {
               value={formData.image}
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
               placeholder="https://example.com/image.jpg"
+              maxLength={1000}
             />
           </div>
 
@@ -161,6 +182,7 @@ const EditBookDialog = ({ book, open, onOpenChange }: EditBookDialogProps) => {
                 value={formData.pages}
                 onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
                 min="1"
+                max="50000"
               />
             </div>
 
@@ -172,7 +194,7 @@ const EditBookDialog = ({ book, open, onOpenChange }: EditBookDialogProps) => {
                 value={formData.year}
                 onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                 min="1000"
-                max={new Date().getFullYear()}
+                max={new Date().getFullYear() + 5}
               />
             </div>
           </div>

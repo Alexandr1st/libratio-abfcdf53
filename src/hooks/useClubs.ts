@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { clubSchema, getFirstError } from '@/lib/validations';
 
 interface Club {
   id: string;
@@ -47,6 +48,12 @@ export const useCreateClub = () => {
 
   return useMutation({
     mutationFn: async ({ clubData, logo }: { clubData: Omit<ClubInsert, 'logo_url'>; logo?: File | null }) => {
+      // Validate club data
+      const validationResult = clubSchema.safeParse(clubData);
+      if (!validationResult.success) {
+        throw new Error(getFirstError(validationResult.error));
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -73,11 +80,14 @@ export const useCreateClub = () => {
         logoUrl = publicUrl;
       }
 
-      // Create club
+      // Create club with validated data
       const { data: club, error: clubError } = await supabase
         .from('clubs')
         .insert({
-          ...clubData,
+          name: validationResult.data.name,
+          description: validationResult.data.description,
+          location: validationResult.data.location,
+          website: validationResult.data.website,
           logo_url: logoUrl,
         })
         .select()
@@ -127,7 +137,7 @@ export const useCreateClub = () => {
       console.error('Error creating club:', error);
       toast({
         title: "Ошибка",
-        description: "Не удалось создать клуб",
+        description: error.message || "Не удалось создать клуб",
         variant: "destructive",
       });
     },
@@ -146,12 +156,17 @@ export const useJoinClub = () => {
         throw new Error('User not authenticated');
       }
 
+      // Validate position if provided
+      if (position && position.length > 100) {
+        throw new Error('Позиция должна быть не более 100 символов');
+      }
+
       const { data, error } = await supabase
         .from('club_members')
         .insert({
           club_id: clubId,
           user_id: user.id,
-          position: position || null,
+          position: position ? position.slice(0, 100) : null,
           is_admin: false,
         })
         .select()

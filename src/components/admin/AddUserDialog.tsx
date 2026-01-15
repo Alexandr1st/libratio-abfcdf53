@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -13,26 +14,33 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { adminUserSchema, type AdminUserFormData } from "@/lib/validations";
 
 interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-interface UserFormData {
-  email: string;
-  password: string;
-  full_name: string;
-  username: string;
-}
-
 const AddUserDialog = ({ open, onOpenChange }: AddUserDialogProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm<UserFormData>();
+  const { 
+    register, 
+    handleSubmit, 
+    reset,
+    formState: { errors }
+  } = useForm<AdminUserFormData>({
+    resolver: zodResolver(adminUserSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      full_name: '',
+      username: '',
+    }
+  });
 
   const addUserMutation = useMutation({
-    mutationFn: async (formData: UserFormData) => {
+    mutationFn: async (formData: AdminUserFormData) => {
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -65,7 +73,7 @@ const AddUserDialog = ({ open, onOpenChange }: AddUserDialogProps) => {
     },
   });
 
-  const onSubmit = (data: UserFormData) => {
+  const onSubmit = (data: AdminUserFormData) => {
     addUserMutation.mutate(data);
   };
 
@@ -84,37 +92,53 @@ const AddUserDialog = ({ open, onOpenChange }: AddUserDialogProps) => {
             <Input
               id="email"
               type="email"
-              {...register("email", { required: true })}
+              {...register("email")}
               placeholder="user@example.com"
+              maxLength={255}
             />
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Пароль *</Label>
+            <Label htmlFor="password">Пароль * (мин. 8 символов)</Label>
             <Input
               id="password"
               type="password"
-              {...register("password", { required: true, minLength: 6 })}
-              placeholder="Минимум 6 символов"
+              {...register("password")}
+              placeholder="Минимум 8 символов"
+              maxLength={72}
             />
+            {errors.password && (
+              <p className="text-sm text-destructive">{errors.password.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="full_name">Полное имя *</Label>
             <Input
               id="full_name"
-              {...register("full_name", { required: true })}
+              {...register("full_name")}
               placeholder="Иван Иванов"
+              maxLength={100}
             />
+            {errors.full_name && (
+              <p className="text-sm text-destructive">{errors.full_name.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="username">Username *</Label>
+            <Label htmlFor="username">Username * (буквы, цифры, подчеркивания)</Label>
             <Input
               id="username"
-              {...register("username", { required: true })}
+              {...register("username")}
               placeholder="ivan_ivanov"
+              maxLength={30}
             />
+            {errors.username && (
+              <p className="text-sm text-destructive">{errors.username.message}</p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
