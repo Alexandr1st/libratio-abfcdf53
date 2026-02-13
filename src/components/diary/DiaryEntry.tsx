@@ -48,7 +48,11 @@ const DiaryEntry = ({ entry, onAddNote }: DiaryEntryProps) => {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
-            <div className="text-4xl">{entry.books?.image || '📚'}</div>
+            {entry.books?.image && (entry.books.image.startsWith('http://') || entry.books.image.startsWith('https://')) ? (
+              <img src={entry.books.image} alt={entry.books?.title} className="w-16 h-20 object-cover rounded" />
+            ) : (
+              <div className="text-4xl">{entry.books?.image || '📚'}</div>
+            )}
             <div>
               <CardTitle 
                 className="text-xl cursor-pointer hover:text-primary transition-colors"
