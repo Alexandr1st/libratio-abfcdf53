@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +15,7 @@ interface DiaryEntryProps {
 }
 
 const DiaryEntry = ({ entry, onAddNote }: DiaryEntryProps) => {
+  const navigate = useNavigate();
   const [editingEntry, setEditingEntry] = useState<string | null>(null);
   const [editNotes, setEditNotes] = useState("");
   const [editRating, setEditRating] = useState<number | null>(null);
@@ -48,7 +50,12 @@ const DiaryEntry = ({ entry, onAddNote }: DiaryEntryProps) => {
           <div className="flex items-start space-x-4">
             <div className="text-4xl">{entry.books?.image || '📚'}</div>
             <div>
-              <CardTitle className="text-xl">{entry.books?.title}</CardTitle>
+              <CardTitle 
+                className="text-xl cursor-pointer hover:text-primary transition-colors"
+                onClick={() => navigate(`/books/${entry.book_id}`)}
+              >
+                {entry.books?.title}
+              </CardTitle>
               <CardDescription className="text-base mb-2">
                 {entry.books?.author}
               </CardDescription>
