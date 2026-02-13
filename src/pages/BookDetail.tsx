@@ -73,7 +73,7 @@ const BookDetail = () => {
         <div className="grid md:grid-cols-3 gap-8">
           {/* Book Cover */}
           <div className="md:col-span-1">
-            {book.image ? (
+            {book.image && (book.image.startsWith('http://') || book.image.startsWith('https://')) ? (
               <img
                 src={book.image}
                 alt={book.title}
@@ -81,7 +81,11 @@ const BookDetail = () => {
               />
             ) : (
               <div className="w-full rounded-lg bg-muted flex items-center justify-center aspect-[2/3]">
-                <BookOpen className="h-20 w-20 text-muted-foreground" />
+                {book.image ? (
+                  <span className="text-6xl">{book.image}</span>
+                ) : (
+                  <BookOpen className="h-20 w-20 text-muted-foreground" />
+                )}
               </div>
             )}
           </div>
