@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
@@ -14,6 +14,7 @@ import MyQuotesBlock from "@/components/book/MyQuotesBlock";
 
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const { data: book, isLoading, error } = useQuery({
@@ -63,12 +64,10 @@ const BookDetail = () => {
     <div className="min-h-screen bg-background">
       <DiaryNavigation />
       <div className="container mx-auto px-4 py-8">
-        <Link to="/books">
-          <Button variant="ghost" className="mb-6">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Назад к каталогу
-          </Button>
-        </Link>
+        <Button variant="ghost" className="mb-6" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Назад
+        </Button>
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Book Cover */}
