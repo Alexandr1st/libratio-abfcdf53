@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBookDiaryEntry, useUpdateBookDiaryEntry } from "@/hooks/useBookDiaryEntry";
 import MyOpinionBlock from "@/components/book/MyOpinionBlock";
 import MyQuotesBlock from "@/components/book/MyQuotesBlock";
+import BookOpinionsList from "@/components/book/BookOpinionsList";
 
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,6 +36,9 @@ const BookDetail = () => {
   const { data: readersCount = 0 } = useBookReadersCount(id || '');
   const { data: diaryEntry, isLoading: isDiaryLoading } = useBookDiaryEntry(id || '');
   const updateDiaryEntry = useUpdateBookDiaryEntry();
+  const handleSaveOpinion = (notes: string, rating: number) => {
+    updateDiaryEntry.mutate({ bookId: id!, updates: { notes, rating } });
+  };
 
   if (isLoading) {
     return (
@@ -153,7 +157,8 @@ const BookDetail = () => {
               <div className="space-y-6 pt-4 border-t">
                 <MyOpinionBlock
                   notes={diaryEntry?.notes || null}
-                  onSave={(notes) => updateDiaryEntry.mutate({ bookId: id!, updates: { notes } })}
+                  rating={diaryEntry?.rating || null}
+                  onSave={handleSaveOpinion}
                   isSaving={updateDiaryEntry.isPending}
                 />
                 <MyQuotesBlock
@@ -163,6 +168,9 @@ const BookDetail = () => {
                 />
               </div>
             )}
+
+            {/* Public opinions from all users */}
+            <BookOpinionsList bookId={id!} currentUserId={user?.id} />
           </div>
         </div>
       </div>

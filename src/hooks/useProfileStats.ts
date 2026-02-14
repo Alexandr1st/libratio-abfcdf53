@@ -17,7 +17,7 @@ export const useProfileStats = () => {
         .eq('user_id', user.id)
         .eq('status', 'completed');
 
-      // Получаем количество отзывов (записи с рейтингом)
+      // Получаем количество мнений (записи с рейтингом и текстом)
       const { count: reviews } = await supabase
         .from('diary_entries')
         .select('*', { count: 'exact', head: true })
