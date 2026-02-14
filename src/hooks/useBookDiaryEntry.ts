@@ -36,7 +36,7 @@ export const useUpdateBookDiaryEntry = () => {
       updates,
     }: {
       bookId: string;
-      updates: { notes?: string; quotes?: string[] };
+      updates: { notes?: string; quotes?: string[]; rating?: number };
     }) => {
       const {
         data: { user },
@@ -85,6 +85,9 @@ export const useUpdateBookDiaryEntry = () => {
         queryKey: ["book-diary-entry", variables.bookId],
       });
       queryClient.invalidateQueries({ queryKey: ["diary-entries"] });
+      queryClient.invalidateQueries({
+        queryKey: ["book-opinions", variables.bookId],
+      });
       toast({
         title: "Сохранено!",
         description: "Ваши заметки обновлены",

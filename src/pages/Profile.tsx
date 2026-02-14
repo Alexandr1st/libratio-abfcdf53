@@ -207,7 +207,7 @@ const Profile = () => {
                     <div className="text-2xl font-bold text-green-600">
                       {statsLoading ? "..." : profileStats?.reviews || 0}
                     </div>
-                    <div className="text-sm text-gray-500">Отзывов</div>
+                    <div className="text-sm text-gray-500">Мнений</div>
                   </div>
                 </div>
 
@@ -305,7 +305,7 @@ const Profile = () => {
             {/* Recent Reviews */}
             <Card className="border-0 shadow-lg">
               <CardHeader>
-                <CardTitle>Последние отзывы</CardTitle>
+                <CardTitle>Последние мнения</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 {mockData.recentReviews.map((review) => (
