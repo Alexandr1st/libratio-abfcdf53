@@ -12,11 +12,12 @@ type Book = Tables<'books'>;
 
 interface BookCardProps {
   book: Book;
-  isInDiary: boolean;
-  isClubProfile: boolean;
+  isInDiary?: boolean;
+  isClubProfile?: boolean;
+  hideActions?: boolean;
 }
 
-const BookCard = ({ book, isInDiary, isClubProfile }: BookCardProps) => {
+const BookCard = ({ book, isInDiary = false, isClubProfile = false, hideActions = false }: BookCardProps) => {
   const { data: isInClubLibrary = false } = useCheckBookInClubLibrary(book.id);
   const { data: readersCount = 0 } = useBookReadersCount(book.id);
 
@@ -70,19 +71,21 @@ const BookCard = ({ book, isInDiary, isClubProfile }: BookCardProps) => {
           <span>Читают: {readersCount}</span>
         </div>
       </CardContent>
-      <div className="p-4 border-t space-y-2">
-        {isClubProfile ? (
-          <AddToClubLibraryDropdown 
-            bookId={book.id} 
-            isInLibrary={isInClubLibrary} 
-          />
-        ) : (
-          <AddToDiaryDropdown 
-            bookId={book.id} 
-            isInDiary={isInDiary} 
-          />
-        )}
-      </div>
+      {!hideActions && (
+        <div className="p-4 border-t space-y-2">
+          {isClubProfile ? (
+            <AddToClubLibraryDropdown 
+              bookId={book.id} 
+              isInLibrary={isInClubLibrary} 
+            />
+          ) : (
+            <AddToDiaryDropdown 
+              bookId={book.id} 
+              isInDiary={isInDiary} 
+            />
+          )}
+        </div>
+      )}
     </Card>
   );
 };

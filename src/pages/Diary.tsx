@@ -5,7 +5,7 @@ import AddBookNoteModal from "@/components/AddBookNoteModal";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import DiaryHeader from "@/components/diary/DiaryHeader";
 import DiaryFilters from "@/components/diary/DiaryFilters";
-import DiaryEntry from "@/components/diary/DiaryEntry";
+import BookCard from "@/components/BookCard";
 import DiaryEmptyState from "@/components/diary/DiaryEmptyState";
 import DiaryLoadingState from "@/components/diary/DiaryLoadingState";
 import DiaryErrorState from "@/components/diary/DiaryErrorState";
@@ -47,7 +47,7 @@ const Diary = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <DiaryNavigation />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <DiaryHeader />
         
         <DiaryFilters 
@@ -60,12 +60,12 @@ const Diary = () => {
         {error && !isLoading && <DiaryErrorState />}
 
         {!isLoading && !error && (
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredEntries.map((entry: any) => (
-              <DiaryEntry 
+              <BookCard 
                 key={entry.id}
-                entry={entry}
-                onAddNote={handleAddNoteClick}
+                book={entry.books}
+                hideActions
               />
             ))}
           </div>
