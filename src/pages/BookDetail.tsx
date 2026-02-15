@@ -4,9 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Star, BookOpen, Calendar, FileText, ArrowLeft } from "lucide-react";
+import { Loader2, Star, BookOpen, Calendar, FileText, ArrowLeft, Library } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useBookReadersCount } from "@/hooks/useBookReaders";
+import { useBookReadersCount, useBookClubsCount } from "@/hooks/useBookReaders";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBookDiaryEntry, useUpdateBookDiaryEntry } from "@/hooks/useBookDiaryEntry";
 import MyOpinionBlock from "@/components/book/MyOpinionBlock";
@@ -34,6 +34,7 @@ const BookDetail = () => {
   });
 
   const { data: readersCount = 0 } = useBookReadersCount(id || '');
+  const { data: clubsCount = 0 } = useBookClubsCount(id || '');
   const { data: diaryEntry, isLoading: isDiaryLoading } = useBookDiaryEntry(id || '');
   const updateDiaryEntry = useUpdateBookDiaryEntry();
   const handleSaveOpinion = (notes: string, rating: number) => {
@@ -136,8 +137,15 @@ const BookDetail = () => {
                 {/* Readers */}
                 <div className="flex items-center space-x-2">
                   <BookOpen className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-muted-foreground">Читают:</span>
+                  <span className="text-muted-foreground">Читатели:</span>
                   <span className="font-medium">{readersCount}</span>
+                </div>
+
+                {/* Clubs */}
+                <div className="flex items-center space-x-2">
+                  <Library className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-muted-foreground">Клубы:</span>
+                  <span className="font-medium">{clubsCount}</span>
                 </div>
               </CardContent>
             </Card>
