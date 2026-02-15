@@ -108,7 +108,7 @@ const DiaryEntry = ({ entry, onAddNote }: DiaryEntryProps) => {
               variant="outline"
               onClick={() => handleEditEntry(entry)}
             >
-              {entry.rating ? "Изменить отзыв" : "Оставить отзыв"}
+              {entry.rating ? "Изменить мнение" : "Оставить мнение"}
             </Button>
           </div>
         </div>
