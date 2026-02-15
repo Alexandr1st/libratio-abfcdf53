@@ -8,11 +8,30 @@ export const useBookReadersCount = (bookId: string) => {
       const { count, error } = await supabase
         .from('diary_entries')
         .select('*', { count: 'exact', head: true })
-        .eq('book_id', bookId)
-        .eq('status', 'reading');
+        .eq('book_id', bookId);
 
       if (error) {
         console.error('Error fetching readers count:', error);
+        return 0;
+      }
+
+      return count || 0;
+    },
+    enabled: !!bookId,
+  });
+};
+
+export const useBookClubsCount = (bookId: string) => {
+  return useQuery({
+    queryKey: ['book-clubs-count', bookId],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('club_books')
+        .select('*', { count: 'exact', head: true })
+        .eq('book_id', bookId);
+
+      if (error) {
+        console.error('Error fetching clubs count:', error);
         return 0;
       }
 

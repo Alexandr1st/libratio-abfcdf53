@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Users, BookOpen } from "lucide-react";
+import { Star, Users, BookOpen, Library } from "lucide-react";
 import AddToDiaryDropdown from "@/components/AddToDiaryDropdown";
 import AddToClubLibraryDropdown from "@/components/AddToClubLibraryDropdown";
 import { useCheckBookInClubLibrary } from "@/hooks/useClubBooks";
-import { useBookReadersCount } from "@/hooks/useBookReaders";
+import { useBookReadersCount, useBookClubsCount } from "@/hooks/useBookReaders";
 import type { Tables } from '@/integrations/supabase/types';
 
 type Book = Tables<'books'>;
@@ -20,6 +20,7 @@ interface BookCardProps {
 const BookCard = ({ book, isInDiary = false, isClubProfile = false, hideActions = false }: BookCardProps) => {
   const { data: isInClubLibrary = false } = useCheckBookInClubLibrary(book.id);
   const { data: readersCount = 0 } = useBookReadersCount(book.id);
+  const { data: clubsCount = 0 } = useBookClubsCount(book.id);
 
   return (
     <Card key={book.id} className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -68,7 +69,11 @@ const BookCard = ({ book, isInDiary = false, isClubProfile = false, hideActions 
         </div>
         <div className="mt-2 flex items-center space-x-2 text-sm text-muted-foreground">
           <BookOpen className="h-4 w-4" />
-          <span>Читают: {readersCount}</span>
+          <span>Читатели: {readersCount}</span>
+        </div>
+        <div className="mt-2 flex items-center space-x-2 text-sm text-muted-foreground">
+          <Library className="h-4 w-4" />
+          <span>Клубы: {clubsCount}</span>
         </div>
       </CardContent>
       {!hideActions && (
