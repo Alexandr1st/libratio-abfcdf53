@@ -11,9 +11,14 @@ export const useDiaryEntries = () => {
   return useQuery({
     queryKey: ['diary-entries'],
     queryFn: async (): Promise<DiaryEntry[]> => {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) return [];
+
       const { data, error } = await supabase
         .from('diary_entries')
         .select('*, books(*)')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
