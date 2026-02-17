@@ -48,7 +48,7 @@ const DiaryNavigation = () => {
                 {isClubProfile && (
                   <Link to="/club-members">
                     <Button variant="ghost" className={getButtonStyle("/club-members")}>
-                      Мои участники
+                      Мой клуб
                     </Button>
                   </Link>
                 )}
