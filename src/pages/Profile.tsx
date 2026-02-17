@@ -57,19 +57,6 @@ const Profile = () => {
         return;
       }
 
-      // Check if user is a club contact person and redirect
-      const { data: clubData } = await supabase
-        .from('clubs')
-        .select('id')
-        .eq('contact_person_id', user.id)
-        .maybeSingle();
-
-      if (clubData) {
-        // User is a club contact person, redirect to club profile
-        navigate('/club-profile');
-        return;
-      }
-
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
