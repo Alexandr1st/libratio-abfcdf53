@@ -60,15 +60,13 @@ const DiaryNavigation = () => {
                 {isClubProfile && (
                   <Link to="/club-library">
                     <Button variant="ghost" className={getButtonStyle("/club-library")}>
-                      Моя библиотека
+                      Библиотека клуба
                     </Button>
                   </Link>
                 )}
-                {!isClubProfile && (
-                  <Link to="/diary">
-                    <Button variant="ghost" className={getButtonStyle("/diary")}>Мой дневник</Button>
-                  </Link>
-                )}
+                <Link to="/diary">
+                  <Button variant="ghost" className={getButtonStyle("/diary")}>Мой дневник</Button>
+                </Link>
                 <Link to="/clubs">
                   <Button variant="ghost" className={getButtonStyle("/clubs")}>Клубы</Button>
                 </Link>
