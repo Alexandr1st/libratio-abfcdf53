@@ -153,17 +153,27 @@ const ClubMembers = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {clubBooks.slice(0, 6).map((item: any) => (
-                      <div key={item.id} className="text-center">
-                        <img
-                          src={item.books?.image || '/placeholder.svg'}
-                          alt={item.books?.title}
-                          className="w-full h-32 object-cover rounded-lg mb-2"
-                        />
-                        <p className="text-sm font-medium truncate">{item.books?.title}</p>
-                        <p className="text-xs text-gray-500 truncate">{item.books?.author}</p>
-                      </div>
-                    ))}
+                    {clubBooks.slice(0, 6).map((item: any) => {
+                      const image = item.books?.image;
+                      const isEmoji = image && !image.startsWith('http') && !image.startsWith('/');
+                      return (
+                        <div key={item.id} className="text-center">
+                          {isEmoji ? (
+                            <div className="w-full h-32 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg mb-2 flex items-center justify-center text-4xl">
+                              {image}
+                            </div>
+                          ) : (
+                            <img
+                              src={image || '/placeholder.svg'}
+                              alt={item.books?.title}
+                              className="w-full h-32 object-cover rounded-lg mb-2"
+                            />
+                          )}
+                          <p className="text-sm font-medium truncate">{item.books?.title}</p>
+                          <p className="text-xs text-gray-500 truncate">{item.books?.author}</p>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
