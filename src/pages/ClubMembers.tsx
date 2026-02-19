@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BookOpen, Building2, Edit, Globe, LogOut, MapPin, Plus, User, Users } from "lucide-react";
+import { BookOpen, Building2, Edit, Globe, LogOut, MapPin, User, Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
-import AssignBookModal from "@/components/AssignBookModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
@@ -18,8 +17,6 @@ const ClubMembers = () => {
   const [club, setClub] = useState<any>(null);
   const [clubId, setClubId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedMember, setSelectedMember] = useState<any>(null);
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -83,7 +80,6 @@ const ClubMembers = () => {
     enabled: !!clubId,
   });
 
-  const handleAssignBook = (member: any) => { setSelectedMember(member); setIsAssignModalOpen(true); };
   const handleSignOut = async () => { await signOut(); navigate("/"); };
 
   if (authLoading || loading) return (
@@ -109,7 +105,7 @@ const ClubMembers = () => {
                   }
                 </div>
                 <CardTitle className="text-2xl">{club.name}</CardTitle>
-                <CardDescription className="text-base">Клуб</CardDescription>
+                <p className="text-base text-muted-foreground">Клуб</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 {club.description && <div className="text-sm text-gray-600"><p>{club.description}</p></div>}
@@ -183,7 +179,6 @@ const ClubMembers = () => {
                   </span>
                   <Badge variant="secondary">{members.length} участников</Badge>
                 </CardTitle>
-                <CardDescription>Управляйте назначением книг для участников</CardDescription>
               </CardHeader>
               <CardContent>
                 {membersLoading ? (
@@ -206,7 +201,6 @@ const ClubMembers = () => {
                       <TableRow>
                         <TableHead>Участник</TableHead>
                         <TableHead>Текущая книга</TableHead>
-                        <TableHead className="text-right">Действия</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -223,12 +217,7 @@ const ClubMembers = () => {
                               <span className="font-medium">{member.full_name || "Не указано"}</span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-muted-foreground">{member.currentBook || "Не назначена"}</TableCell>
-                          <TableCell className="text-right">
-                            <Button size="sm" onClick={() => handleAssignBook(member)}>
-                              <Plus className="mr-2 h-4 w-4" />Добавить книгу
-                            </Button>
-                          </TableCell>
+                          <TableCell className="text-muted-foreground">{member.currentBook || "—"}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -239,7 +228,6 @@ const ClubMembers = () => {
           </div>
         </div>
       </div>
-      <AssignBookModal isOpen={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)} employee={selectedMember} companyId={clubId || ''} />
     </div>
   );
 };
