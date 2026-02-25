@@ -77,8 +77,8 @@ const DiaryNavigation = () => {
                     </Button>
                   </Link>
                 )}
-                <Link to={isClubProfile ? "/club-profile" : "/profile"}>
-                  <Button variant="outline" className={getButtonStyle(isClubProfile ? "/club-profile" : "/profile")}>
+                <Link to="/profile">
+                  <Button variant="outline" className={getButtonStyle("/profile")}>
                     Профиль
                   </Button>
                 </Link>
