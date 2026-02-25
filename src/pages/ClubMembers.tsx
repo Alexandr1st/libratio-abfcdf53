@@ -59,10 +59,14 @@ const ClubMembers = () => {
         .eq('status', 'reading');
       if (diaryError) throw diaryError;
 
-      return profiles.map(profile => ({
+      const mapped = profiles.map(profile => ({
         ...profile,
-        currentBook: diaryEntries?.find(e => e.user_id === profile.id)?.books?.title || null
+        currentBook: diaryEntries?.find(e => e.user_id === profile.id)?.books?.title || null,
+        isAdmin: profile.id === user?.id,
       }));
+      // Admin always first
+      mapped.sort((a, b) => (a.isAdmin ? -1 : b.isAdmin ? 1 : 0));
+      return mapped;
     },
     enabled: !!clubId,
   });
@@ -225,6 +229,7 @@ const ClubMembers = () => {
                                 </AvatarFallback>
                               </Avatar>
                               <span className="font-medium">{member.full_name || "Не указано"}</span>
+                              {member.isAdmin && <Badge variant="outline" className="ml-2 text-xs">Админ</Badge>}
                             </div>
                           </TableCell>
                           <TableCell className="text-muted-foreground">{member.currentBook || "—"}</TableCell>
