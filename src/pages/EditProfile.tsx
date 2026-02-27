@@ -4,19 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, User } from "lucide-react";
+import { LogOut, Save, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useClubs } from "@/hooks/useClubs";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface ProfileData {
   full_name: string | null;
   bio: string | null;
   club_id: string | null;
+  club_name: string | null;
 }
 
 const EditProfile = () => {
@@ -24,13 +24,14 @@ const EditProfile = () => {
   const [profileData, setProfileData] = useState<ProfileData>({
     full_name: "",
     bio: "",
-    club_id: null
+    club_id: null,
+    club_name: null,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [leavingClub, setLeavingClub] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { data: clubs = [], isLoading: clubsLoading } = useClubs();
 
   useEffect(() => {
     if (!authLoading) {
@@ -48,7 +49,7 @@ const EditProfile = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, bio, club_id')
+        .select('full_name, bio, club_id, club_name')
         .eq('id', user.id)
         .single();
 
@@ -61,15 +62,58 @@ const EditProfile = () => {
         return;
       }
 
+      // If club_id exists but no club_name, fetch club name
+      let clubName = data.club_name;
+      if (data.club_id && !clubName) {
+        const { data: club } = await supabase
+          .from('clubs')
+          .select('name')
+          .eq('id', data.club_id)
+          .single();
+        clubName = club?.name || null;
+      }
+
       setProfileData({
         full_name: data.full_name || "",
         bio: data.bio || "",
-        club_id: data.club_id || null
+        club_id: data.club_id || null,
+        club_name: clubName || null,
       });
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLeaveClub = async () => {
+    if (!user) return;
+    setLeavingClub(true);
+    try {
+      // Remove from club_members
+      if (profileData.club_id) {
+        await supabase
+          .from('club_members')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('club_id', profileData.club_id);
+      }
+
+      // Clear club from profile
+      const { error } = await supabase
+        .from('profiles')
+        .update({ club_id: null, club_name: null, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      setProfileData(prev => ({ ...prev, club_id: null, club_name: null }));
+      toast({ title: "Успешно", description: "Вы вышли из клуба" });
+    } catch (error) {
+      console.error('Error leaving club:', error);
+      toast({ title: "Ошибка", description: "Не удалось выйти из клуба", variant: "destructive" });
+    } finally {
+      setLeavingClub(false);
     }
   };
 
@@ -84,33 +128,20 @@ const EditProfile = () => {
         .update({
           full_name: profileData.full_name || null,
           bio: profileData.bio || null,
-          club_id: profileData.club_id,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
 
       if (error) {
-        toast({
-          title: "Ошибка",
-          description: "Не удалось сохранить изменения",
-          variant: "destructive",
-        });
+        toast({ title: "Ошибка", description: "Не удалось сохранить изменения", variant: "destructive" });
         return;
       }
 
-      toast({
-        title: "Успешно",
-        description: "Профиль обновлен",
-      });
-
+      toast({ title: "Успешно", description: "Профиль обновлен" });
       navigate("/profile");
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast({
-        title: "Ошибка",
-        description: "Произошла ошибка при сохранении",
-        variant: "destructive",
-      });
+      toast({ title: "Ошибка", description: "Произошла ошибка при сохранении", variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -118,21 +149,19 @@ const EditProfile = () => {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <User className="h-12 w-12 text-blue-600 mx-auto animate-pulse mb-4" />
-          <p className="text-lg text-gray-600">Загрузка профиля...</p>
+          <User className="h-12 w-12 text-primary mx-auto animate-pulse mb-4" />
+          <p className="text-lg text-muted-foreground">Загрузка профиля...</p>
         </div>
       </div>
     );
   }
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-background">
       <DiaryNavigation />
       
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -165,22 +194,36 @@ const EditProfile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="club">Клуб</Label>
-                <Select
-                  value={profileData.club_id || undefined}
-                  onValueChange={(value) => setProfileData(prev => ({ ...prev, club_id: value || null }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Выберите клуб или оставьте пустым" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clubs.map((club) => (
-                      <SelectItem key={club.id} value={club.id}>
-                        {club.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Клуб</Label>
+                {profileData.club_id ? (
+                  <div className="flex items-center justify-between rounded-md border px-3 py-2">
+                    <span className="text-sm">{profileData.club_name || "Клуб"}</span>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button type="button" variant="ghost" size="sm" className="text-destructive hover:text-destructive" disabled={leavingClub}>
+                          <LogOut className="h-4 w-4 mr-1" />
+                          Выйти
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Выйти из клуба?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Вы уверены, что хотите покинуть клуб «{profileData.club_name}»? Это действие нельзя отменить.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Отмена</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleLeaveClub} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            Выйти
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground py-2">Вы не состоите в клубе</p>
+                )}
               </div>
 
               <div className="flex gap-4 pt-4">
