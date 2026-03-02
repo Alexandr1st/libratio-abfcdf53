@@ -62,15 +62,15 @@ const EditProfile = () => {
         return;
       }
 
-      // If club_id exists but no club_name, fetch club name
+      // Always fetch club name from clubs table for accuracy
       let clubName = data.club_name;
-      if (data.club_id && !clubName) {
+      if (data.club_id) {
         const { data: club } = await supabase
           .from('clubs')
           .select('name')
           .eq('id', data.club_id)
           .single();
-        clubName = club?.name || null;
+        clubName = club?.name || data.club_name;
       }
 
       setProfileData({
