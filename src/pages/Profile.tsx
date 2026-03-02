@@ -57,6 +57,18 @@ const Profile = () => {
         return;
       }
 
+      // If user has a club, fetch the actual club name from clubs table
+      if (data.club_id) {
+        const { data: clubData } = await supabase
+          .from('clubs')
+          .select('name')
+          .eq('id', data.club_id)
+          .single();
+        if (clubData) {
+          data.club_name = clubData.name;
+        }
+      }
+
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
