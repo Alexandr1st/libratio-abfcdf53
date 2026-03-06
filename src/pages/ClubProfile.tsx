@@ -97,8 +97,7 @@ const ClubProfile = () => {
                 {club.location && <div className="flex items-center space-x-2 text-sm text-gray-600"><MapPin className="h-4 w-4" /><span>{club.location}</span></div>}
                 {club.website && <div className="flex items-center space-x-2 text-sm text-gray-600"><Globe className="h-4 w-4" /><a href={club.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Чат</a></div>}
                 <div className="space-y-2 pt-4">
-                  <Link to="/club-profile/edit"><Button className="w-full"><Edit className="mr-2 h-4 w-4" />Редактировать профиль</Button></Link>
-                  <Button variant="outline" className="w-full" onClick={handleSignOut}><LogOut className="mr-2 h-4 w-4" />Выйти</Button>
+                  <Link to="/club-profile/edit"><Button className="w-full"><Edit className="mr-2 h-4 w-4" />Редактировать клуб</Button></Link>
                 </div>
               </CardContent>
             </Card>

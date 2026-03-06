@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 
-interface ClubFormData { description: string; location: string; chat_link: string; }
+interface ClubFormData { name: string; description: string; location: string; chat_link: string; }
 
 const EditClubProfile = () => {
   const { user, loading: authLoading } = useAuth();
@@ -34,9 +34,12 @@ const EditClubProfile = () => {
   const fetchClubData = async () => {
     if (!user) return;
     try {
-      const { data, error } = await supabase.from('clubs').select('id, description, location, logo_url, website').eq('contact_person_id', user.id).single();
+      const { data: profile } = await supabase.from('profiles').select('club_id').eq('id', user.id).single();
+      if (!profile?.club_id) { navigate("/profile"); return; }
+      const { data, error } = await supabase.from('clubs').select('id, name, description, location, logo_url, website').eq('id', profile.club_id).single();
       if (error || !data) { navigate("/profile"); return; }
       setClub(data);
+      setValue('name', data.name || '');
       setValue('description', data.description || '');
       setValue('location', data.location || '');
       setValue('chat_link', data.website || '');
@@ -60,7 +63,7 @@ const EditClubProfile = () => {
         const { data: { publicUrl } } = supabase.storage.from('club-logos').getPublicUrl(fileName);
         logoUrl = publicUrl;
       }
-      const { error } = await supabase.from('clubs').update({ description: data.description || null, location: data.location || null, website: data.chat_link || null, logo_url: logoUrl || null, updated_at: new Date().toISOString() }).eq('id', club.id);
+      const { error } = await supabase.from('clubs').update({ name: data.name, description: data.description || null, location: data.location || null, website: data.chat_link || null, logo_url: logoUrl || null, updated_at: new Date().toISOString() }).eq('id', club.id);
       if (error) throw error;
       toast({ title: "Успешно!", description: "Данные клуба обновлены" });
       navigate("/club-profile");
@@ -83,6 +86,7 @@ const EditClubProfile = () => {
           <CardHeader><CardTitle className="flex items-center"><Building2 className="h-6 w-6 mr-2" />Редактирование профиля клуба</CardTitle><CardDescription>Обновите информацию о вашем клубе</CardDescription></CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-2"><Label htmlFor="name">Название клуба</Label><Input id="name" placeholder="Название клуба" {...register('name', { required: true })} /></div>
               <div className="space-y-2"><Label htmlFor="location">Местоположение</Label><Input id="location" placeholder="Город, страна" {...register('location')} /></div>
               <div className="space-y-2"><Label htmlFor="chat_link">Ссылка на чат</Label><Input id="chat_link" type="url" placeholder="https://t.me/yourgroup" {...register('chat_link')} /></div>
               <div className="space-y-2"><Label htmlFor="logo">Логотип клуба</Label>{club?.logo_url && <div className="mb-2"><img src={club.logo_url} alt="Current logo" className="w-20 h-20 object-cover rounded" /></div>}<Input id="logo" type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) setLogoFile(file); }} /></div>
