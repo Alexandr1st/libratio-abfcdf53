@@ -29,7 +29,9 @@ const ClubLibrary = () => {
   const fetchClubLibrary = async () => {
     if (!user) return;
     try {
-      const { data: clubData, error: clubError } = await supabase.from('clubs').select('id, name').eq('contact_person_id', user.id).single();
+      const { data: profileData } = await supabase.from('profiles').select('club_id').eq('id', user.id).single();
+      if (!profileData?.club_id) { navigate("/profile"); return; }
+      const { data: clubData, error: clubError } = await supabase.from('clubs').select('id, name').eq('id', profileData.club_id).single();
       if (clubError || !clubData) { navigate("/profile"); return; }
       setClub(clubData);
       const { data: booksData, error: booksError } = await supabase.from('club_books').select(`id, book_id, added_at, books (*)`).eq('club_id', clubData.id).order('added_at', { ascending: false });
