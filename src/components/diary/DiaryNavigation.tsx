@@ -16,12 +16,12 @@ const DiaryNavigation = () => {
     const checkClubProfile = async () => {
       if (user) {
         const { data } = await supabase
-          .from('clubs')
-          .select('id')
-          .eq('contact_person_id', user.id)
+          .from('profiles')
+          .select('club_id')
+          .eq('id', user.id)
           .single();
         
-        setIsClubProfile(!!data);
+        setIsClubProfile(!!data?.club_id);
       }
     };
     
