@@ -28,7 +28,15 @@ const ClubProfile = () => {
   const fetchClubData = async () => {
     if (!user) return;
     try {
-      const { data, error } = await supabase.from('clubs').select('*').eq('contact_person_id', user.id).single();
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('club_id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError || !profile?.club_id) { navigate("/profile"); return; }
+
+      const { data, error } = await supabase.from('clubs').select('*').eq('id', profile.club_id).single();
       if (error || !data) { navigate("/profile"); return; }
       setClub(data);
     } catch (error) {
