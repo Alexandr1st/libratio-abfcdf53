@@ -135,11 +135,8 @@ const ClubMembers = () => {
                 )}
                 <div className="space-y-2 pt-4">
                   <Link to="/club-profile/edit">
-                    <Button className="w-full"><Edit className="mr-2 h-4 w-4" />Редактировать профиль</Button>
+                    <Button className="w-full"><Edit className="mr-2 h-4 w-4" />Редактировать клуб</Button>
                   </Link>
-                  <Button variant="outline" className="w-full" onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />Выйти
-                  </Button>
                 </div>
               </CardContent>
             </Card>
