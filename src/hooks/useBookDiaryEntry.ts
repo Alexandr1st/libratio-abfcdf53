@@ -36,7 +36,7 @@ export const useUpdateBookDiaryEntry = () => {
       updates,
     }: {
       bookId: string;
-      updates: { notes?: string; quotes?: string[]; rating?: number };
+      updates: { notes?: string; quotes?: string[]; rating?: number; status?: string; completed_at?: string | null };
     }) => {
       const {
         data: { user },

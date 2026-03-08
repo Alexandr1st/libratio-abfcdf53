@@ -4,8 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Star, BookOpen, Calendar, FileText, ArrowLeft, Library } from "lucide-react";
+import { Loader2, Star, BookOpen, Calendar, FileText, ArrowLeft, Library, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useBookReadersCount, useBookClubsCount } from "@/hooks/useBookReaders";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBookDiaryEntry, useUpdateBookDiaryEntry } from "@/hooks/useBookDiaryEntry";
@@ -41,6 +47,26 @@ const BookDetail = () => {
   const handleSaveOpinion = (notes: string, rating: number) => {
     updateDiaryEntry.mutate({ bookId: id!, updates: { notes, rating } });
   };
+
+  const statusOptions = [
+    { value: "want_to_read", label: "Хочу читать", variant: "outline" as const },
+    { value: "reading", label: "Читаю", variant: "default" as const },
+    { value: "paused", label: "Пауза", variant: "outline" as const },
+    { value: "completed", label: "Прочел", variant: "secondary" as const },
+  ];
+
+  const handleStatusChange = (newStatus: string) => {
+    const updates: { status: string; completed_at?: string | null } = { status: newStatus };
+    if (newStatus === "completed") {
+      updates.completed_at = new Date().toISOString();
+    } else {
+      updates.completed_at = null;
+    }
+    updateDiaryEntry.mutate({ bookId: id!, updates });
+  };
+
+  const currentStatus = diaryEntry?.status;
+  const currentStatusOption = statusOptions.find(o => o.value === currentStatus);
 
   if (isLoading) {
     return (
@@ -117,6 +143,41 @@ const BookDetail = () => {
                 </Badge>
               )}
             </div>
+
+            {/* Status dropdown */}
+            {user && !isDiaryLoading && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    {currentStatusOption ? (
+                      <>
+                        <Badge variant={currentStatusOption.variant}>{currentStatusOption.label}</Badge>
+                        <ChevronDown className="h-4 w-4" />
+                      </>
+                    ) : (
+                      <>
+                        Указать статус
+                        <ChevronDown className="h-4 w-4" />
+                      </>
+                    )}
+                    {updateDiaryEntry.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {statusOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onClick={() => handleStatusChange(option.value)}
+                      className={currentStatus === option.value ? "bg-accent" : ""}
+                    >
+                      <Badge variant={option.variant} className="mr-2">
+                        {option.label}
+                      </Badge>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             <Card>
               <CardContent className="pt-6 space-y-4">
