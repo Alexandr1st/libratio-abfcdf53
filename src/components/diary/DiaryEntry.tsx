@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Edit3, Star, Loader2, FileText, Quote } from "lucide-react";
 import StatusDropdown from "@/components/StatusDropdown";
-import BookNotesList from "@/components/BookNotesList";
+
 import { useUpdateDiaryEntry } from "@/hooks/useDiaryEntries";
 
 interface DiaryEntryProps {
