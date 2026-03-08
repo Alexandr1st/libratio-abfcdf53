@@ -481,17 +481,19 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
     <>
       <Card className="border-0 shadow-lg mt-4">
         <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Vote className="h-4 w-4" />
-              {poll.title}
-            </CardTitle>
-            {isClubAdmin && (
-              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setEditDialogOpen(true)}>
-                <Settings className="h-3.5 w-3.5" />
-              </Button>
-            )}
-          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Vote className="h-4 w-4" />
+                {poll.title}
+              </CardTitle>
+              {isClubAdmin && (
+                <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setEditDialogOpen(true)}>
+                  <Settings className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
+            <Badge variant={phaseBadgeVariant as any} className="text-xs">{phaseLabel}</Badge>
           </div>
           <DateInfo />
         </CardHeader>
