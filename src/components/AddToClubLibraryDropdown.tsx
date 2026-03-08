@@ -44,6 +44,7 @@ const AddToClubLibraryDropdown = ({ bookId, isInLibrary }: AddToClubLibraryDropd
   return (
     <Button 
       size="sm" 
+      className="w-full"
       disabled={addBookToLibrary.isPending}
       onClick={handleAddToLibrary}
     >
@@ -52,7 +53,7 @@ const AddToClubLibraryDropdown = ({ bookId, isInLibrary }: AddToClubLibraryDropd
       ) : (
         <Plus className="mr-2 h-4 w-4" />
       )}
-      Добавить в библиотеку
+      Добавить в клуб
     </Button>
   );
 };
