@@ -324,8 +324,12 @@ export type Database = {
           created_by: string
           id: string
           is_active: boolean
+          reading_ends_at: string | null
+          reading_starts_at: string | null
           status: string
           title: string
+          voting_ends_at: string | null
+          voting_starts_at: string | null
           winner_option_id: string | null
         }
         Insert: {
@@ -335,8 +339,12 @@ export type Database = {
           created_by: string
           id?: string
           is_active?: boolean
+          reading_ends_at?: string | null
+          reading_starts_at?: string | null
           status?: string
           title?: string
+          voting_ends_at?: string | null
+          voting_starts_at?: string | null
           winner_option_id?: string | null
         }
         Update: {
@@ -346,8 +354,12 @@ export type Database = {
           created_by?: string
           id?: string
           is_active?: boolean
+          reading_ends_at?: string | null
+          reading_starts_at?: string | null
           status?: string
           title?: string
+          voting_ends_at?: string | null
+          voting_starts_at?: string | null
           winner_option_id?: string | null
         }
         Relationships: [
