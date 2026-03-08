@@ -175,6 +175,7 @@ const BookDetail = () => {
                   onSave={(quotes) => updateDiaryEntry.mutate({ bookId: id!, updates: { quotes } })}
                   isSaving={updateDiaryEntry.isPending}
                 />
+                <MyNotesBlock bookId={id!} />
               </div>
             )}
 
