@@ -179,6 +179,7 @@ const BookDetail = () => {
               </DropdownMenu>
             )}
 
+            <Card>
               <CardContent className="pt-6 space-y-4">
                 {/* Rating */}
                 <div className="flex items-center space-x-2">
