@@ -44,6 +44,22 @@ const Profile = () => {
   const [goalInput, setGoalInput] = useState("");
   const { data: currentlyReading, isLoading: readingLoading } = useCurrentlyReading();
 
+  const { data: recentNotes, isLoading: notesLoading } = useQuery({
+    queryKey: ["recent-notes"],
+    queryFn: async () => {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (!u) return [];
+      const { data, error } = await supabase
+        .from("book_notes")
+        .select("*, books(*)")
+        .eq("user_id", u.id)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   useEffect(() => {
     if (!authLoading) {
       if (!user) {
