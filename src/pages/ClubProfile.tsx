@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { useQuery } from "@tanstack/react-query";
+import { pluralize } from "@/lib/pluralize";
 
 const ClubProfile = () => {
   const { user, signOut, loading: authLoading } = useAuth();
