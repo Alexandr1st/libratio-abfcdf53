@@ -66,7 +66,9 @@ const ClubProfile = () => {
       const { data, error } = await supabase
         .from('club_books')
         .select('*, books(*)')
-        .eq('club_id', club.id);
+        .eq('club_id', club.id)
+        .order('added_at', { ascending: false })
+        .limit(3);
       if (error) throw error;
       return data || [];
     },
@@ -121,18 +123,25 @@ const ClubProfile = () => {
                     <p>Библиотека клуба пуста</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {clubBooks.slice(0, 6).map((item: any) => (
-                      <div key={item.id} className="text-center">
-                        <img 
-                          src={item.books?.image || '/placeholder.svg'} 
-                          alt={item.books?.title}
-                          className="w-full h-32 object-cover rounded-lg mb-2"
-                        />
-                        <p className="text-sm font-medium truncate">{item.books?.title}</p>
-                        <p className="text-xs text-gray-500 truncate">{item.books?.author}</p>
-                      </div>
-                    ))}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {clubBooks.map((item: any) => (
+                        <div key={item.id} className="text-center">
+                          <img 
+                            src={item.books?.image || '/placeholder.svg'} 
+                            alt={item.books?.title}
+                            className="w-full h-32 object-cover rounded-lg mb-2"
+                          />
+                          <p className="text-sm font-medium truncate">{item.books?.title}</p>
+                          <p className="text-xs text-gray-500 truncate">{item.books?.author}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex justify-end">
+                      <Link to="/club-library">
+                        <Button variant="outline" size="sm">Смотреть все</Button>
+                      </Link>
+                    </div>
                   </div>
                 )}
               </CardContent>
