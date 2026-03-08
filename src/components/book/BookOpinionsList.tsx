@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Star, User, MessageSquare } from "lucide-react";
 import { useBookOpinions } from "@/hooks/useBookOpinions";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,15 +10,20 @@ import { ru } from "date-fns/locale";
 interface BookOpinionsListProps {
   bookId: string;
   currentUserId?: string;
+  limit?: number;
 }
 
-const BookOpinionsList = ({ bookId, currentUserId }: BookOpinionsListProps) => {
+const BookOpinionsList = ({ bookId, currentUserId, limit }: BookOpinionsListProps) => {
   const { data: opinions, isLoading } = useBookOpinions(bookId);
+  const [showAll, setShowAll] = useState(false);
 
   // Filter out current user's opinion (shown separately in MyOpinionBlock)
   const otherOpinions = (opinions || []).filter(
     (o) => o.userId !== currentUserId
   );
+
+  const hasMore = limit && !showAll && otherOpinions.length > limit;
+  const visibleOpinions = hasMore ? otherOpinions.slice(0, limit) : otherOpinions;
 
   if (isLoading) {
     return (
@@ -43,7 +50,7 @@ const BookOpinionsList = ({ bookId, currentUserId }: BookOpinionsListProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {otherOpinions.map((opinion) => (
+        {visibleOpinions.map((opinion) => (
           <div key={opinion.id} className="border-b last:border-b-0 pb-4 last:pb-0">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
@@ -88,6 +95,13 @@ const BookOpinionsList = ({ bookId, currentUserId }: BookOpinionsListProps) => {
             </div>
           </div>
         ))}
+        {hasMore && (
+          <div className="flex justify-end pt-2">
+            <Button variant="outline" size="sm" onClick={() => setShowAll(true)}>
+              Смотреть все
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
