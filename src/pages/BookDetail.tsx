@@ -144,7 +144,41 @@ const BookDetail = () => {
               )}
             </div>
 
-            <Card>
+            {/* Status dropdown */}
+            {user && !isDiaryLoading && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    {currentStatusOption ? (
+                      <>
+                        <Badge variant={currentStatusOption.variant}>{currentStatusOption.label}</Badge>
+                        <ChevronDown className="h-4 w-4" />
+                      </>
+                    ) : (
+                      <>
+                        Указать статус
+                        <ChevronDown className="h-4 w-4" />
+                      </>
+                    )}
+                    {updateDiaryEntry.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {statusOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onClick={() => handleStatusChange(option.value)}
+                      className={currentStatus === option.value ? "bg-accent" : ""}
+                    >
+                      <Badge variant={option.variant} className="mr-2">
+                        {option.label}
+                      </Badge>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
               <CardContent className="pt-6 space-y-4">
                 {/* Rating */}
                 <div className="flex items-center space-x-2">
