@@ -136,30 +136,6 @@ const Profile = () => {
       })
     : 'Неизвестно';
 
-  const mockData = {
-    booksRead: 24,
-    reviews: 18,
-    recentReviews: [
-      {
-        id: 1,
-        book: "Чистый код",
-        author: "Роберт Мартин",
-        rating: 5,
-        review: "Отличная книга для любого разработчика. Много практических советов по написанию качественного кода.",
-        date: "5 дней назад",
-        image: "📚"
-      },
-      {
-        id: 2,
-        book: "Психология влияния",
-        author: "Роберт Чалдини",
-        rating: 4,
-        review: "Интересные принципы влияния, которые можно применить не только в продажах, но и в повседневной жизни.",
-        date: "2 недели назад",
-        image: "🧠"
-      }
-    ]
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
