@@ -39,15 +39,18 @@ export const useAddBookToClubLibrary = () => {
       }
 
       // Получаем клуб пользователя
-      const { data: clubData, error: clubError } = await supabase
-        .from('clubs')
-        .select('id')
-        .eq('contact_person_id', user.id)
-        .single();
+      const { data: memberData, error: memberError } = await supabase
+        .from('club_members')
+        .select('club_id')
+        .eq('user_id', user.id)
+        .eq('is_admin', true)
+        .maybeSingle();
 
-      if (clubError || !clubData) {
-        throw new Error('User is not a club contact person');
+      if (memberError || !memberData) {
+        throw new Error('User is not a club admin');
       }
+
+      const clubData = { id: memberData.club_id };
 
       // Проверяем, есть ли уже книга в библиотеке клуба
       const { data: existingEntry } = await supabase
