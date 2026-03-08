@@ -17,6 +17,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { pluralize } from "@/lib/pluralize";
+import { useCurrentlyReading } from "@/hooks/useCurrentlyReading";
 
 interface Profile {
   id: string;
