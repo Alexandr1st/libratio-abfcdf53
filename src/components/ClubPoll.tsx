@@ -313,7 +313,7 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
         <CreatePollDialog
           open={createDialogOpen}
           onOpenChange={setCreateDialogOpen}
-          onCreatePoll={(dates) => createPollMutation.mutate(dates)}
+          onSubmit={(dates) => createPollMutation.mutate(dates)}
           isPending={createPollMutation.isPending}
         />
       </>
