@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -253,6 +253,51 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
       toast({ title: "Ошибка", description: "Не удалось обновить даты", variant: "destructive" });
     },
   });
+
+  // Auto-add winning book to club library when phase is completed
+  useEffect(() => {
+    if (phase !== "completed" || !poll || options.length === 0 || totalVotes === 0) return;
+
+    const sorted = [...options].sort((a: any, b: any) => getVoteCount(b.id) - getVoteCount(a.id));
+    const winnerOption = sorted[0];
+    if (!winnerOption) return;
+
+    const addWinnerToLibrary = async () => {
+      try {
+        // Check if the book is already in the club library
+        const { data: existing } = await supabase
+          .from("club_books")
+          .select("id")
+          .eq("club_id", clubId)
+          .eq("book_id", winnerOption.book_id)
+          .maybeSingle();
+
+        if (existing) return; // Already in library
+
+        // Add the winning book to the club library
+        const { error } = await supabase
+          .from("club_books")
+          .insert({
+            club_id: clubId,
+            book_id: winnerOption.book_id,
+            added_by: user?.id || null,
+          });
+
+        if (error) {
+          console.error("Failed to auto-add winning book to library:", error);
+          return;
+        }
+
+        console.log("Winning book auto-added to club library:", winnerOption.books?.title);
+        queryClient.invalidateQueries({ queryKey: ["club-books"] });
+        queryClient.invalidateQueries({ queryKey: ["club-books-with-details"] });
+      } catch (err) {
+        console.error("Error auto-adding winning book:", err);
+      }
+    };
+
+    addWinnerToLibrary();
+  }, [phase, poll?.id, options, totalVotes]);
 
   const formatDate = (d: string) => format(new Date(d), "d MMM", { locale: ru });
 
