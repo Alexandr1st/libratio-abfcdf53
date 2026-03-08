@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Vote, Check, Plus, Calendar } from "lucide-react";
+import { Vote, Check, Plus, Calendar, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -26,6 +26,7 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [suggestModalOpen, setSuggestModalOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const { data: isClubAdmin } = useQuery({
     queryKey: ["is-club-admin", clubId, user?.id],
@@ -230,6 +231,29 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
     },
   });
 
+  const editPollMutation = useMutation({
+    mutationFn: async (dates: { votingStartsAt: Date; votingEndsAt: Date; readingStartsAt: Date; readingEndsAt: Date }) => {
+      const { error } = await supabase
+        .from("club_polls" as any)
+        .update({
+          voting_starts_at: dates.votingStartsAt.toISOString(),
+          voting_ends_at: dates.votingEndsAt.toISOString(),
+          reading_starts_at: dates.readingStartsAt.toISOString(),
+          reading_ends_at: dates.readingEndsAt.toISOString(),
+        } as any)
+        .eq("id", poll?.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["club-poll", clubId] });
+      setEditDialogOpen(false);
+      toast({ title: "Даты обновлены!" });
+    },
+    onError: () => {
+      toast({ title: "Ошибка", description: "Не удалось обновить даты", variant: "destructive" });
+    },
+  });
+
   const formatDate = (d: string) => format(new Date(d), "d MMM", { locale: ru });
 
   const phaseLabel = phase === "collecting"
@@ -312,7 +336,7 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
         <CreatePollDialog
           open={createDialogOpen}
           onOpenChange={setCreateDialogOpen}
-          onCreatePoll={(dates) => createPollMutation.mutate(dates)}
+          onSubmit={(dates) => createPollMutation.mutate(dates)}
           isPending={createPollMutation.isPending}
         />
       </>
@@ -458,10 +482,17 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
       <Card className="border-0 shadow-lg mt-4">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Vote className="h-4 w-4" />
-              {poll.title}
-            </CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Vote className="h-4 w-4" />
+                {poll.title}
+              </CardTitle>
+              {isClubAdmin && (
+                <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setEditDialogOpen(true)}>
+                  <Settings className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
             <Badge variant={phaseBadgeVariant as any} className="text-xs">{phaseLabel}</Badge>
           </div>
           <DateInfo />
@@ -566,8 +597,21 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
       <CreatePollDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
-        onCreatePoll={(dates) => createPollMutation.mutate(dates)}
+        onSubmit={(dates) => createPollMutation.mutate(dates)}
         isPending={createPollMutation.isPending}
+      />
+      <CreatePollDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        mode="edit"
+        initialDates={poll ? {
+          votingStartsAt: poll.voting_starts_at ? new Date(poll.voting_starts_at) : undefined,
+          votingEndsAt: poll.voting_ends_at ? new Date(poll.voting_ends_at) : undefined,
+          readingStartsAt: poll.reading_starts_at ? new Date(poll.reading_starts_at) : undefined,
+          readingEndsAt: poll.reading_ends_at ? new Date(poll.reading_ends_at) : undefined,
+        } : undefined}
+        onSubmit={(dates) => editPollMutation.mutate(dates)}
+        isPending={editPollMutation.isPending}
       />
     </>
   );
