@@ -105,6 +105,7 @@ const ClubProfile = () => {
                 </div>
               </CardContent>
             </Card>
+            <ClubPoll clubId={club.id} />
           </div>
           <div className="lg:col-span-2 space-y-6">
             {/* Библиотека клуба */}
