@@ -80,15 +80,14 @@ const BookCard = ({ book, isInDiary = false, isClubProfile = false, hideActions 
       </CardContent>
       {!hideActions && (
         <div className="p-4 border-t space-y-2">
-          {isClubProfile ? (
+          <AddToDiaryDropdown 
+            bookId={book.id} 
+            isInDiary={isInDiary} 
+          />
+          {isClubProfile && (
             <AddToClubLibraryDropdown 
               bookId={book.id} 
               isInLibrary={isInClubLibrary} 
-            />
-          ) : (
-            <AddToDiaryDropdown 
-              bookId={book.id} 
-              isInDiary={isInDiary} 
             />
           )}
         </div>
