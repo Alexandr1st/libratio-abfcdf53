@@ -48,6 +48,26 @@ const BookDetail = () => {
     updateDiaryEntry.mutate({ bookId: id!, updates: { notes, rating } });
   };
 
+  const statusOptions = [
+    { value: "want_to_read", label: "Хочу читать", variant: "outline" as const },
+    { value: "reading", label: "Читаю", variant: "default" as const },
+    { value: "paused", label: "Пауза", variant: "outline" as const },
+    { value: "completed", label: "Прочел", variant: "secondary" as const },
+  ];
+
+  const handleStatusChange = (newStatus: string) => {
+    const updates: { status: string; completed_at?: string | null } = { status: newStatus };
+    if (newStatus === "completed") {
+      updates.completed_at = new Date().toISOString();
+    } else {
+      updates.completed_at = null;
+    }
+    updateDiaryEntry.mutate({ bookId: id!, updates });
+  };
+
+  const currentStatus = diaryEntry?.status;
+  const currentStatusOption = statusOptions.find(o => o.value === currentStatus);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
