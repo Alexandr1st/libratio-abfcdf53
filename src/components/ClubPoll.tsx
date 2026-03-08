@@ -26,6 +26,7 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [suggestModalOpen, setSuggestModalOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const { data: isClubAdmin } = useQuery({
     queryKey: ["is-club-admin", clubId, user?.id],
