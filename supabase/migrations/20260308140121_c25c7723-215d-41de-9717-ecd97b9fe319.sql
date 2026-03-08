@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN yearly_reading_goal integer DEFAULT NULL;

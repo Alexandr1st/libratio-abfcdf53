@@ -351,6 +351,7 @@ export type Database = {
           position: string | null
           updated_at: string | null
           username: string | null
+          yearly_reading_goal: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -364,6 +365,7 @@ export type Database = {
           position?: string | null
           updated_at?: string | null
           username?: string | null
+          yearly_reading_goal?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -377,6 +379,7 @@ export type Database = {
           position?: string | null
           updated_at?: string | null
           username?: string | null
+          yearly_reading_goal?: number | null
         }
         Relationships: [
           {

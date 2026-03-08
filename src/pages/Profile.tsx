@@ -1,13 +1,22 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Building2, Calendar, Edit, Star, TrendingUp, User, LogOut } from "lucide-react";
+import { BookOpen, Building2, Calendar, Edit, Star, TrendingUp, User, LogOut, Target } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
-import { useProfileStats } from "@/hooks/useProfileStats";
+import { useProfileStats, useUpdateReadingGoal } from "@/hooks/useProfileStats";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { pluralize } from "@/lib/pluralize";
 
 interface Profile {
   id: string;
@@ -27,6 +36,9 @@ const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { data: profileStats, isLoading: statsLoading } = useProfileStats();
+  const updateGoal = useUpdateReadingGoal();
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [goalInput, setGoalInput] = useState("");
 
   useEffect(() => {
     if (!authLoading) {
@@ -143,12 +155,8 @@ const Profile = () => {
         date: "2 недели назад",
         image: "🧠"
       }
-    ],
-    readingGoals: {
-      yearly: 30,
-      current: 24,
-      percentage: 80
-    }
+    ]
+  };
   };
 
   return (
@@ -232,30 +240,94 @@ const Profile = () => {
 
             {/* Reading Goals */}
             <Card className="border-0 shadow-lg mt-6">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="flex items-center space-x-2">
                   <TrendingUp className="h-5 w-5 text-green-600" />
                   <span>Цель на год</span>
                 </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setGoalInput(profileStats?.yearlyReadingGoal?.toString() || "");
+                    setGoalDialogOpen(true);
+                  }}
+                >
+                  <Target className="h-4 w-4 mr-1" />
+                  {profileStats?.yearlyReadingGoal ? "Изменить" : "Указать"}
+                </Button>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Прогресс</span>
-                    <span className="text-sm font-medium">{mockData.readingGoals.current}/{mockData.readingGoals.yearly} книг</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full transition-all duration-300" 
-                      style={{ width: `${mockData.readingGoals.percentage}%` }}
-                    />
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    Осталось прочитать {mockData.readingGoals.yearly - mockData.readingGoals.current} книг до конца года
+                {profileStats?.yearlyReadingGoal ? (() => {
+                  const current = profileStats.booksReadThisYear;
+                  const goal = profileStats.yearlyReadingGoal;
+                  const percentage = Math.min(Math.round((current / goal) * 100), 100);
+                  const remaining = Math.max(goal - current, 0);
+                  return (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Прогресс</span>
+                        <span className="text-sm font-medium">
+                          {current}/{goal} {pluralize(goal, "книга", "книги", "книг").split(" ").slice(1).join(" ")}
+                        </span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {remaining > 0
+                          ? `Осталось прочитать ${pluralize(remaining, "книгу", "книги", "книг")} до конца года`
+                          : "Цель достигнута! 🎉"}
+                      </p>
+                    </div>
+                  );
+                })() : (
+                  <p className="text-sm text-muted-foreground">
+                    Укажите, сколько книг вы хотите прочитать в этом году
                   </p>
-                </div>
+                )}
               </CardContent>
             </Card>
+
+            {/* Goal Dialog */}
+            <Dialog open={goalDialogOpen} onOpenChange={setGoalDialogOpen}>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Цель на год</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">Сколько книг вы хотите прочитать в этом году?</label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={365}
+                    placeholder="Например, 12"
+                    value={goalInput}
+                    onChange={(e) => setGoalInput(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setGoalDialogOpen(false)}>
+                    Отмена
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const val = parseInt(goalInput);
+                      if (val > 0) {
+                        updateGoal.mutate(val, { onSuccess: () => setGoalDialogOpen(false) });
+                      }
+                    }}
+                    disabled={!goalInput || parseInt(goalInput) <= 0 || updateGoal.isPending}
+                  >
+                    Сохранить
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* Main Content */}
