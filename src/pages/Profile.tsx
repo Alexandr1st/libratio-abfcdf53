@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dialog";
 import { pluralize } from "@/lib/pluralize";
 import { useCurrentlyReading } from "@/hooks/useCurrentlyReading";
+import { useBookNotesByBook } from "@/hooks/useBookNotes";
+import { useQuery } from "@tanstack/react-query";
 
 interface Profile {
   id: string;
