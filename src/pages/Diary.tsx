@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useDiaryEntries } from "@/hooks/useDiaryEntries";
-import AddBookNoteModal from "@/components/AddBookNoteModal";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import DiaryHeader from "@/components/diary/DiaryHeader";
 import DiaryFilters from "@/components/diary/DiaryFilters";
@@ -12,32 +11,12 @@ import DiaryErrorState from "@/components/diary/DiaryErrorState";
 
 const Diary = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
-  const [noteModalOpen, setNoteModalOpen] = useState(false);
-  const [selectedBookForNote, setSelectedBookForNote] = useState<{
-    id: string;
-    title: string;
-    diaryEntryId: string;
-  } | null>(null);
 
   const { data: diaryEntries, isLoading, error } = useDiaryEntries();
 
   const filteredEntries = selectedStatus === "all" 
     ? diaryEntries || []
     : (diaryEntries || []).filter(entry => entry.status === selectedStatus);
-
-  const handleAddNoteClick = (entry: any) => {
-    setSelectedBookForNote({
-      id: entry.book_id,
-      title: entry.books?.title || '',
-      diaryEntryId: entry.id,
-    });
-    setNoteModalOpen(true);
-  };
-
-  const handleCloseNoteModal = () => {
-    setNoteModalOpen(false);
-    setSelectedBookForNote(null);
-  };
 
   if (error) {
     console.error('Error loading diary entries:', error);
@@ -75,16 +54,6 @@ const Diary = () => {
           <DiaryEmptyState selectedStatus={selectedStatus} />
         )}
       </div>
-
-      {selectedBookForNote && (
-        <AddBookNoteModal
-          isOpen={noteModalOpen}
-          onClose={handleCloseNoteModal}
-          bookTitle={selectedBookForNote.title}
-          bookId={selectedBookForNote.id}
-          diaryEntryId={selectedBookForNote.diaryEntryId}
-        />
-      )}
     </div>
   );
 };

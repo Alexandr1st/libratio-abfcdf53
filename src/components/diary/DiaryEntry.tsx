@@ -186,7 +186,7 @@ const DiaryEntry = ({ entry, onAddNote }: DiaryEntryProps) => {
                 </div>
               )}
 
-              <BookNotesList diaryEntryId={entry.id} />
+              
             </>
           )}
         </div>
