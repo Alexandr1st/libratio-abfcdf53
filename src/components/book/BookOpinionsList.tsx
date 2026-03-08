@@ -95,6 +95,13 @@ const BookOpinionsList = ({ bookId, currentUserId, limit }: BookOpinionsListProp
             </div>
           </div>
         ))}
+        {hasMore && (
+          <div className="flex justify-end pt-2">
+            <Button variant="outline" size="sm" onClick={() => setShowAll(true)}>
+              Смотреть все
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
