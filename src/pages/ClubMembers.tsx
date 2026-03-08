@@ -144,6 +144,7 @@ const ClubMembers = () => {
                 </div>
               </CardContent>
             </Card>
+            {clubId && <ClubPoll clubId={clubId} />}
           </div>
 
           {/* Main content */}
