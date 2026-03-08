@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { useQuery } from "@tanstack/react-query";
 import { pluralize } from "@/lib/pluralize";
+import ClubPoll from "@/components/ClubPoll";
 
 const ClubProfile = () => {
   const { user, signOut, loading: authLoading } = useAuth();
@@ -104,6 +105,7 @@ const ClubProfile = () => {
                 </div>
               </CardContent>
             </Card>
+            <ClubPoll clubId={club.id} />
           </div>
           <div className="lg:col-span-2 space-y-6">
             {/* Библиотека клуба */}
