@@ -40,6 +40,7 @@ const Profile = () => {
   const updateGoal = useUpdateReadingGoal();
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [goalInput, setGoalInput] = useState("");
+  const { data: currentlyReading, isLoading: readingLoading } = useCurrentlyReading();
 
   useEffect(() => {
     if (!authLoading) {
