@@ -231,6 +231,29 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
     },
   });
 
+  const editPollMutation = useMutation({
+    mutationFn: async (dates: { votingStartsAt: Date; votingEndsAt: Date; readingStartsAt: Date; readingEndsAt: Date }) => {
+      const { error } = await supabase
+        .from("club_polls" as any)
+        .update({
+          voting_starts_at: dates.votingStartsAt.toISOString(),
+          voting_ends_at: dates.votingEndsAt.toISOString(),
+          reading_starts_at: dates.readingStartsAt.toISOString(),
+          reading_ends_at: dates.readingEndsAt.toISOString(),
+        } as any)
+        .eq("id", poll?.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["club-poll", clubId] });
+      setEditDialogOpen(false);
+      toast({ title: "Даты обновлены!" });
+    },
+    onError: () => {
+      toast({ title: "Ошибка", description: "Не удалось обновить даты", variant: "destructive" });
+    },
+  });
+
   const formatDate = (d: string) => format(new Date(d), "d MMM", { locale: ru });
 
   const phaseLabel = phase === "collecting"
