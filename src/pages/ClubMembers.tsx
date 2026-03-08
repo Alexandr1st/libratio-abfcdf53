@@ -12,6 +12,7 @@ import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { pluralize } from "@/lib/pluralize";
+import ClubPoll from "@/components/ClubPoll";
 
 const ClubMembers = () => {
   const { user, signOut, loading: authLoading } = useAuth();
