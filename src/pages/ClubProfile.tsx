@@ -66,7 +66,9 @@ const ClubProfile = () => {
       const { data, error } = await supabase
         .from('club_books')
         .select('*, books(*)')
-        .eq('club_id', club.id);
+        .eq('club_id', club.id)
+        .order('added_at', { ascending: false })
+        .limit(3);
       if (error) throw error;
       return data || [];
     },
