@@ -567,8 +567,21 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
       <CreatePollDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
-        onCreatePoll={(dates) => createPollMutation.mutate(dates)}
+        onSubmit={(dates) => createPollMutation.mutate(dates)}
         isPending={createPollMutation.isPending}
+      />
+      <CreatePollDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        mode="edit"
+        initialDates={poll ? {
+          votingStartsAt: poll.voting_starts_at ? new Date(poll.voting_starts_at) : undefined,
+          votingEndsAt: poll.voting_ends_at ? new Date(poll.voting_ends_at) : undefined,
+          readingStartsAt: poll.reading_starts_at ? new Date(poll.reading_starts_at) : undefined,
+          readingEndsAt: poll.reading_ends_at ? new Date(poll.reading_ends_at) : undefined,
+        } : undefined}
+        onSubmit={(dates) => editPollMutation.mutate(dates)}
+        isPending={editPollMutation.isPending}
       />
     </>
   );
