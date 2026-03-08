@@ -1,13 +1,22 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Building2, Calendar, Edit, Star, TrendingUp, User, LogOut } from "lucide-react";
+import { BookOpen, Building2, Calendar, Edit, Star, TrendingUp, User, LogOut, Target } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
-import { useProfileStats } from "@/hooks/useProfileStats";
+import { useProfileStats, useUpdateReadingGoal } from "@/hooks/useProfileStats";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { pluralize } from "@/lib/pluralize";
 
 interface Profile {
   id: string;
