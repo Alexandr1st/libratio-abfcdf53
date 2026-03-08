@@ -81,12 +81,14 @@ const ClubMembers = () => {
   });
 
   const { data: clubBooks = [] } = useQuery({
-    queryKey: ['club-books', clubId],
+    queryKey: ['club-books-recent', clubId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('club_books')
         .select('*, books(*)')
-        .eq('club_id', clubId!);
+        .eq('club_id', clubId!)
+        .order('added_at', { ascending: false })
+        .limit(3);
       if (error) throw error;
       return data || [];
     },
