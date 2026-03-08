@@ -161,15 +161,24 @@ const BookDetail = () => {
               </div>
             )}
 
-            {/* Personal blocks for authenticated users */}
+            {/* My opinion */}
             {user && !isDiaryLoading && (
-              <div className="space-y-6 pt-4 border-t">
+              <div className="pt-4 border-t">
                 <MyOpinionBlock
                   notes={diaryEntry?.notes || null}
                   rating={diaryEntry?.rating || null}
                   onSave={handleSaveOpinion}
                   isSaving={updateDiaryEntry.isPending}
                 />
+              </div>
+            )}
+
+            {/* Public opinions from other users (max 3) */}
+            <BookOpinionsList bookId={id!} currentUserId={user?.id} limit={3} />
+
+            {/* My quotes & notes */}
+            {user && !isDiaryLoading && (
+              <div className="space-y-6">
                 <MyQuotesBlock
                   quotes={diaryEntry?.quotes || null}
                   onSave={(quotes) => updateDiaryEntry.mutate({ bookId: id!, updates: { quotes } })}
@@ -178,9 +187,6 @@ const BookDetail = () => {
                 <MyNotesBlock bookId={id!} />
               </div>
             )}
-
-            {/* Public opinions from all users */}
-            <BookOpinionsList bookId={id!} currentUserId={user?.id} />
           </div>
         </div>
       </div>
