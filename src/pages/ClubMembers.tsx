@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { pluralize } from "@/lib/pluralize";
 
 const ClubMembers = () => {
   const { user, signOut, loading: authLoading } = useAuth();
@@ -154,7 +155,7 @@ const ClubMembers = () => {
                     <BookOpen className="h-5 w-5" />
                     Библиотека клуба
                   </span>
-                  <Badge variant="secondary">{clubBooks.length} книг</Badge>
+                  <Badge variant="secondary">{pluralize(clubBooks.length, 'книга', 'книги', 'книг')}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -206,7 +207,7 @@ const ClubMembers = () => {
                     <Users className="h-5 w-5" />
                     Участники клуба
                   </span>
-                  <Badge variant="secondary">{members.length} участников</Badge>
+                  <Badge variant="secondary">{pluralize(members.length, 'участник', 'участника', 'участников')}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
