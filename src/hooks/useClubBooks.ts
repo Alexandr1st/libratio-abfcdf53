@@ -145,15 +145,18 @@ export const useCheckBookInClubLibrary = (bookId: string) => {
       }
 
       // Получаем клуб пользователя
-      const { data: clubData, error: clubError } = await supabase
-        .from('clubs')
-        .select('id')
-        .eq('contact_person_id', user.id)
-        .single();
+      const { data: memberData } = await supabase
+        .from('club_members')
+        .select('club_id')
+        .eq('user_id', user.id)
+        .eq('is_admin', true)
+        .maybeSingle();
 
-      if (clubError || !clubData) {
+      if (!memberData) {
         return false;
       }
+
+      const clubData = { id: memberData.club_id };
 
       // Проверяем, есть ли книга в библиотеке клуба
       const { data } = await supabase
