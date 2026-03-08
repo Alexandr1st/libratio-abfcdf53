@@ -75,7 +75,7 @@ export type Database = {
         Row: {
           book_id: string
           created_at: string
-          diary_entry_id: string
+          diary_entry_id: string | null
           id: string
           note_content: string
           page_number: number | null
@@ -85,7 +85,7 @@ export type Database = {
         Insert: {
           book_id: string
           created_at?: string
-          diary_entry_id: string
+          diary_entry_id?: string | null
           id?: string
           note_content: string
           page_number?: number | null
@@ -95,7 +95,7 @@ export type Database = {
         Update: {
           book_id?: string
           created_at?: string
-          diary_entry_id?: string
+          diary_entry_id?: string | null
           id?: string
           note_content?: string
           page_number?: number | null
