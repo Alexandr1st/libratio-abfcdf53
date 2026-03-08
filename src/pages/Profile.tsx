@@ -155,12 +155,8 @@ const Profile = () => {
         date: "2 недели назад",
         image: "🧠"
       }
-    ],
-    readingGoals: {
-      yearly: 30,
-      current: 24,
-      percentage: 80
-    }
+    ]
+  };
   };
 
   return (
