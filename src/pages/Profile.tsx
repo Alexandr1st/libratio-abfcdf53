@@ -346,31 +346,55 @@ const Profile = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {mockData.currentlyReading.map((book) => (
-                    <div key={book.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex items-start space-x-3">
-                        <div className="text-2xl">{book.image}</div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-sm line-clamp-2">{book.title}</h4>
-                          <p className="text-xs text-gray-500 mb-2">{book.author}</p>
-                          <div className="space-y-2">
-                            <div className="flex justify-between text-xs">
-                              <span>Прогресс</span>
-                              <span>{book.progress}%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1">
-                              <div 
-                                className="bg-blue-600 h-1 rounded-full" 
-                                style={{ width: `${book.progress}%` }}
-                              />
+                {readingLoading ? (
+                  <p className="text-sm text-muted-foreground">Загрузка...</p>
+                ) : !currentlyReading || currentlyReading.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Нет книг со статусом «Читаю»</p>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {currentlyReading.map((entry) => {
+                      const book = entry.books as any;
+                      const progress = book?.pages && entry.pages_read
+                        ? Math.round((entry.pages_read / book.pages) * 100)
+                        : 0;
+                      return (
+                        <Link
+                          key={entry.id}
+                          to={`/books/${book?.id}`}
+                          className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start space-x-3">
+                            {book?.image ? (
+                              <img src={book.image} alt={book.title} className="w-10 h-14 object-cover rounded" />
+                            ) : (
+                              <div className="text-2xl">📖</div>
+                            )}
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-sm line-clamp-2">{book?.title}</h4>
+                              <p className="text-xs text-muted-foreground mb-2">{book?.author}</p>
+                              {book?.pages ? (
+                                <div className="space-y-2">
+                                  <div className="flex justify-between text-xs">
+                                    <span>Прогресс</span>
+                                    <span>{progress}%</span>
+                                  </div>
+                                  <div className="w-full bg-muted rounded-full h-1">
+                                    <div
+                                      className="bg-primary h-1 rounded-full"
+                                      style={{ width: `${progress}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              ) : (
+                                <p className="text-xs text-muted-foreground">{entry.pages_read || 0} стр. прочитано</p>
+                              )}
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
