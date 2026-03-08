@@ -156,7 +156,7 @@ const ClubProfile = () => {
                     <Users className="h-5 w-5" />
                     Участники клуба
                   </span>
-                  <Badge variant="secondary">{members.length} участников</Badge>
+                  <Badge variant="secondary">{pluralize(members.length, 'участник', 'участника', 'участников')}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
