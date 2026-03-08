@@ -4,8 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Star, BookOpen, Calendar, FileText, ArrowLeft, Library } from "lucide-react";
+import { Loader2, Star, BookOpen, Calendar, FileText, ArrowLeft, Library, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useBookReadersCount, useBookClubsCount } from "@/hooks/useBookReaders";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBookDiaryEntry, useUpdateBookDiaryEntry } from "@/hooks/useBookDiaryEntry";
