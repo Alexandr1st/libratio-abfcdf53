@@ -7,7 +7,7 @@ interface BookNote {
   id: string;
   user_id: string;
   book_id: string;
-  diary_entry_id: string;
+  diary_entry_id?: string;
   page_number?: number;
   note_content: string;
   created_at: string;
@@ -16,21 +16,19 @@ interface BookNote {
 
 interface CreateBookNoteParams {
   bookId: string;
-  diaryEntryId: string;
-  pageNumber?: number;
   noteContent: string;
 }
 
-export const useBookNotes = (diaryEntryId?: string) => {
+export const useBookNotesByBook = (bookId?: string) => {
   return useQuery({
-    queryKey: ['book-notes', diaryEntryId],
+    queryKey: ['book-notes', 'by-book', bookId],
     queryFn: async (): Promise<BookNote[]> => {
-      if (!diaryEntryId) return [];
-      
+      if (!bookId) return [];
+
       const { data, error } = await supabase
         .from('book_notes')
         .select('*')
-        .eq('diary_entry_id', diaryEntryId)
+        .eq('book_id', bookId)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -40,7 +38,7 @@ export const useBookNotes = (diaryEntryId?: string) => {
 
       return data || [];
     },
-    enabled: !!diaryEntryId,
+    enabled: !!bookId,
   });
 };
 
@@ -49,9 +47,9 @@ export const useCreateBookNote = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ bookId, diaryEntryId, pageNumber, noteContent }: CreateBookNoteParams) => {
+    mutationFn: async ({ bookId, noteContent }: CreateBookNoteParams) => {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         throw new Error('User not authenticated');
       }
@@ -61,8 +59,6 @@ export const useCreateBookNote = () => {
         .insert({
           user_id: user.id,
           book_id: bookId,
-          diary_entry_id: diaryEntryId,
-          page_number: pageNumber || null,
           note_content: noteContent,
         })
         .select()
