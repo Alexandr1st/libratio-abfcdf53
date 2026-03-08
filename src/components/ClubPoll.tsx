@@ -244,22 +244,71 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
       ? "default"
       : "outline";
 
+  // Auto-create poll and suggest book in one go
+  const suggestWithAutoCreateMutation = useMutation({
+    mutationFn: async (bookId: string) => {
+      // Create a poll first
+      const { data: newPoll, error: pollError } = await supabase
+        .from("club_polls" as any)
+        .insert({
+          club_id: clubId,
+          created_by: user!.id,
+          status: "collecting",
+          is_active: true,
+        } as any)
+        .select()
+        .single();
+      if (pollError) throw pollError;
+
+      // Then suggest the book
+      const { error } = await supabase
+        .from("club_poll_options" as any)
+        .insert({ poll_id: (newPoll as any).id, book_id: bookId, suggested_by: user!.id } as any);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["club-poll", clubId] });
+      setSuggestModalOpen(false);
+      toast({ title: "Книга предложена!" });
+    },
+    onError: () => {
+      toast({ title: "Ошибка", description: "Не удалось предложить книгу", variant: "destructive" });
+    },
+  });
+
   // ── No poll ──
   if (!poll) {
     return (
       <>
         <Card className="border-0 shadow-lg mt-4">
-          <CardContent className="py-6 text-center">
-            <Vote className="h-8 w-8 mx-auto mb-3 text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground mb-3">Нет активного голосования</p>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Vote className="h-4 w-4" />
+              Голосование за следующую книгу
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground text-center py-2">
+              Пока нет предложений. Предложите книгу!
+            </p>
+            <Button variant="outline" className="w-full" onClick={() => setSuggestModalOpen(true)}>
+              <Plus className="h-4 w-4 mr-1" />
+              Предложить книгу
+            </Button>
             {isClubAdmin && (
-              <Button variant="outline" size="sm" onClick={() => setCreateDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-1" />
-                Создать голосование
+              <Button variant="outline" className="w-full" size="sm" onClick={() => setCreateDialogOpen(true)}>
+                <Calendar className="h-4 w-4 mr-1" />
+                Настроить даты
               </Button>
             )}
           </CardContent>
         </Card>
+        <SuggestBookModal
+          open={suggestModalOpen}
+          onOpenChange={setSuggestModalOpen}
+          onSuggest={(bookId) => suggestWithAutoCreateMutation.mutate(bookId)}
+          isPending={suggestWithAutoCreateMutation.isPending}
+        />
         <CreatePollDialog
           open={createDialogOpen}
           onOpenChange={setCreateDialogOpen}
