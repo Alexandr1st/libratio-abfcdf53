@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBookDiaryEntry, useUpdateBookDiaryEntry } from "@/hooks/useBookDiaryEntry";
 import MyOpinionBlock from "@/components/book/MyOpinionBlock";
 import MyQuotesBlock from "@/components/book/MyQuotesBlock";
+import MyNotesBlock from "@/components/book/MyNotesBlock";
 import BookOpinionsList from "@/components/book/BookOpinionsList";
 
 const BookDetail = () => {
@@ -174,6 +175,7 @@ const BookDetail = () => {
                   onSave={(quotes) => updateDiaryEntry.mutate({ bookId: id!, updates: { quotes } })}
                   isSaving={updateDiaryEntry.isPending}
                 />
+                <MyNotesBlock bookId={id!} />
               </div>
             )}
 
