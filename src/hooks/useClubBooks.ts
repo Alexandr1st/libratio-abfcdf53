@@ -84,6 +84,7 @@ export const useAddBookToClubLibrary = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['club-books'] });
+      queryClient.invalidateQueries({ queryKey: ['club-book-check'] });
       toast({
         title: "Успешно",
         description: "Книга добавлена в библиотеку клуба",
