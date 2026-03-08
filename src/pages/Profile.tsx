@@ -36,6 +36,9 @@ const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { data: profileStats, isLoading: statsLoading } = useProfileStats();
+  const updateGoal = useUpdateReadingGoal();
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [goalInput, setGoalInput] = useState("");
 
   useEffect(() => {
     if (!authLoading) {
