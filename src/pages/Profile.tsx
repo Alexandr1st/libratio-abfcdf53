@@ -118,26 +118,9 @@ const Profile = () => {
       })
     : 'Неизвестно';
 
-  // Mock data for now - will be replaced with real data later
   const mockData = {
     booksRead: 24,
     reviews: 18,
-    currentlyReading: [
-      {
-        id: 1,
-        title: "Microservices Patterns",
-        author: "Chris Richardson",
-        progress: 65,
-        image: "📖"
-      },
-      {
-        id: 2,
-        title: "Team Topologies",
-        author: "Matthew Skelton",
-        progress: 32,
-        image: "👥"
-      }
-    ],
     recentReviews: [
       {
         id: 1,
