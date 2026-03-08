@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Building2, Calendar, Edit, Star, TrendingUp, User, LogOut, Target } from "lucide-react";
+import { BookOpen, Building2, Calendar, Edit, TrendingUp, User, LogOut, Target } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dialog";
 import { pluralize } from "@/lib/pluralize";
 import { useCurrentlyReading } from "@/hooks/useCurrentlyReading";
+import { useBookNotesByBook } from "@/hooks/useBookNotes";
+import { useQuery } from "@tanstack/react-query";
 
 interface Profile {
   id: string;
@@ -41,6 +43,22 @@ const Profile = () => {
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [goalInput, setGoalInput] = useState("");
   const { data: currentlyReading, isLoading: readingLoading } = useCurrentlyReading();
+
+  const { data: recentNotes, isLoading: notesLoading } = useQuery({
+    queryKey: ["recent-notes"],
+    queryFn: async () => {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (!u) return [];
+      const { data, error } = await supabase
+        .from("book_notes")
+        .select("*, books(*)")
+        .eq("user_id", u.id)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   useEffect(() => {
     if (!authLoading) {
@@ -118,30 +136,6 @@ const Profile = () => {
       })
     : 'Неизвестно';
 
-  const mockData = {
-    booksRead: 24,
-    reviews: 18,
-    recentReviews: [
-      {
-        id: 1,
-        book: "Чистый код",
-        author: "Роберт Мартин",
-        rating: 5,
-        review: "Отличная книга для любого разработчика. Много практических советов по написанию качественного кода.",
-        date: "5 дней назад",
-        image: "📚"
-      },
-      {
-        id: 2,
-        book: "Психология влияния",
-        author: "Роберт Чалдини",
-        rating: 4,
-        review: "Интересные принципы влияния, которые можно применить не только в продажах, но и в повседневной жизни.",
-        date: "2 недели назад",
-        image: "🧠"
-      }
-    ]
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -381,41 +375,44 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            {/* Recent Reviews */}
+            {/* Recent Notes */}
             <Card className="border-0 shadow-lg">
               <CardHeader>
-                <CardTitle>Последние мнения</CardTitle>
+                <CardTitle>Последние заметки</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {mockData.recentReviews.map((review) => (
-                  <div key={review.id} className="border-b pb-6 last:border-b-0 last:pb-0">
-                    <div className="flex items-start space-x-4">
-                      <div className="text-3xl">{review.image}</div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <h4 className="font-semibold">{review.book}</h4>
-                            <p className="text-sm text-gray-500">{review.author}</p>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`h-4 w-4 ${
-                                  i < review.rating
-                                    ? "fill-yellow-400 text-yellow-400"
-                                    : "text-gray-300"
-                                }`}
-                              />
-                            ))}
+                {notesLoading ? (
+                  <p className="text-sm text-muted-foreground">Загрузка...</p>
+                ) : !recentNotes || recentNotes.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">У вас пока нет заметок</p>
+                ) : (
+                  recentNotes.map((note: any) => {
+                    const book = note.books;
+                    const date = new Date(note.created_at).toLocaleDateString("ru-RU", {
+                      day: "numeric",
+                      month: "long",
+                    });
+                    return (
+                      <div key={note.id} className="border-b pb-6 last:border-b-0 last:pb-0">
+                        <div className="flex items-start space-x-4">
+                          {book?.image ? (
+                            <img src={book.image} alt={book.title} className="w-10 h-14 object-cover rounded" />
+                          ) : (
+                            <div className="text-3xl">📝</div>
+                          )}
+                          <div className="flex-1">
+                            <Link to={`/books/${book?.id}`}>
+                              <h4 className="font-semibold hover:underline">{book?.title || "Книга"}</h4>
+                            </Link>
+                            <p className="text-sm text-muted-foreground mb-1">{book?.author}</p>
+                            <p className="text-sm text-foreground mb-2 line-clamp-3">{note.note_content}</p>
+                            <p className="text-xs text-muted-foreground">{date}</p>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-700 mb-2">{review.review}</p>
-                        <p className="text-xs text-gray-400">{review.date}</p>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })
+                )}
               </CardContent>
             </Card>
           </div>
