@@ -46,8 +46,12 @@ const BookCard = ({ book, isInDiary = false, isClubProfile = false, hideActions 
         </div>
       </CardHeader>
       <CardContent className="p-4">
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <Badge variant="secondary">{book.genre}</Badge>
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground min-h-[22px]">
+          {book.genre ? (
+            <Badge variant="secondary">{book.genre}</Badge>
+          ) : (
+            <Badge variant="secondary" className="invisible">placeholder</Badge>
+          )}
         </div>
         {book.description && (
           <div className="mt-2 text-sm text-gray-600 line-clamp-2">
