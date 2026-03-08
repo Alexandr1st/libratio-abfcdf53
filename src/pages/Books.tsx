@@ -17,9 +17,10 @@ const Books = () => {
     const checkClubProfile = async () => {
       if (user) {
         const { data } = await supabase
-          .from('clubs')
+          .from('club_members')
           .select('id')
-          .eq('contact_person_id', user.id)
+          .eq('user_id', user.id)
+          .eq('is_admin', true)
           .maybeSingle();
         
         setIsClubProfile(!!data);
