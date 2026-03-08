@@ -164,28 +164,35 @@ const ClubMembers = () => {
                     <p>Библиотека клуба пуста</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {clubBooks.slice(0, 6).map((item: any) => {
-                      const image = item.books?.image;
-                      const isEmoji = image && !image.startsWith('http') && !image.startsWith('/');
-                      return (
-                        <div key={item.id} className="text-center">
-                          {isEmoji ? (
-                            <div className="w-full h-32 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg mb-2 flex items-center justify-center text-4xl">
-                              {image}
-                            </div>
-                          ) : (
-                            <img
-                              src={image || '/placeholder.svg'}
-                              alt={item.books?.title}
-                              className="w-full h-32 object-cover rounded-lg mb-2"
-                            />
-                          )}
-                          <p className="text-sm font-medium truncate">{item.books?.title}</p>
-                          <p className="text-xs text-gray-500 truncate">{item.books?.author}</p>
-                        </div>
-                      );
-                    })}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {clubBooks.map((item: any) => {
+                        const image = item.books?.image;
+                        const isEmoji = image && !image.startsWith('http') && !image.startsWith('/');
+                        return (
+                          <div key={item.id} className="text-center">
+                            {isEmoji ? (
+                              <div className="w-full h-32 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg mb-2 flex items-center justify-center text-4xl">
+                                {image}
+                              </div>
+                            ) : (
+                              <img
+                                src={image || '/placeholder.svg'}
+                                alt={item.books?.title}
+                                className="w-full h-32 object-cover rounded-lg mb-2"
+                              />
+                            )}
+                            <p className="text-sm font-medium truncate">{item.books?.title}</p>
+                            <p className="text-xs text-gray-500 truncate">{item.books?.author}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="flex justify-end">
+                      <Link to="/club-library">
+                        <Button variant="outline" size="sm">Смотреть все</Button>
+                      </Link>
+                    </div>
                   </div>
                 )}
               </CardContent>
