@@ -79,7 +79,7 @@ const BookCard = ({ book, isInDiary = false, isClubProfile = false, hideActions 
         </div>
       </CardContent>
       {!hideActions && (
-        <div className="p-4 border-t space-y-2">
+        <div className="p-4 border-t flex flex-col gap-2">
           <AddToDiaryDropdown 
             bookId={book.id} 
             isInDiary={isInDiary} 
