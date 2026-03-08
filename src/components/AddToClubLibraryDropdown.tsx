@@ -34,9 +34,9 @@ const AddToClubLibraryDropdown = ({ bookId, isInLibrary }: AddToClubLibraryDropd
 
   if (isInLibrary) {
     return (
-      <Button disabled variant="outline" size="sm">
+      <Button disabled variant="outline" size="sm" className="w-full">
         <Building2 className="mr-2 h-4 w-4" />
-        В библиотеке
+        В клубе
       </Button>
     );
   }
