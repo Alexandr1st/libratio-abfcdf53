@@ -244,18 +244,21 @@ export type Database = {
           created_at: string
           id: string
           poll_id: string
+          suggested_by: string | null
         }
         Insert: {
           book_id: string
           created_at?: string
           id?: string
           poll_id: string
+          suggested_by?: string | null
         }
         Update: {
           book_id?: string
           created_at?: string
           id?: string
           poll_id?: string
+          suggested_by?: string | null
         }
         Relationships: [
           {
@@ -321,7 +324,9 @@ export type Database = {
           created_by: string
           id: string
           is_active: boolean
+          status: string
           title: string
+          winner_option_id: string | null
         }
         Insert: {
           allow_multiple?: boolean
@@ -330,7 +335,9 @@ export type Database = {
           created_by: string
           id?: string
           is_active?: boolean
+          status?: string
           title?: string
+          winner_option_id?: string | null
         }
         Update: {
           allow_multiple?: boolean
@@ -339,7 +346,9 @@ export type Database = {
           created_by?: string
           id?: string
           is_active?: boolean
+          status?: string
           title?: string
+          winner_option_id?: string | null
         }
         Relationships: [
           {
@@ -347,6 +356,13 @@ export type Database = {
             columns: ["club_id"]
             isOneToOne: false
             referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_polls_winner_option_id_fkey"
+            columns: ["winner_option_id"]
+            isOneToOne: false
+            referencedRelation: "club_poll_options"
             referencedColumns: ["id"]
           },
         ]
