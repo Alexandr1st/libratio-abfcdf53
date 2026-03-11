@@ -522,12 +522,6 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
     );
   };
 
-  // Get winning book for completed phase
-  const winningBook = useMemo(() => {
-    if (phase !== "completed" || options.length === 0 || totalVotes === 0) return null;
-    const sorted = [...options].sort((a: any, b: any) => getVoteCount(b.id) - getVoteCount(a.id));
-    return sorted[0]?.books || null;
-  }, [phase, options, totalVotes]);
 
   return (
     <>
