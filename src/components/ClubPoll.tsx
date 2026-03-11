@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Vote, Check, Plus, Calendar, Settings } from "lucide-react";
+import { Vote, Check, Plus, Calendar, Settings, BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -345,6 +345,13 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
     },
   });
 
+  // Get winning book for completed phase
+  const winningBook = useMemo(() => {
+    if (phase !== "completed" || options.length === 0 || totalVotes === 0) return null;
+    const sorted = [...options].sort((a: any, b: any) => getVoteCount(b.id) - getVoteCount(a.id));
+    return sorted[0]?.books || null;
+  }, [phase, options, totalVotes]);
+
   // ── No poll ──
   if (!poll) {
     return (
@@ -522,15 +529,17 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
     );
   };
 
+
   return (
     <>
-      <Card className="border-0 shadow-lg mt-4">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+      {/* "Читаем сейчас" card — shown when poll is completed and there's a winner */}
+      {phase === "completed" && winningBook && (
+        <Card className="border-0 shadow-lg mt-4">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
-                <Vote className="h-4 w-4" />
-                {poll.title}
+                <BookOpen className="h-4 w-4" />
+                Читаем сейчас
               </CardTitle>
               {isClubAdmin && (
                 <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setEditDialogOpen(true)}>
@@ -538,9 +547,49 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
                 </Button>
               )}
             </div>
-            <Badge variant={phaseBadgeVariant as any} className="text-xs">{phaseLabel}</Badge>
+            {poll.reading_ends_at && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                <span>Чтение до {formatDate(poll.reading_ends_at)}</span>
+              </div>
+            )}
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+              <img
+                src={winningBook.image || "/placeholder.svg"}
+                alt={winningBook.title}
+                className="w-10 h-14 object-cover rounded shrink-0"
+              />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold truncate">{winningBook.title}</p>
+                <p className="text-xs text-muted-foreground truncate">{winningBook.author}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Main poll card */}
+      <Card className="border-0 shadow-lg mt-4">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Vote className="h-4 w-4" />
+                {phase === "completed" ? "Голосование на следующую книгу" : poll.title}
+              </CardTitle>
+              {isClubAdmin && phase !== "completed" && (
+                <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setEditDialogOpen(true)}>
+                  <Settings className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
+            {phase !== "completed" && (
+              <Badge variant={phaseBadgeVariant as any} className="text-xs">{phaseLabel}</Badge>
+            )}
           </div>
-          <DateInfo />
+          {phase !== "completed" && <DateInfo />}
         </CardHeader>
         <CardContent className="space-y-2">
           {phase === "collecting" && (
@@ -589,34 +638,46 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
 
           {phase === "completed" && (
             <>
-              <ResultsList />
-              {totalVotes > 0 && (
-                <div className="text-right">
-                  <span className="text-xs text-muted-foreground">
-                    {totalVotes} {totalVotes === 1 ? "голос" : totalVotes < 5 ? "голоса" : "голосов"}
-                  </span>
-                </div>
-              )}
-
-              {/* Suggestions during reading period */}
-              {canSuggest && (
-                <div className="pt-3 border-t border-border mt-3">
-                  <p className="text-xs text-muted-foreground mb-2">Предложения для следующего голосования</p>
-                  {!userSuggestion && (
-                    <Button variant="outline" className="w-full" size="sm" onClick={() => setSuggestModalOpen(true)}>
-                      <Plus className="h-4 w-4 mr-1" />
-                      Предложить книгу
-                    </Button>
-                  )}
-                  {userSuggestion && (
-                    <div className="rounded-lg border border-primary/50 bg-primary/5 p-2 flex items-center gap-2">
-                      <img src={userSuggestion.books?.image || "/placeholder.svg"} alt="" className="w-6 h-9 object-cover rounded shrink-0" />
-                      <span className="text-xs truncate flex-1">{userSuggestion.books?.title}</span>
+              <p className="text-xs text-muted-foreground mb-2">Предложения для следующего голосования</p>
+              {/* Show existing suggestions for next poll */}
+              {options.filter((o: any) => {
+                const sorted = [...options].sort((a: any, b: any) => getVoteCount(b.id) - getVoteCount(a.id));
+                return o.id !== sorted[0]?.id;
+              }).map((option: any) => {
+                const book = option.books;
+                const isMine = option.suggested_by === user?.id;
+                return (
+                  <div
+                    key={option.id}
+                    className={cn(
+                      "rounded-lg border p-2 flex items-center gap-2",
+                      isMine ? "border-primary/50 bg-primary/5" : "border-border"
+                    )}
+                  >
+                    <img src={book?.image || "/placeholder.svg"} alt="" className="w-6 h-9 object-cover rounded shrink-0" />
+                    <span className="text-xs truncate flex-1">{book?.title}</span>
+                    {isMine && canSuggest && (
                       <Button variant="ghost" size="sm" className="text-xs h-6 px-2" onClick={() => removeSuggestionMutation.mutate()}>
-                        Сменить
+                        Отменить
                       </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
+                );
+              })}
+
+              {canSuggest && !userSuggestion && (
+                <Button variant="outline" className="w-full" size="sm" onClick={() => setSuggestModalOpen(true)}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Предложить книгу
+                </Button>
+              )}
+              {canSuggest && userSuggestion && (
+                <div className="rounded-lg border border-primary/50 bg-primary/5 p-2 flex items-center gap-2">
+                  <img src={userSuggestion.books?.image || "/placeholder.svg"} alt="" className="w-6 h-9 object-cover rounded shrink-0" />
+                  <span className="text-xs truncate flex-1">{userSuggestion.books?.title}</span>
+                  <Button variant="ghost" size="sm" className="text-xs h-6 px-2" onClick={() => removeSuggestionMutation.mutate()}>
+                    Сменить
+                  </Button>
                 </div>
               )}
 
