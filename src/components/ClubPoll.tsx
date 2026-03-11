@@ -142,9 +142,11 @@ const ClubPoll = ({ clubId }: ClubPollProps) => {
         .single();
       if (error) throw error;
 
-      // Carry over non-winning suggestions from old poll
-      if (poll && poll.winner_option_id) {
-        const carryOver = options.filter((o: any) => o.id !== poll.winner_option_id);
+      // Carry over suggestions from old poll (exclude winner if set)
+      if (poll && options.length > 0) {
+        const carryOver = poll.winner_option_id
+          ? options.filter((o: any) => o.id !== poll.winner_option_id)
+          : options;
         if (carryOver.length > 0) {
           await supabase.from("club_poll_options" as any).insert(
             carryOver.map((o: any) => ({
