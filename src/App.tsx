@@ -63,6 +63,7 @@ const App = () => (
             <Route path="/admin/books/:id" element={<AdminBookDetail />} />
             <Route path="/admin/activity" element={<AdminActivity />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/users/:id" element={<UserProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
