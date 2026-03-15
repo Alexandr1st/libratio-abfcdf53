@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen } from "lucide-react";
+import { BookOpen, MessageCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,6 +77,12 @@ const DiaryNavigation = () => {
                     </Button>
                   </Link>
                 )}
+                <Link to="/messages">
+                  <Button variant="ghost" className={getButtonStyle("/messages")}>
+                    <MessageCircle className="mr-1 h-4 w-4" />
+                    Сообщения
+                  </Button>
+                </Link>
                 <Link to="/profile">
                   <Button variant="outline" className={getButtonStyle("/profile")}>
                     Профиль

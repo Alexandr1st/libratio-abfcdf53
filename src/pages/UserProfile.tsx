@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Building2, Calendar, User } from "lucide-react";
+import { BookOpen, Building2, Calendar, MessageCircle, User } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -155,6 +155,16 @@ const UserProfile = () => {
                     <div className="text-sm text-muted-foreground">Мнений</div>
                   </div>
                 </div>
+
+                {user && (
+                  <Button
+                    className="w-full mt-4"
+                    onClick={() => navigate(`/messages?user=${profile.id}`)}
+                  >
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Написать
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>
