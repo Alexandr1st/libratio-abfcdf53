@@ -155,6 +155,16 @@ const UserProfile = () => {
                     <div className="text-sm text-muted-foreground">Мнений</div>
                   </div>
                 </div>
+
+                {user && (
+                  <Button
+                    className="w-full mt-4"
+                    onClick={() => navigate(`/messages?user=${profile.id}`)}
+                  >
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Написать
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>
