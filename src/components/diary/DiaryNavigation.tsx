@@ -77,6 +77,12 @@ const DiaryNavigation = () => {
                     </Button>
                   </Link>
                 )}
+                <Link to="/messages">
+                  <Button variant="ghost" className={getButtonStyle("/messages")}>
+                    <MessageCircle className="mr-1 h-4 w-4" />
+                    Сообщения
+                  </Button>
+                </Link>
                 <Link to="/profile">
                   <Button variant="outline" className={getButtonStyle("/profile")}>
                     Профиль

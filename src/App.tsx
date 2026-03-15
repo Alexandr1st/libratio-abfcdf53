@@ -65,6 +65,7 @@ const App = () => (
             <Route path="/admin/activity" element={<AdminActivity />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/users/:id" element={<UserProfile />} />
+            <Route path="/messages" element={<Messages />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
