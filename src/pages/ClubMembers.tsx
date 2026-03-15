@@ -246,7 +246,7 @@ const ClubMembers = () => {
                                   {member.full_name?.charAt(0) || <User className="h-3 w-3" />}
                                 </AvatarFallback>
                               </Avatar>
-                              <span className="font-medium">{member.full_name || "Не указано"}</span>
+                              <Link to={`/users/${member.id}`} className="font-medium hover:underline text-primary">{member.full_name || "Не указано"}</Link>
                               {member.isAdmin && <Badge variant="outline" className="ml-2 text-xs">Админ</Badge>}
                             </div>
                           </TableCell>
