@@ -620,6 +620,10 @@ export type Database = {
     }
     Functions: {
       can_view_profile: { Args: { profile_user_id: string }; Returns: boolean }
+      get_or_create_conversation: {
+        Args: { other_user_id: string }
+        Returns: string
+      }
       has_admin_role: {
         Args: { required_role: string; user_uuid: string }
         Returns: boolean
