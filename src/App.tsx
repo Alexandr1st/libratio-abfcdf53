@@ -28,6 +28,7 @@ import AdminBookDetail from "./pages/admin/AdminBookDetail";
 import AdminActivity from "./pages/admin/AdminActivity";
 import AdminSettings from "./pages/admin/AdminSettings";
 import UserProfile from "./pages/UserProfile";
+import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
