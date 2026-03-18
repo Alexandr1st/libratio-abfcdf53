@@ -38,8 +38,9 @@ const Messages = () => {
         other_user_id: targetUserId,
       });
       if (!error && data) {
+        // Refetch conversations first, then set active
+        await queryClient.invalidateQueries({ queryKey: ["conversations"] });
         setActiveConversationId(data);
-        queryClient.invalidateQueries({ queryKey: ["conversations"] });
       }
     };
     initConversation();
