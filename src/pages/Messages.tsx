@@ -30,25 +30,9 @@ const Messages = () => {
     if (!authLoading && !user) navigate("/auth");
   }, [user, authLoading, navigate]);
 
-  // Get or create conversation when navigating with ?user=
-  useEffect(() => {
-    if (!targetUserId || !user) return;
-    const initConversation = async () => {
-      const { data, error } = await supabase.rpc("get_or_create_conversation", {
-        other_user_id: targetUserId,
-      });
-      if (!error && data) {
-        // Refetch conversations first, then set active
-        await queryClient.invalidateQueries({ queryKey: ["conversations"] });
-        setActiveConversationId(data);
-      }
-    };
-    initConversation();
-  }, [targetUserId, user]);
-
   // Fetch conversations list
   const { data: conversations = [], isLoading: convsLoading } = useQuery({
-    queryKey: ["conversations"],
+    queryKey: ["conversations", user?.id],
     enabled: !!user,
     queryFn: async () => {
       // Get user's conversation IDs
@@ -119,6 +103,7 @@ const Messages = () => {
           const lastMessage = lastMessageMap.get(convId);
           return {
             id: convId,
+            otherUserId,
             otherUser: otherProfile,
             lastMessage,
             unreadCount: unreadMap.get(convId) || 0,
@@ -131,6 +116,38 @@ const Messages = () => {
         });
     },
   });
+
+  // Open existing conversation for ?user=<id>, or create it if missing
+  useEffect(() => {
+    if (!targetUserId || !user || convsLoading) return;
+
+    const existingConversation = conversations.find(
+      (conversation: any) => conversation.otherUserId === targetUserId
+    );
+
+    if (existingConversation) {
+      if (activeConversationId !== existingConversation.id) {
+        setActiveConversationId(existingConversation.id);
+      }
+      return;
+    }
+
+    const initConversation = async () => {
+      const { data, error } = await supabase.rpc("get_or_create_conversation", {
+        other_user_id: targetUserId,
+      });
+
+      if (error || !data) {
+        console.error("Failed to get or create conversation", error);
+        return;
+      }
+
+      await queryClient.refetchQueries({ queryKey: ["conversations", user.id], exact: true });
+      setActiveConversationId(data);
+    };
+
+    initConversation();
+  }, [targetUserId, user, convsLoading, conversations, activeConversationId, queryClient]);
 
   // Fetch messages for active conversation
   const { data: chatMessages = [], isLoading: msgsLoading } = useQuery({
