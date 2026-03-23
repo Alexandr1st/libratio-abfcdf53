@@ -49,6 +49,7 @@ const Messages = () => {
   // Fetch conversations list
   const { data: conversations = [], isLoading: convsLoading } = useQuery({
     queryKey: ["conversations"],
+    enabled: !!user,
     queryFn: async () => {
       // Get user's conversation IDs
       const { data: participations, error: pErr } = await supabase
@@ -129,7 +130,6 @@ const Messages = () => {
           return bTime.localeCompare(aTime);
         });
     },
-    enabled: !!user,
   });
 
   // Fetch messages for active conversation
