@@ -30,12 +30,26 @@ const Messages = () => {
     if (!authLoading && !user) navigate("/auth");
   }, [user, authLoading, navigate]);
 
+  const { data: targetProfile } = useQuery({
+    queryKey: ["message-target-profile", targetUserId],
+    enabled: !!user && !!targetUserId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, username, avatar_url")
+        .eq("id", targetUserId!)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Fetch conversations list
   const { data: conversations = [], isLoading: convsLoading } = useQuery({
     queryKey: ["conversations", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      // Get user's conversation IDs
       const { data: participations, error: pErr } = await supabase
         .from("conversation_participants")
         .select("conversation_id")
@@ -44,13 +58,11 @@ const Messages = () => {
 
       const convIds = participations.map((p: any) => p.conversation_id);
 
-      // Get all participants for these conversations
       const { data: allParticipants } = await supabase
         .from("conversation_participants")
         .select("conversation_id, user_id")
         .in("conversation_id", convIds);
 
-      // Get other user IDs
       const otherUserIds = [
         ...new Set(
           (allParticipants || [])
@@ -59,7 +71,6 @@ const Messages = () => {
         ),
       ];
 
-      // Fetch profiles
       const { data: profiles } = await supabase
         .from("profiles")
         .select("id, full_name, username, avatar_url")
@@ -67,7 +78,6 @@ const Messages = () => {
 
       const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
 
-      // Get last message per conversation
       const { data: messages } = await supabase
         .from("messages")
         .select("conversation_id, content, created_at, sender_id")
@@ -81,7 +91,6 @@ const Messages = () => {
         }
       });
 
-      // Get unread count per conversation
       const { data: unreadMessages } = await supabase
         .from("messages")
         .select("conversation_id")
@@ -101,6 +110,7 @@ const Messages = () => {
           )?.user_id;
           const otherProfile = otherUserId ? profileMap.get(otherUserId) : null;
           const lastMessage = lastMessageMap.get(convId);
+
           return {
             id: convId,
             otherUserId,
@@ -142,12 +152,28 @@ const Messages = () => {
         return;
       }
 
-      await queryClient.refetchQueries({ queryKey: ["conversations", user.id], exact: true });
+      queryClient.setQueryData(["conversations", user.id], (current: any[] = []) => {
+        const alreadyExists = current.some((conversation) => conversation.id === data);
+        if (alreadyExists) return current;
+
+        return [
+          {
+            id: data,
+            otherUserId: targetUserId,
+            otherUser: targetProfile ?? null,
+            lastMessage: null,
+            unreadCount: 0,
+          },
+          ...current,
+        ];
+      });
+
       setActiveConversationId(data);
+      queryClient.invalidateQueries({ queryKey: ["conversations", user.id], exact: true });
     };
 
     initConversation();
-  }, [targetUserId, user, convsLoading, conversations, activeConversationId, queryClient]);
+  }, [targetUserId, user, convsLoading, conversations, activeConversationId, queryClient, targetProfile]);
 
   // Fetch messages for active conversation
   const { data: chatMessages = [], isLoading: msgsLoading } = useQuery({
@@ -160,7 +186,6 @@ const Messages = () => {
         .order("created_at", { ascending: true });
       if (error) throw error;
 
-      // Mark unread messages as read
       const unread = (data || []).filter(
         (m: any) => m.sender_id !== user!.id && !m.read_at
       );
@@ -169,7 +194,7 @@ const Messages = () => {
           .from("messages")
           .update({ read_at: new Date().toISOString() })
           .in("id", unread.map((m: any) => m.id));
-        queryClient.invalidateQueries({ queryKey: ["conversations"] });
+        queryClient.invalidateQueries({ queryKey: ["conversations", user?.id] });
       }
 
       return data || [];
@@ -194,7 +219,7 @@ const Messages = () => {
         },
         () => {
           queryClient.invalidateQueries({ queryKey: ["messages", activeConversationId] });
-          queryClient.invalidateQueries({ queryKey: ["conversations"] });
+          queryClient.invalidateQueries({ queryKey: ["conversations", user?.id] });
         }
       )
       .subscribe();
@@ -202,7 +227,7 @@ const Messages = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [activeConversationId, queryClient]);
+  }, [activeConversationId, queryClient, user?.id]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -224,7 +249,6 @@ const Messages = () => {
         content: messageText.trim(),
       });
       setMessageText("");
-      // Update conversation timestamp
       await supabase
         .from("conversations")
         .update({ updated_at: new Date().toISOString() })
@@ -241,7 +265,17 @@ const Messages = () => {
     }
   };
 
-  const activeConversation = conversations.find((c: any) => c.id === activeConversationId);
+  const activeConversation =
+    conversations.find((c: any) => c.id === activeConversationId) ||
+    (activeConversationId && targetUserId
+      ? {
+          id: activeConversationId,
+          otherUserId: targetUserId,
+          otherUser: targetProfile ?? null,
+          lastMessage: null,
+          unreadCount: 0,
+        }
+      : null);
 
   if (authLoading) {
     return (
