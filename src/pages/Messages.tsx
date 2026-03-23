@@ -128,6 +128,7 @@ const Messages = () => {
           const aTime = a.lastMessage?.created_at || "";
           const bTime = b.lastMessage?.created_at || "";
           return bTime.localeCompare(aTime);
+        });
     },
   });
 
