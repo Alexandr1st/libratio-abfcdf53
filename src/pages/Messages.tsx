@@ -127,20 +127,9 @@ const Messages = () => {
     },
   });
 
-  // Open existing conversation for ?user=<id>, or create it if missing
+  // Always resolve the target conversation for ?user=<id>
   useEffect(() => {
-    if (!targetUserId || !user || convsLoading) return;
-
-    const existingConversation = conversations.find(
-      (conversation: any) => conversation.otherUserId === targetUserId
-    );
-
-    if (existingConversation) {
-      if (activeConversationId !== existingConversation.id) {
-        setActiveConversationId(existingConversation.id);
-      }
-      return;
-    }
+    if (!targetUserId || !user) return;
 
     const initConversation = async () => {
       const { data, error } = await supabase.rpc("get_or_create_conversation", {
@@ -168,12 +157,12 @@ const Messages = () => {
         ];
       });
 
-      setActiveConversationId(data);
+      setActiveConversationId((current) => (current === data ? current : data));
       queryClient.invalidateQueries({ queryKey: ["conversations", user.id], exact: true });
     };
 
     initConversation();
-  }, [targetUserId, user, convsLoading, conversations, activeConversationId, queryClient, targetProfile]);
+  }, [targetUserId, user, queryClient, targetProfile]);
 
   // Fetch messages for active conversation
   const { data: chatMessages = [], isLoading: msgsLoading } = useQuery({
