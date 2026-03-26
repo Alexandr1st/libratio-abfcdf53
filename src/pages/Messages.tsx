@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageCircle, Send, User, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const Messages = () => {
   const { user, loading: authLoading } = useAuth();
@@ -22,6 +23,7 @@ const Messages = () => {
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   // If opened with ?user=<id>, find or create conversation
   const targetUserId = searchParams.get("user");
@@ -230,18 +232,67 @@ const Messages = () => {
 
   const sendMessage = async () => {
     if (!messageText.trim() || !activeConversationId || !user) return;
+
+    const trimmedMessage = messageText.trim();
     setSending(true);
     try {
-      await supabase.from("messages").insert({
+      const optimisticMessage = {
+        id: `temp-${Date.now()}`,
         conversation_id: activeConversationId,
         sender_id: user.id,
-        content: messageText.trim(),
-      });
+        content: trimmedMessage,
+        created_at: new Date().toISOString(),
+        read_at: null,
+      };
+
+      queryClient.setQueryData(["messages", activeConversationId], (current: any[] = []) => [
+        ...current,
+        optimisticMessage,
+      ]);
       setMessageText("");
-      await supabase
+
+      const { error: insertError } = await supabase.from("messages").insert({
+        conversation_id: activeConversationId,
+        sender_id: user.id,
+        content: trimmedMessage,
+      });
+
+      if (insertError) {
+        queryClient.setQueryData(["messages", activeConversationId], (current: any[] = []) =>
+          current.filter((message) => message.id !== optimisticMessage.id)
+        );
+        setMessageText(trimmedMessage);
+        toast({
+          title: "Сообщение не отправлено",
+          description: insertError.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error: conversationError } = await supabase
         .from("conversations")
         .update({ updated_at: new Date().toISOString() })
         .eq("id", activeConversationId);
+
+      if (conversationError) {
+        console.error("Failed to update conversation timestamp", conversationError);
+      }
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["messages", activeConversationId] }),
+        queryClient.invalidateQueries({ queryKey: ["conversations", user.id] }),
+      ]);
+    } catch (error) {
+      queryClient.setQueryData(["messages", activeConversationId], (current: any[] = []) =>
+        current.filter((message) => !String(message.id).startsWith("temp-"))
+      );
+      setMessageText(trimmedMessage);
+      toast({
+        title: "Ошибка отправки",
+        description: error instanceof Error ? error.message : "Попробуйте ещё раз",
+        variant: "destructive",
+      });
     } finally {
       setSending(false);
     }
