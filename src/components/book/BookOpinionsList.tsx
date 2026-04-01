@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, User, MessageSquare } from "lucide-react";
@@ -66,9 +67,12 @@ const BookOpinionsList = ({ bookId, currentUserId, limit }: BookOpinionsListProp
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-sm">
+                  <Link
+                    to={`/user/${opinion.userId}`}
+                    className="font-medium text-sm hover:underline"
+                  >
                     {opinion.profile?.full_name || opinion.profile?.username || "Пользователь"}
-                  </span>
+                  </Link>
                   <span className="text-xs text-muted-foreground">
                     {formatDistanceToNow(new Date(opinion.updatedAt), {
                       addSuffix: true,
