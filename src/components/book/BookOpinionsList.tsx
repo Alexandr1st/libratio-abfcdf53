@@ -68,7 +68,7 @@ const BookOpinionsList = ({ bookId, currentUserId, limit }: BookOpinionsListProp
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                   <Link
-                    to={`/user/${opinion.userId}`}
+                    to={`/users/${opinion.userId}`}
                     className="font-medium text-sm hover:underline"
                   >
                     {opinion.profile?.full_name || opinion.profile?.username || "Пользователь"}
