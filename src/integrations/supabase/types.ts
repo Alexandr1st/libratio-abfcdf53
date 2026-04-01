@@ -629,6 +629,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { user_uuid: string }; Returns: boolean }
+      is_conversation_participant: {
+        Args: { _conversation_id: string }
+        Returns: boolean
+      }
       is_super_admin: { Args: { user_uuid: string }; Returns: boolean }
       update_book_rating: {
         Args: { book_id_param: string }
