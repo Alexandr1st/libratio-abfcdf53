@@ -97,6 +97,20 @@ const ClubMembers = () => {
     enabled: !!clubId,
   });
 
+  const { data: isClubAdmin } = useQuery({
+    queryKey: ['is-club-admin', clubId, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('club_members')
+        .select('is_admin')
+        .eq('club_id', clubId!)
+        .eq('user_id', user!.id)
+        .single();
+      return data?.is_admin === true;
+    },
+    enabled: !!clubId && !!user,
+  });
+
   const handleSignOut = async () => { await signOut(); navigate("/"); };
 
   if (authLoading || loading) return (
