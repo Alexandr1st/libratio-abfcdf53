@@ -36,6 +36,16 @@ const EditClubProfile = () => {
     try {
       const { data: profile } = await supabase.from('profiles').select('club_id').eq('id', user.id).single();
       if (!profile?.club_id) { navigate("/profile"); return; }
+
+      // Check if user is club admin
+      const { data: membership } = await supabase
+        .from('club_members')
+        .select('is_admin')
+        .eq('club_id', profile.club_id)
+        .eq('user_id', user.id)
+        .single();
+      if (!membership?.is_admin) { navigate("/club-profile"); return; }
+
       const { data, error } = await supabase.from('clubs').select('id, name, description, location, logo_url, website').eq('id', profile.club_id).single();
       if (error || !data) { navigate("/profile"); return; }
       setClub(data);

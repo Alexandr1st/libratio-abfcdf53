@@ -97,6 +97,20 @@ const ClubMembers = () => {
     enabled: !!clubId,
   });
 
+  const { data: isClubAdmin } = useQuery({
+    queryKey: ['is-club-admin', clubId, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('club_members')
+        .select('is_admin')
+        .eq('club_id', clubId!)
+        .eq('user_id', user!.id)
+        .single();
+      return data?.is_admin === true;
+    },
+    enabled: !!clubId && !!user,
+  });
+
   const handleSignOut = async () => { await signOut(); navigate("/"); };
 
   if (authLoading || loading) return (
@@ -137,11 +151,13 @@ const ClubMembers = () => {
                     <a href={club.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Чат</a>
                   </div>
                 )}
+                {isClubAdmin && (
                 <div className="space-y-2 pt-4">
                   <Link to="/club-profile/edit">
                     <Button className="w-full"><Edit className="mr-2 h-4 w-4" />Редактировать клуб</Button>
                   </Link>
                 </div>
+                )}
               </CardContent>
             </Card>
             {clubId && <ClubPoll clubId={clubId} />}
