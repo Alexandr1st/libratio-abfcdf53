@@ -77,6 +77,20 @@ const ClubProfile = () => {
     enabled: !!club?.id,
   });
 
+  const { data: isClubAdmin } = useQuery({
+    queryKey: ['is-club-admin', club?.id, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('club_members')
+        .select('is_admin')
+        .eq('club_id', club.id)
+        .eq('user_id', user!.id)
+        .single();
+      return data?.is_admin === true;
+    },
+    enabled: !!club?.id && !!user,
+  });
+
   const handleSignOut = async () => { await signOut(); navigate("/"); };
 
   if (authLoading || loading) return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center"><BookOpen className="h-12 w-12 text-blue-600 mx-auto animate-pulse" /></div>;
