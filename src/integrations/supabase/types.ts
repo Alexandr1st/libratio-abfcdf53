@@ -238,6 +238,41 @@ export type Database = {
           },
         ]
       }
+      club_messages: {
+        Row: {
+          club_id: string
+          content: string
+          created_at: string
+          id: string
+          is_pinned: boolean
+          sender_id: string
+        }
+        Insert: {
+          club_id: string
+          content: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          sender_id: string
+        }
+        Update: {
+          club_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_messages_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_poll_options: {
         Row: {
           book_id: string
