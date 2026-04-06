@@ -731,6 +731,7 @@ const Messages = () => {
                       })
                     )}
                     <div ref={messagesEndRef} />
+                    </div>
                   </div>
 
                   {/* Input */}
