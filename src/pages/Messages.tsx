@@ -638,7 +638,9 @@ const Messages = () => {
                   )}
 
                   {/* Messages */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  <div className="flex-1 overflow-y-auto p-4 flex flex-col">
+                    <div className="flex-1" />
+                    <div className="space-y-3">
                     {isLoadingMessages ? (
                       <div className="flex items-center justify-center h-full">
                         <MessageCircle className="h-8 w-8 text-muted-foreground animate-pulse" />
@@ -729,6 +731,7 @@ const Messages = () => {
                       })
                     )}
                     <div ref={messagesEndRef} />
+                    </div>
                   </div>
 
                   {/* Input */}
