@@ -605,6 +605,7 @@ export type Database = {
           created_at: string | null
           full_name: string | null
           id: string
+          is_blocked: boolean
           location: string | null
           position: string | null
           updated_at: string | null
@@ -619,6 +620,7 @@ export type Database = {
           created_at?: string | null
           full_name?: string | null
           id: string
+          is_blocked?: boolean
           location?: string | null
           position?: string | null
           updated_at?: string | null
@@ -633,6 +635,7 @@ export type Database = {
           created_at?: string | null
           full_name?: string | null
           id?: string
+          is_blocked?: boolean
           location?: string | null
           position?: string | null
           updated_at?: string | null

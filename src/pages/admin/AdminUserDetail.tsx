@@ -9,7 +9,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save, User, Building2, Shield } from "lucide-react";
+import { ArrowLeft, Save, User, Building2, Shield, Ban, CheckCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
@@ -123,6 +134,24 @@ const AdminUserDetail = () => {
     },
   });
 
+  const blockMutation = useMutation({
+    mutationFn: async (blocked: boolean) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ is_blocked: blocked, updated_at: new Date().toISOString() })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: (_, blocked) => {
+      queryClient.invalidateQueries({ queryKey: ["adminUser", id] });
+      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
+      toast.success(blocked ? "Пользователь заблокирован" : "Пользователь разблокирован");
+    },
+    onError: () => {
+      toast.error("Ошибка при изменении статуса блокировки");
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateMutation.mutate(formData);
@@ -174,10 +203,51 @@ const AdminUserDetail = () => {
               <p className="text-gray-600">@{user.username || "нет username"}</p>
             </div>
           </div>
-          <Button type="submit" disabled={updateMutation.isPending}>
-            <Save className="mr-2 h-4 w-4" />
-            {updateMutation.isPending ? "Сохранение..." : "Сохранить"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant={user.is_blocked ? "outline" : "destructive"}
+                  disabled={blockMutation.isPending}
+                >
+                  {user.is_blocked ? (
+                    <>
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Разблокировать
+                    </>
+                  ) : (
+                    <>
+                      <Ban className="mr-2 h-4 w-4" />
+                      Заблокировать
+                    </>
+                  )}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {user.is_blocked ? "Разблокировать пользователя?" : "Заблокировать пользователя?"}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {user.is_blocked
+                      ? "Пользователь снова сможет входить в систему."
+                      : "Пользователь не сможет войти в систему до разблокировки."}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Отмена</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => blockMutation.mutate(!user.is_blocked)}>
+                    {user.is_blocked ? "Разблокировать" : "Заблокировать"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <Button type="submit" disabled={updateMutation.isPending}>
+              <Save className="mr-2 h-4 w-4" />
+              {updateMutation.isPending ? "Сохранение..." : "Сохранить"}
+            </Button>
+          </div>
         </div>
 
         {/* User Info Card */}

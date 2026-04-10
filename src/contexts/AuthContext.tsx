@@ -36,10 +36,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Check if user needs club creation
         if (session?.user) {
           setTimeout(() => {
             checkAndCreateClub(session.user);
+            checkIfBlocked(session.user.id);
           }, 0);
         }
       }
@@ -51,10 +51,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setUser(session?.user ?? null);
       setLoading(false);
       
-      // Check if user needs club creation
       if (session?.user) {
         setTimeout(() => {
           checkAndCreateClub(session.user);
+          checkIfBlocked(session.user.id);
         }, 0);
       }
     });
@@ -62,11 +62,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const checkIfBlocked = async (userId: string) => {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_blocked')
+      .eq('id', userId)
+      .single();
+    
+    if (profile?.is_blocked) {
+      await supabase.auth.signOut();
+    }
+  };
+
   const checkAndCreateClub = async (user: User) => {
     const accountType = user.user_metadata?.account_type;
     
     if (accountType === 'company') {
-      // Check if user already has a club
       const { data: profile } = await supabase
         .from('profiles')
         .select('club_id')
@@ -74,7 +85,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         .single();
       
       if (!profile?.club_id) {
-        // User is club type but has no club - they might have registered but club creation failed
         console.log('Club user without club detected:', user.id);
       }
     }
