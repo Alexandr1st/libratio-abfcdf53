@@ -185,14 +185,13 @@ const Auth = () => {
 
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: signInData, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       toast({
         title: "Ошибка входа",
         description: error.message === "Invalid login credentials" 
@@ -200,9 +199,31 @@ const Auth = () => {
           : error.message,
         variant: "destructive",
       });
-    } else {
-      navigate("/");
+      return;
     }
+
+    // Check if user is blocked
+    if (signInData.user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_blocked")
+        .eq("id", signInData.user.id)
+        .single();
+
+      if (profile?.is_blocked) {
+        await supabase.auth.signOut();
+        setLoading(false);
+        toast({
+          title: "Доступ заблокирован",
+          description: "Ваш аккаунт заблокирован. Обратитесь к администратору для получения информации.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    setLoading(false);
+    navigate("/");
   };
 
   return (
