@@ -22,6 +22,7 @@ interface ClubInsert {
   location?: string | null;
   logo_url?: string | null;
   website?: string | null;
+  club_type?: string;
 }
 
 export const useClubs = () => {
