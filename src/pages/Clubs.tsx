@@ -48,12 +48,14 @@ const Clubs = () => {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-xl font-semibold">{club.name}</CardTitle>
-                      <Badge variant={club.club_type === 'online' ? 'secondary' : 'outline'} className="text-xs">
-                        {club.club_type === 'online' ? '🌐 Онлайн' : '📍 Оффлайн'}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-xl font-semibold">{club.name}</CardTitle>
+                        <Badge variant={club.club_type === 'online' ? 'secondary' : 'outline'} className="text-xs">
+                          {club.club_type === 'online' ? '🌐 Онлайн' : '📍 Оффлайн'}
+                        </Badge>
+                      </div>
                     </div>
+                  </div>
                   <CardDescription>{club.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
