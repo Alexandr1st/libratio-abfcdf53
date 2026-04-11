@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Users, MapPin, Globe } from "lucide-react";
 import { useClubs } from "@/hooks/useClubs";
 import { useToast } from "@/hooks/use-toast";
@@ -36,7 +37,19 @@ const Clubs = () => {
             <Card key={club.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
               <Link to={`/clubs/${club.id}`} className="block">
                 <CardHeader>
-                  <CardTitle className="text-xl font-semibold">{club.name}</CardTitle>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      {club.logo_url ? (
+                        <AvatarImage src={club.logo_url} alt={club.name} />
+                      ) : null}
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                        {club.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <CardTitle className="text-xl font-semibold">{club.name}</CardTitle>
+                    </div>
+                  </div>
                   <CardDescription>{club.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
