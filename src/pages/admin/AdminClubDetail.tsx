@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Building2, Users, Globe, Calendar } from "lucide-react";
+import { ArrowLeft, Building2, Users, Calendar } from "lucide-react";
 
 const AdminClubDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,7 +22,6 @@ const AdminClubDetail = () => {
     description: "",
     location: "",
     logo_url: "",
-    chat_link: "",
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
@@ -105,7 +104,6 @@ const AdminClubDetail = () => {
         description: club.description || "",
         location: club.location || "",
         logo_url: club.logo_url || "",
-        chat_link: club.website || "",
       });
       setLogoFile(null);
     }
@@ -139,7 +137,6 @@ const AdminClubDetail = () => {
           description: data.description || null,
           location: data.location || null,
           logo_url: logoUrl || null,
-          website: data.chat_link || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", id);
@@ -283,15 +280,6 @@ const AdminClubDetail = () => {
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="chat_link">Ссылка на чат</Label>
-                    <Input
-                      id="chat_link"
-                      value={formData.chat_link}
-                      onChange={(e) => setFormData({ ...formData, chat_link: e.target.value })}
-                      placeholder="https://t.me/yourgroup"
-                    />
-                  </div>
 
                   <div className="flex justify-end gap-2 pt-4">
                     <Button 
@@ -357,24 +345,6 @@ const AdminClubDetail = () => {
                 <CardTitle>Информация</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-start">
-                  <Globe className="mr-3 h-5 w-5 text-gray-400 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-gray-500">Ссылка на чат</p>
-                    {club.website ? (
-                      <a
-                        href={club.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        {club.website}
-                      </a>
-                    ) : (
-                      <p className="text-gray-400">Не указано</p>
-                    )}
-                  </div>
-                </div>
 
                 <div className="flex items-start">
                   <Users className="mr-3 h-5 w-5 text-gray-400 mt-0.5" />

@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Building2, Users, MapPin, Globe, Calendar, Book } from "lucide-react";
+import { ArrowLeft, Building2, Users, MapPin, Calendar, Book } from "lucide-react";
 import { useClubs } from "@/hooks/useClubs";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { useQuery } from '@tanstack/react-query';
@@ -80,7 +80,7 @@ const ClubDetail = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {club.location && <div className="flex items-center space-x-2"><MapPin className="h-5 w-5 text-gray-500" /><span>{club.location}</span></div>}
-              {club.website && <div className="flex items-center space-x-2"><Globe className="h-5 w-5 text-gray-500" /><a href={club.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Чат</a></div>}
+              
               <div className="flex items-center space-x-2"><Calendar className="h-5 w-5 text-gray-500" /><span>Создан {new Date(club.created_at).toLocaleDateString('ru-RU')}</span></div>
               <div className="flex items-center space-x-2"><Users className="h-5 w-5 text-gray-500" /><span>{members?.length || 0} участников</span></div>
             </div>
