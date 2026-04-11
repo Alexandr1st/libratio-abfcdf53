@@ -24,7 +24,7 @@ const Auth = () => {
   const [clubName, setClubName] = useState("");
   const [clubDescription, setClubDescription] = useState("");
   const [clubLocation, setClubLocation] = useState("");
-  const [clubChatLink, setClubChatLink] = useState("");
+  
   
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -68,7 +68,6 @@ const Auth = () => {
         name: clubName,
         description: clubDescription || null,
         location: clubLocation || null,
-        website: clubChatLink || null,
       });
 
       if (!clubValidation.success) {
@@ -112,7 +111,7 @@ const Auth = () => {
             name: clubName,
             description: clubDescription || null,
             location: clubLocation || null,
-            website: clubChatLink || null,
+            
           })
           .select()
           .single();
@@ -338,17 +337,6 @@ const Auth = () => {
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="clubChatLink">Ссылка на чат</Label>
-                        <Input
-                          id="clubChatLink"
-                          type="url"
-                          placeholder="https://t.me/yourgroup"
-                          value={clubChatLink}
-                          onChange={(e) => setClubChatLink(e.target.value)}
-                          maxLength={500}
-                        />
-                      </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="clubDescription">Описание клуба</Label>

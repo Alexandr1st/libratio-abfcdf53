@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Users, MapPin, Globe } from "lucide-react";
+import { Users, MapPin } from "lucide-react";
 import { useClubs } from "@/hooks/useClubs";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
@@ -61,12 +61,6 @@ const Clubs = () => {
                     <div className="flex items-center space-x-2 text-gray-600">
                       <MapPin className="h-4 w-4" />
                       <span>{club.location}</span>
-                    </div>
-                  )}
-                  {club.website && (
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <Globe className="h-4 w-4" />
-                      <span className="text-blue-500">Чат</span>
                     </div>
                   )}
                 </CardContent>

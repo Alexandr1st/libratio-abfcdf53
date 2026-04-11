@@ -25,7 +25,6 @@ interface ClubFormData {
   name: string;
   description?: string;
   location?: string;
-  chat_link?: string;
   logo?: File;
 }
 
@@ -43,7 +42,6 @@ export const CreateClubDialog = ({ open, setOpen }: CreateClubDialogProps) => {
       name: "",
       description: "",
       location: "",
-      chat_link: "",
     },
   });
 
@@ -54,7 +52,6 @@ export const CreateClubDialog = ({ open, setOpen }: CreateClubDialogProps) => {
           name: data.name,
           description: data.description || null,
           location: data.location || null,
-          website: data.chat_link || null,
         },
         logo: logoFile 
       });
@@ -107,19 +104,6 @@ export const CreateClubDialog = ({ open, setOpen }: CreateClubDialogProps) => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="chat_link"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ссылка на чат</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://t.me/yourgroup" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <FormItem>
               <FormLabel>Логотип клуба</FormLabel>

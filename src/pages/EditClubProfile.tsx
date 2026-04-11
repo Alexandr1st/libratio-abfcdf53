@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 
-interface ClubFormData { name: string; description: string; location: string; chat_link: string; }
+interface ClubFormData { name: string; description: string; location: string; }
 
 const EditClubProfile = () => {
   const { user, loading: authLoading } = useAuth();
@@ -52,7 +52,7 @@ const EditClubProfile = () => {
       setValue('name', data.name || '');
       setValue('description', data.description || '');
       setValue('location', data.location || '');
-      setValue('chat_link', data.website || '');
+      
     } catch (error) {
       toast({ title: "Ошибка", description: "Не удалось загрузить данные клуба", variant: "destructive" });
     } finally {
@@ -73,7 +73,7 @@ const EditClubProfile = () => {
         const { data: { publicUrl } } = supabase.storage.from('club-logos').getPublicUrl(fileName);
         logoUrl = publicUrl;
       }
-      const { error } = await supabase.from('clubs').update({ name: data.name, description: data.description || null, location: data.location || null, website: data.chat_link || null, logo_url: logoUrl || null, updated_at: new Date().toISOString() }).eq('id', club.id);
+      const { error } = await supabase.from('clubs').update({ name: data.name, description: data.description || null, location: data.location || null, logo_url: logoUrl || null, updated_at: new Date().toISOString() }).eq('id', club.id);
       if (error) throw error;
       toast({ title: "Успешно!", description: "Данные клуба обновлены" });
       navigate("/club-profile");
@@ -98,7 +98,7 @@ const EditClubProfile = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2"><Label htmlFor="name">Название клуба</Label><Input id="name" placeholder="Название клуба" {...register('name', { required: true })} /></div>
               <div className="space-y-2"><Label htmlFor="location">Местоположение</Label><Input id="location" placeholder="Город, страна" {...register('location')} /></div>
-              <div className="space-y-2"><Label htmlFor="chat_link">Ссылка на чат</Label><Input id="chat_link" type="url" placeholder="https://t.me/yourgroup" {...register('chat_link')} /></div>
+              
               <div className="space-y-2"><Label htmlFor="logo">Логотип клуба</Label>{club?.logo_url && <div className="mb-2"><img src={club.logo_url} alt="Current logo" className="w-20 h-20 object-cover rounded" /></div>}<Input id="logo" type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) setLogoFile(file); }} /></div>
               <div className="space-y-2"><Label htmlFor="description">Описание клуба</Label><Textarea id="description" placeholder="Расскажите о вашем клубе" className="min-h-[120px]" {...register('description')} /></div>
               <div className="flex justify-end space-x-4"><Link to="/club-profile"><Button variant="outline" type="button">Отмена</Button></Link><Button type="submit" disabled={saving}>{saving ? "Сохранение..." : <><Save className="h-4 w-4 mr-2" />Сохранить изменения</>}</Button></div>

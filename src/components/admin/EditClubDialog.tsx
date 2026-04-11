@@ -33,7 +33,6 @@ const EditClubDialog = ({ club, open, onOpenChange }: EditClubDialogProps) => {
     description: "",
     location: "",
     logo_url: "",
-    chat_link: "",
   });
 
   useEffect(() => {
@@ -43,7 +42,6 @@ const EditClubDialog = ({ club, open, onOpenChange }: EditClubDialogProps) => {
         description: club.description || "",
         location: club.location || "",
         logo_url: club.logo_url || "",
-        chat_link: club.website || "",
       });
     }
     setLogoFile(null);
@@ -80,7 +78,6 @@ const EditClubDialog = ({ club, open, onOpenChange }: EditClubDialogProps) => {
           description: data.description || null,
           location: data.location || null,
           logo_url: logoUrl || null,
-          website: data.chat_link || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", club.id);
@@ -145,15 +142,6 @@ const EditClubDialog = ({ club, open, onOpenChange }: EditClubDialogProps) => {
             />
           </div>
 
-          <div>
-            <Label htmlFor="chat_link">Ссылка на чат</Label>
-            <Input
-              id="chat_link"
-              value={formData.chat_link}
-              onChange={(e) => setFormData({ ...formData, chat_link: e.target.value })}
-              placeholder="https://t.me/yourgroup"
-            />
-          </div>
 
           <div>
             <Label htmlFor="logo">Логотип клуба</Label>
