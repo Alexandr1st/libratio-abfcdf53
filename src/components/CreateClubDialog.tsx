@@ -19,12 +19,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 
 interface ClubFormData {
   name: string;
   description?: string;
   location?: string;
+  club_type: string;
   logo?: File;
 }
 
@@ -42,6 +44,7 @@ export const CreateClubDialog = ({ open, setOpen }: CreateClubDialogProps) => {
       name: "",
       description: "",
       location: "",
+      club_type: "online",
     },
   });
 
@@ -52,6 +55,7 @@ export const CreateClubDialog = ({ open, setOpen }: CreateClubDialogProps) => {
           name: data.name,
           description: data.description || null,
           location: data.location || null,
+          club_type: data.club_type,
         },
         logo: logoFile 
       });
@@ -104,6 +108,27 @@ export const CreateClubDialog = ({ open, setOpen }: CreateClubDialogProps) => {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="club_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Тип клуба</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите тип клуба" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="online">🌐 Онлайн</SelectItem>
+                      <SelectItem value="offline">📍 Оффлайн</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormItem>
               <FormLabel>Логотип клуба</FormLabel>

@@ -10,6 +10,7 @@ interface Club {
   location: string | null;
   logo_url: string | null;
   website: string | null;
+  club_type: string;
   contact_person_id: string | null;
   created_at: string;
   updated_at: string;
@@ -21,6 +22,7 @@ interface ClubInsert {
   location?: string | null;
   logo_url?: string | null;
   website?: string | null;
+  club_type?: string;
 }
 
 export const useClubs = () => {
@@ -88,6 +90,7 @@ export const useCreateClub = () => {
           description: validationResult.data.description,
           location: validationResult.data.location,
           website: validationResult.data.website,
+          club_type: (clubData as any).club_type || 'online',
           logo_url: logoUrl,
         })
         .select()
