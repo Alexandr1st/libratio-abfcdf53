@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Users, MapPin, Globe } from "lucide-react";
 import { useClubs } from "@/hooks/useClubs";
 import { useToast } from "@/hooks/use-toast";
