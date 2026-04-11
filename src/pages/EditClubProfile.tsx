@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Building2, Save } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 
-interface ClubFormData { name: string; description: string; location: string; }
+interface ClubFormData { name: string; description: string; location: string; club_type: string; }
 
 const EditClubProfile = () => {
   const { user, loading: authLoading } = useAuth();
@@ -46,12 +47,13 @@ const EditClubProfile = () => {
         .single();
       if (!membership?.is_admin) { navigate("/club-profile"); return; }
 
-      const { data, error } = await supabase.from('clubs').select('id, name, description, location, logo_url, website').eq('id', profile.club_id).single();
+      const { data, error } = await supabase.from('clubs').select('id, name, description, location, logo_url, club_type').eq('id', profile.club_id).single();
       if (error || !data) { navigate("/profile"); return; }
       setClub(data);
       setValue('name', data.name || '');
       setValue('description', data.description || '');
       setValue('location', data.location || '');
+      setValue('club_type', data.club_type || 'online');
       
     } catch (error) {
       toast({ title: "Ошибка", description: "Не удалось загрузить данные клуба", variant: "destructive" });
@@ -73,7 +75,7 @@ const EditClubProfile = () => {
         const { data: { publicUrl } } = supabase.storage.from('club-logos').getPublicUrl(fileName);
         logoUrl = publicUrl;
       }
-      const { error } = await supabase.from('clubs').update({ name: data.name, description: data.description || null, location: data.location || null, logo_url: logoUrl || null, updated_at: new Date().toISOString() }).eq('id', club.id);
+      const { error } = await supabase.from('clubs').update({ name: data.name, description: data.description || null, location: data.location || null, club_type: data.club_type, logo_url: logoUrl || null, updated_at: new Date().toISOString() }).eq('id', club.id);
       if (error) throw error;
       toast({ title: "Успешно!", description: "Данные клуба обновлены" });
       navigate("/club-profile");
@@ -98,6 +100,16 @@ const EditClubProfile = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2"><Label htmlFor="name">Название клуба</Label><Input id="name" placeholder="Название клуба" {...register('name', { required: true })} /></div>
               <div className="space-y-2"><Label htmlFor="location">Местоположение</Label><Input id="location" placeholder="Город, страна" {...register('location')} /></div>
+              <div className="space-y-2">
+                <Label>Тип клуба</Label>
+                <Select defaultValue={club?.club_type || 'online'} onValueChange={(val) => setValue('club_type', val)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="online">🌐 Онлайн</SelectItem>
+                    <SelectItem value="offline">📍 Оффлайн</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               
               <div className="space-y-2"><Label htmlFor="logo">Логотип клуба</Label>{club?.logo_url && <div className="mb-2"><img src={club.logo_url} alt="Current logo" className="w-20 h-20 object-cover rounded" /></div>}<Input id="logo" type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) setLogoFile(file); }} /></div>
               <div className="space-y-2"><Label htmlFor="description">Описание клуба</Label><Textarea id="description" placeholder="Расскажите о вашем клубе" className="min-h-[120px]" {...register('description')} /></div>

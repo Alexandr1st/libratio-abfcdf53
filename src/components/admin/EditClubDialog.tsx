@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
 interface Club {
@@ -15,6 +16,7 @@ interface Club {
   location?: string;
   logo_url?: string;
   website?: string;
+  club_type?: string;
 }
 
 interface EditClubDialogProps {
@@ -33,6 +35,7 @@ const EditClubDialog = ({ club, open, onOpenChange }: EditClubDialogProps) => {
     description: "",
     location: "",
     logo_url: "",
+    club_type: "online",
   });
 
   useEffect(() => {
@@ -42,6 +45,7 @@ const EditClubDialog = ({ club, open, onOpenChange }: EditClubDialogProps) => {
         description: club.description || "",
         location: club.location || "",
         logo_url: club.logo_url || "",
+        club_type: club.club_type || "online",
       });
     }
     setLogoFile(null);
@@ -78,6 +82,7 @@ const EditClubDialog = ({ club, open, onOpenChange }: EditClubDialogProps) => {
           description: data.description || null,
           location: data.location || null,
           logo_url: logoUrl || null,
+          club_type: data.club_type,
           updated_at: new Date().toISOString(),
         })
         .eq("id", club.id);
@@ -140,6 +145,17 @@ const EditClubDialog = ({ club, open, onOpenChange }: EditClubDialogProps) => {
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             />
+          </div>
+
+          <div>
+            <Label>Тип клуба</Label>
+            <Select value={formData.club_type} onValueChange={(val) => setFormData({ ...formData, club_type: val })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="online">🌐 Онлайн</SelectItem>
+                <SelectItem value="offline">📍 Оффлайн</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
 

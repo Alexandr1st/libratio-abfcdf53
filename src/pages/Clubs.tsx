@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Users, MapPin } from "lucide-react";
+import { Users, MapPin, Globe, Wifi } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useClubs } from "@/hooks/useClubs";
 import { useToast } from "@/hooks/use-toast";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
@@ -47,9 +48,12 @@ const Clubs = () => {
                       </AvatarFallback>
                     </Avatar>
                     <div>
+                    <div className="flex items-center gap-2">
                       <CardTitle className="text-xl font-semibold">{club.name}</CardTitle>
+                      <Badge variant={club.club_type === 'online' ? 'secondary' : 'outline'} className="text-xs">
+                        {club.club_type === 'online' ? '🌐 Онлайн' : '📍 Оффлайн'}
+                      </Badge>
                     </div>
-                  </div>
                   <CardDescription>{club.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">

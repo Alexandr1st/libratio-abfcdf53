@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Building2, Users, Calendar } from "lucide-react";
 
@@ -22,6 +23,7 @@ const AdminClubDetail = () => {
     description: "",
     location: "",
     logo_url: "",
+    club_type: "online",
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
@@ -104,6 +106,7 @@ const AdminClubDetail = () => {
         description: club.description || "",
         location: club.location || "",
         logo_url: club.logo_url || "",
+        club_type: club.club_type || "online",
       });
       setLogoFile(null);
     }
@@ -137,6 +140,7 @@ const AdminClubDetail = () => {
           description: data.description || null,
           location: data.location || null,
           logo_url: logoUrl || null,
+          club_type: data.club_type,
           updated_at: new Date().toISOString(),
         })
         .eq("id", id);
@@ -280,6 +284,16 @@ const AdminClubDetail = () => {
                     />
                   </div>
 
+                  <div>
+                    <Label>Тип клуба</Label>
+                    <Select value={formData.club_type} onValueChange={(val) => setFormData({ ...formData, club_type: val })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="online">🌐 Онлайн</SelectItem>
+                        <SelectItem value="offline">📍 Оффлайн</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   <div className="flex justify-end gap-2 pt-4">
                     <Button 
