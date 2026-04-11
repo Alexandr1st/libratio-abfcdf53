@@ -1,0 +1,1 @@
+ALTER TABLE public.clubs ADD COLUMN club_type text NOT NULL DEFAULT 'online' CHECK (club_type IN ('online', 'offline'));

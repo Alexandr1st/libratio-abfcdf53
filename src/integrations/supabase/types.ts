@@ -416,6 +416,7 @@ export type Database = {
       }
       clubs: {
         Row: {
+          club_type: string
           contact_person_id: string | null
           created_at: string
           description: string | null
@@ -428,6 +429,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          club_type?: string
           contact_person_id?: string | null
           created_at?: string
           description?: string | null
@@ -440,6 +442,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          club_type?: string
           contact_person_id?: string | null
           created_at?: string
           description?: string | null
