@@ -6,7 +6,7 @@ import { useClubs } from "@/hooks/useClubs";
 import DiaryNavigation from "@/components/diary/DiaryNavigation";
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import BookCard from "@/components/BookCard";
+
 
 const ClubDetail = () => {
   const { id } = useParams<{ id: string }>();
