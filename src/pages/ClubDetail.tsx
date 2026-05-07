@@ -83,26 +83,10 @@ const ClubDetail = () => {
               
               <div className="flex items-center space-x-2"><Calendar className="h-5 w-5 text-gray-500" /><span>Создан {new Date(club.created_at).toLocaleDateString('ru-RU')}</span></div>
               <div className="flex items-center space-x-2"><Users className="h-5 w-5 text-gray-500" /><span>{members?.length || 0} участников</span></div>
+              <div className="flex items-center space-x-2"><Book className="h-5 w-5 text-gray-500" /><span>{clubBooks?.length || 0} книг</span></div>
             </div>
           </CardContent>
         </Card>
-
-        {/* Club Books */}
-        <div>
-          <h2 className="text-2xl font-bold mb-4 flex items-center space-x-2">
-            <Book className="h-6 w-6" />
-            <span>Книги клуба</span>
-          </h2>
-          {clubBooks && clubBooks.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {clubBooks.map((cb: any) => (
-                cb.books && <BookCard key={cb.id} book={cb.books} hideActions />
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground">Нет книг в библиотеке клуба</p>
-          )}
-        </div>
       </div>
     </div>
   );
